@@ -1,12 +1,27 @@
 #pragma once
 
+#ifdef WIN32
+
 #pragma comment(lib, "ws2_32.lib")
+#include <winsock2.h>
+#include <WS2tcpip.h>
+typedef SOCKET EN_SOCKET;
+
+#else
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+typedef int EN_SOCKET; 
+#define INVALID_SOCKET -1
+
+#endif
 
 #include <iostream>
 #include <string>
 #include <thread>
-#include <winsock2.h>
-#include <WS2tcpip.h>
+
 
 #include "EN_Functions.h"
 
@@ -18,7 +33,7 @@ namespace EN
 	private:
 
 		// Socket to connect to server
-		SOCKET ServerConnectionSocket = INVALID_SOCKET;
+		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
@@ -52,7 +67,7 @@ namespace EN
 		std::string GetIpAddr() { return IpAddres; }
 
 		// Socket getter
-		SOCKET* GetSocket() { return &ServerConnectionSocket; }
+		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
 
 		// Connect to localhost and default port
 		int Connect();

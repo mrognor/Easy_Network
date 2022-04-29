@@ -1,17 +1,27 @@
 #pragma once
 
-#pragma comment(lib, "ws2_32.lib")
+#ifdef WIN32
 
-#include <iostream>
-#include <string>
-#include <thread>
+#pragma comment(lib, "ws2_32.lib")
 #include <winsock2.h>
 #include <WS2tcpip.h>
+typedef SOCKET EN_SOCKET;
+
+#else
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+typedef int EN_SOCKET; 
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+
+#endif
 
 #include "EN_Functions.h"
+#include "thread"
 
-#define IP INADDR_ANY
-#define LOCALHOST "127.0.0.1"
 
 namespace EN
 {
@@ -37,7 +47,7 @@ namespace EN
 		std::string IpAddress = "127.0.0.1";
 
 		// Connected clients
-		std::vector<SOCKET> ClientSockets;
+		std::vector<EN_SOCKET> ClientSockets;
 
 		// The method that is executed when the client connects to the server
 		virtual void OnClientConnected(int ClientID) = 0;

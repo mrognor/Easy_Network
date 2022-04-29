@@ -4,6 +4,7 @@ namespace EN
 {
 	EN_TCP_Client::EN_TCP_Client()
 	{
+		#ifdef WIN32
 		//WSAStartup
 		WSAData wsaData;
 		// Winsock operation int result
@@ -15,6 +16,7 @@ namespace EN
 			std::cerr << "WSAStartup failed: " << OperationRes << std::endl;
 			exit(1);
 		}
+		#endif
 	}
 
 	int EN_TCP_Client::Connect()
@@ -32,7 +34,7 @@ namespace EN
 		IpAddres = ipAddr;
 		Port = port;
 
-		SOCKADDR_IN addr;
+		sockaddr_in addr;
 		int sizeofaddr = sizeof(addr);
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(port);
@@ -44,12 +46,12 @@ namespace EN
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
 		{
-			std::cerr << "Error at socket() : " << WSAGetLastError() << std::endl;
+			std::cerr << "Error at socket" << std::endl;
 		}
 
 		// Winsock operation int result
 		int OperationRes;
-		OperationRes = connect(ServerConnectionSocket, (SOCKADDR*)&addr, sizeof(addr));
+		OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
 
 		if (OperationRes != 0)
 			std::cerr << "Error: failed connect to server." << std::endl; 
@@ -97,9 +99,15 @@ namespace EN
 	void EN_TCP_Client::Disconnect()
 	{
 		BeforeDisconnect();
+
+		#ifdef WIN32
 		closesocket(ServerConnectionSocket);
 		ServerConnectionSocket = INVALID_SOCKET;
 		WSACleanup();
+		#else 
+		close(ServerConnectionSocket);
+		ServerConnectionSocket = INVALID_SOCKET;
+		#endif
 	}
 
 	EN_TCP_Client::~EN_TCP_Client()

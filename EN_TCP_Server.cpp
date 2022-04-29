@@ -4,6 +4,7 @@ namespace EN
 {
 	EN_TCP_Server::EN_TCP_Server()
 	{
+		#ifdef WIN32
 		//WSAStartup
 		WSAData wsaData;
 		if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
@@ -11,6 +12,7 @@ namespace EN
 			std::cerr << "Error: Library initialization failure." << std::endl;
 			exit(1);
 		}
+		#endif
 	}
 
 	int EN_TCP_Server::RecvFromClient(int ClientSocketID, std::string& message)
@@ -21,7 +23,13 @@ namespace EN
 		if (ConnectionStatus <= 0)
 		{
 			message = "";
+
+			#ifdef WIN32
 			closesocket(ClientSockets[ClientSocketID]);
+			#else 
+			close(ClientSockets[ClientSocketID]);
+			#endif
+
 			return ConnectionStatus;
 		}
 
@@ -33,7 +41,13 @@ namespace EN
 		if (ConnectionStatus <= 0)
 		{
 			message = "";
+
+			#ifdef WIN32
 			closesocket(ClientSockets[ClientSocketID]);
+			#else 
+			close(ClientSockets[ClientSocketID]);
+			#endif
+
 			return ConnectionStatus;
 		}
 
@@ -45,7 +59,7 @@ namespace EN
 	void EN_TCP_Server::Run()
 	{
 		// Configure ip address
-		SOCKADDR_IN ServerAddress;
+		sockaddr_in ServerAddress;
 		int sizeofaddr = sizeof(ServerAddress);
 		ServerAddress.sin_family = AF_INET;
 		ServerAddress.sin_port = htons(Port);
@@ -54,7 +68,7 @@ namespace EN
 		inet_pton(AF_INET, IpAddress.c_str(), &ServerAddress.sin_addr);
 
 		// Start socket to listen incoming connections
-		SOCKET ServerListenSocket = socket(AF_INET, SOCK_STREAM, NULL);
+		EN_SOCKET ServerListenSocket = socket(AF_INET, SOCK_STREAM, NULL);
 		
 		if (ServerListenSocket == INVALID_SOCKET)
 		{
@@ -62,7 +76,7 @@ namespace EN
 		}
 
 		int OperationRes;
-		OperationRes = bind(ServerListenSocket, (SOCKADDR*)&ServerAddress, sizeof(ServerAddress));
+		OperationRes = bind(ServerListenSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress));
 
 		if (OperationRes == SOCKET_ERROR)
 		{
@@ -76,21 +90,32 @@ namespace EN
 			std::cerr << "Error: cannot listen socket" << std::endl;
 		}
 
-		SOCKET IncomingConnection;
+		EN_SOCKET IncomingConnection;
 
 		// Handle new connections
 		while (true)
 		{
-			IncomingConnection = accept(ServerListenSocket, (SOCKADDR*)&ServerAddress, &sizeofaddr);
+			#ifdef WIN32
+			IncomingConnection = accept(ServerListenSocket, (sockaddr*)&ServerAddress, &sizeofaddr);
+			#else
+			IncomingConnection = accept(ServerListenSocket, (sockaddr*)&ServerAddress, (socklen_t*)&sizeofaddr);
+			#endif
 
 			// Shutdown server
 			if (IsShutdown == true)
 			{
-				for (SOCKET sock : ClientSockets)
+				for (EN_SOCKET sock : ClientSockets)
 				{
+					#ifdef WIN32
 					closesocket(sock);
+					#else
+					close(sock);
+					#endif
 				}
+				#ifdef WIN32
 				WSACleanup();
+				#endif
+
 				break;
 			}
 
@@ -105,7 +130,6 @@ namespace EN
 				{
 					if (ClientSockets[i] == INVALID_SOCKET)
 					{
-						//CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ClientHandler, (LPVOID)(i), NULL, NULL);
 						std::thread ClientHandlerThread([this, i]() { this->ClientHandler(i); });
 						ClientHandlerThread.detach();
 						ClientSockets[i] = IncomingConnection;
@@ -115,7 +139,6 @@ namespace EN
 				}
 				if (WasReusedSocket == false)
 				{
-					//CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ClientHandler, (LPVOID)(ClientSockets.size()), NULL, NULL);
 					std::thread ClientHandlerThread([this]() { this->ClientHandler(ClientSockets.size() - 1); });
 					ClientHandlerThread.detach();
 
@@ -145,7 +168,12 @@ namespace EN
 			ClientMessageHandler(message, ClientID);
 		}
 
+		#ifdef WIN32
 		closesocket(ClientID);
+		#else
+		close(ClientID);
+		#endif
+
 		ClientSockets[ClientID] = INVALID_SOCKET;
 		if (ClientID == ClientSockets.size() - 1)
 			ClientSockets.pop_back();
@@ -154,33 +182,42 @@ namespace EN
 
 	void EN_TCP_Server::DisconnectClient(int ClientID)
 	{
+		#ifdef WIN32
 		closesocket(ClientSockets[ClientID]);
+		#else
+		close(ClientSockets[ClientID]);
+		#endif
 	}
 
 	void EN_TCP_Server::Shutdown()
 	{
 		IsShutdown = true;
 
-		SOCKADDR_IN addr;
-		int sizeofaddr = sizeof(addr);
-		addr.sin_family = AF_INET;
-		addr.sin_port = htons(Port);
+		sockaddr_in CurrentServerAddress;
+		int sizeofaddr = sizeof(CurrentServerAddress);
+		CurrentServerAddress.sin_family = AF_INET;
+		CurrentServerAddress.sin_port = htons(Port);
 		
 		// Set ip address
-		inet_pton(AF_INET, IpAddress.c_str(), &addr.sin_addr);
+		inet_pton(AF_INET, IpAddress.c_str(), &CurrentServerAddress.sin_addr);
 
-		SOCKET ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, NULL);
+		EN_SOCKET ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, NULL);
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
 		{
-			std::cerr << "Error at socket() : " << WSAGetLastError() << std::endl;
+			std::cerr << "Error at socket " << std::endl;
 		}
 
-		int OperationRes = connect(ServerConnectionSocket, (SOCKADDR*)&addr, sizeof(addr));
+		int OperationRes = connect(ServerConnectionSocket, (sockaddr*)&CurrentServerAddress, sizeof(CurrentServerAddress));
 
 		if (OperationRes != 0)
 			std::cerr << "Error: failed connect to server." << std::endl;
-		closesocket(ServerConnectionSocket);
+		
+		#ifdef WIN32
+		closesocket(ClientSockets[ServerConnectionSocket]);
 		WSACleanup();
+		#else
+		close(ClientSockets[ServerConnectionSocket]);
+		#endif		
 	}
 }

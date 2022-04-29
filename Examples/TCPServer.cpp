@@ -7,6 +7,7 @@ class MyServer : public EN::EN_TCP_Server
 public:
 	MyServer()
 	{
+		//IpAddress = "192.168.1.69";
 		// IpAddress = IP to set real computer ip address
 		// IpAddress = LOCALHOST to set localhost computer ip
 		// Port = <put int here> to set port. Default port is 1111

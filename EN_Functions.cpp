@@ -2,16 +2,21 @@
 
 namespace EN
 {
-	void Send(SOCKET& sock, std::string message, int MessageDelay)
+	void Send(EN_SOCKET& sock, std::string message, int MessageDelay)
 	{
 		int msg_size = message.length();
 
 		send(sock, (char*)&msg_size, sizeof(int), NULL);
 		send(sock, message.c_str(), message.length(), NULL);
+
+		#ifdef WIN32
 		Sleep(MessageDelay);
+		#else
+		sleep(MessageDelay);
+		#endif
 	}
 
-	int Recv(SOCKET& sock, std::string& message)
+	int Recv(EN_SOCKET& sock, std::string& message)
 	{
 		int msg_size;
 		int ConnectionStatus = recv(sock, (char*)&msg_size, sizeof(int), NULL);
@@ -19,7 +24,13 @@ namespace EN
 		if (ConnectionStatus <= 0)
 		{
 			message = "";
+
+			#ifdef WIN32
 			closesocket(sock);
+			#else 
+			close(sock);
+			#endif
+
 			return ConnectionStatus;
 		}
 
@@ -31,7 +42,13 @@ namespace EN
 		if (ConnectionStatus <= 0)
 		{
 			message = "";
+
+			#ifdef WIN32
 			closesocket(sock);
+			#else 
+			close(sock);
+			#endif
+
 			return ConnectionStatus;
 		}
 
