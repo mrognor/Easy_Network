@@ -1,6 +1,11 @@
 # Easy_Network
 Simple C++ network library
-# Installation guide
+# Library usage 
+Before you start, I advise you to download the code examples. For linux, you can save files to one folder, and for visual studio, you will need to add these files to different projects  
+Full client example: https://github.com/mrognor/Easy_Network/blob/master/Client.cpp  
+Full server example: https://github.com/mrognor/Easy_Network/blob/master/Server.cpp  
+
+## Windows library usage guide
 1. Download the latest release from github
 2. Create a new project in visual studio
 3. Click project -> properties
@@ -22,6 +27,21 @@ and add the path to the lib library folder there
 6. Open menu on Linker -> Input -> Additional Dependencies and add "EasyNetwork.lib" here. 
 ![image](https://user-images.githubusercontent.com/47296449/165808413-9a2e783d-5a25-4829-858e-c48ed7267bac.png)
 
-7. The configuration of the project for working with the library is completed. Now you can take the code samples and try to compile yourself
-Full client example: https://github.com/mrognor/Easy_Network/blob/master/Client.cpp  
-Full server example: https://github.com/mrognor/Easy_Network/blob/master/Server.cpp
+7. The configuration of the project for working with the library is completed. Now you can use the code samples and try to make own programm  
+
+
+## Linux library usage
+1. Download the latest release from github
+2. You can extract library release archive to any folder. I will save everything in one folder for convenience
+
+![image](https://user-images.githubusercontent.com/47296449/166112771-628c328f-cef5-4c75-a440-d018841f351b.png)
+
+3. Now all ready to compile your project  
+You can compile server using command:  
+`g++ -pthread TCPServer.cpp bin/libEasyNetwork.a -o server.sh`  
+You can compile client using command:   
+`g++ -pthread TCPClient.cpp bin/libEasyNetwork.a -o client.sh`  
+4. Run your programs using command:  
+`./server.sh` and `./client.sh`
+
+![image](https://user-images.githubusercontent.com/47296449/166113135-c9fc8b7d-bf3a-4589-bdce-3582c5f7abd0.png)
