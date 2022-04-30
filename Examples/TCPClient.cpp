@@ -7,14 +7,7 @@ class MyClient : public EN::EN_TCP_Client
 public:
 	bool IsConnected = false;
 
-	MyClient()
-	{
-		// IpAddres = <std::string address> to set server ip
-		// Example: IpAddress = "192.168.1.69"
-		// By default set to 127.0.0.1(localhost)
-		// Port = <put int here> to set port. Default port is 1111
-		//IpAddres = "192.168.1.69";
-	}
+	MyClient(){}
 
 	// A function to be defined by the user. It is used for logic after connection
 	void AfterConnect()

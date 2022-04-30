@@ -32,6 +32,12 @@ namespace EN
 	{
 	private:
 
+		// Default port
+		int Port = 1111;
+
+		// Client ip address string. Default set to localhost
+		std::string IpAddres = "127.0.0.1";
+
 		// Socket to connect to server
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
@@ -40,12 +46,6 @@ namespace EN
 		void ServerHandler();
 
 	protected:
-
-		// Default port
-		int Port = 1111;
-
-		// Client ip address string. Default set to localhost
-		std::string IpAddres = "127.0.0.1";
 
 		// A function to be defined by the user. It is used for logic after connection
 		virtual void AfterConnect() = 0;
