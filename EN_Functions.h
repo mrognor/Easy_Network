@@ -31,4 +31,6 @@ namespace EN
 
 	// Divides the string to std::vector<std::string>. Second string is string divider
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString);
+
+	void SendFile(SOCKET& FileSendSocket, std::string FilePath);
 }

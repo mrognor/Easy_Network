@@ -1,4 +1,5 @@
 #include "EN_Functions.h"
+#include <fstream>
 
 namespace EN
 {
@@ -88,5 +89,9 @@ namespace EN
 		}
 		ReturnVector.push_back(SplittedString);
 		return ReturnVector;
+	}
+
+	void SendFile(SOCKET& FileSendSocket, std::string FilePath)
+	{
 	}
 }
