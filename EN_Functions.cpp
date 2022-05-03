@@ -1,5 +1,4 @@
 #include "EN_Functions.h"
-#include <fstream>
 
 namespace EN
 {
@@ -10,11 +9,11 @@ namespace EN
 		send(sock, (char*)&msg_size, sizeof(int), NULL);
 		send(sock, message.c_str(), message.length(), NULL);
 
-		#ifdef WIN32
+#ifdef WIN32
 		Sleep(MessageDelay);
-		#else
+#else
 		usleep(MessageDelay);
-		#endif
+#endif
 	}
 
 	int Recv(EN_SOCKET& sock, std::string& message)
@@ -26,11 +25,11 @@ namespace EN
 		{
 			message = "";
 
-			#ifdef WIN32
+#ifdef WIN32
 			closesocket(sock);
-			#else 
+#else 
 			close(sock);
-			#endif
+#endif
 
 			return ConnectionStatus;
 		}
@@ -44,11 +43,11 @@ namespace EN
 		{
 			message = "";
 
-			#ifdef WIN32
+#ifdef WIN32
 			closesocket(sock);
-			#else 
+#else 
 			close(sock);
-			#endif
+#endif
 
 			return ConnectionStatus;
 		}
@@ -96,11 +95,11 @@ namespace EN
 		return ReturnVector;
 	}
 
-	void SendFile(SOCKET& FileSendSocket, std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	void SendFile(EN_SOCKET& FileSendSocket, std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
-		
+
 		// Char array to keep file chunks
 		char* MessageBuf = new char[SendFileBufLen];
 		memset(MessageBuf, NULL, SendFileBufLen);
@@ -122,15 +121,20 @@ namespace EN
 		{
 			std::time_t t = std::time(0);
 			uint64_t LastSendMessageSize = 0;
+
+			// Skip while loop if file size less when send buffer
+			if (FileSize < SendFileBufLen)
+				goto SendLittleFile;
+
 			while (SendMessageSize < FileSize - SendFileBufLen)
 			{
 				// Print sending status
 				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
-					{
-						ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
-						LastSendMessageSize = SendMessageSize;
-						t = std::time(0);
-					}
+				{
+					ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
+					LastSendMessageSize = SendMessageSize;
+					t = std::time(0);
+				}
 
 				// Read binary data
 				SendingFile.read(MessageBuf, SendFileBufLen);
@@ -149,6 +153,9 @@ namespace EN
 				memset(MessageBuf, NULL, SendFileBufLen);
 			}
 
+			// End while loop skipping
+		SendLittleFile:
+
 			SendingFile.read(MessageBuf, SendFileBufLen);
 			send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
 
@@ -157,9 +164,11 @@ namespace EN
 
 			SendingFile.close();
 		}
+
+		delete[] MessageBuf;
 	}
 
-	void RecvFile(SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	void RecvFile(EN_SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
@@ -170,7 +179,7 @@ namespace EN
 
 		// Create received file
 		std::ofstream ReceivedFile("r" + FileName, std::ios::binary | std::ios::trunc);
-		// Already received kbytes
+		// Already received bytes
 		uint64_t ReceivedMessageSize = 0;
 
 		// Receivef file buffer 
@@ -180,11 +189,16 @@ namespace EN
 		{
 			std::time_t t = std::time(0);
 			uint64_t LastReceivedMessageSize = 0;
+
+			// Skip while loop if file size less when send buffer
+			if (FileSize < SendFileBufLen)
+				goto RecvLittleFile;
+
 			while (ReceivedMessageSize < FileSize - SendFileBufLen)
 			{
 				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
 				{
-					ProgressFunction(ReceivedMessageSize, FileSize, ReceivedMessageSize - LastReceivedMessageSize, (FileSize - ReceivedMessageSize)/(ReceivedMessageSize - LastReceivedMessageSize));
+					ProgressFunction(ReceivedMessageSize, FileSize, ReceivedMessageSize - LastReceivedMessageSize, (FileSize - ReceivedMessageSize) / (ReceivedMessageSize - LastReceivedMessageSize));
 					LastReceivedMessageSize = ReceivedMessageSize;
 					t = std::time(0);
 				}
@@ -204,6 +218,8 @@ namespace EN
 				memset(MessageBuf, NULL, SendFileBufLen);
 			}
 
+			// End skipping while loop
+		RecvLittleFile:
 			int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
 			if (ReceiveBytes <= 0)
@@ -214,16 +230,17 @@ namespace EN
 				return;
 			}
 
-			ReceivedFile.write(MessageBuf, SendFileBufLen);
+			ReceivedFile.write(MessageBuf, FileSize);
 
 
 			if (ProgressFunction != nullptr)
 				ProgressFunction(FileSize, FileSize, 0, 0);
+
+			ReceivedFile.close();
 		}
-		
-		ReceivedFile.close();
+		delete[] MessageBuf;
 	}
-	
+
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)
 	{
 		std::string AllMeasureName, SpeedName, Eta;

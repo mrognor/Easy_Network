@@ -9,6 +9,7 @@ typedef SOCKET EN_SOCKET;
 
 #else
 
+#include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -21,6 +22,7 @@ typedef int EN_SOCKET;
 #include <string>
 #include <vector>
 #include <ctime>
+#include <fstream>
 
 #define SendFileBufLen 1024
 
@@ -39,10 +41,10 @@ namespace EN
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString);
 
 	// Functions gets socket and filename and send file to socket
-	void SendFile(SOCKET& FileSendSocket, std::string FilePath, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)=nullptr);
+	void SendFile(EN_SOCKET& FileSendSocket, std::string FilePath, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	// This function will wait file
-	void RecvFile(SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)=nullptr);
+	void RecvFile(EN_SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
 }

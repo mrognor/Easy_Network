@@ -1,5 +1,5 @@
 #include <iostream>
-#include "..\EN_TCP_FileSender.h"
+#include "../EN_TCP_FileSender.h"
 
 int main()
 {
