@@ -38,14 +38,14 @@ namespace EN
 		// Client ip address string. Default set to localhost
 		std::string IpAddres = "127.0.0.1";
 
-		// Socket to connect to server
-		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
-
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
 
 	protected:
+
+		// Socket to connect to server
+		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
 		// A function to be defined by the user. It is used for logic after connection
 		virtual void AfterConnect() = 0;

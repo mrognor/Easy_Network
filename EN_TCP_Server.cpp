@@ -18,7 +18,7 @@ namespace EN
 	int EN_TCP_Server::RecvFromClient(int ClientSocketID, std::string& message)
 	{
 		int msg_size;
-		int ConnectionStatus = recv(ClientSockets[ClientSocketID], (char*)&msg_size, sizeof(int), NULL);
+		int ConnectionStatus = recv(ClientSockets[ClientSocketID], (char*)&msg_size, sizeof(int), MSG_WAITALL);
 
 		if (ConnectionStatus <= 0)
 		{
@@ -36,7 +36,7 @@ namespace EN
 		char* msg = new char[msg_size + 1];
 		msg[msg_size] = '\0';
 
-		ConnectionStatus = recv(ClientSockets[ClientSocketID], msg, msg_size, NULL);
+		ConnectionStatus = recv(ClientSockets[ClientSocketID], msg, msg_size, MSG_WAITALL);
 
 		if (ConnectionStatus <= 0)
 		{
@@ -122,6 +122,8 @@ namespace EN
 			if (IncomingConnection == INVALID_SOCKET)
 			{
 				std::cerr << "Error: Client connection failure." << std::endl;
+				std::cerr << "Tip: check server ip" << std::endl;
+				break;
 			}
 			else
 			{
