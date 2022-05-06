@@ -51,8 +51,10 @@ int main()
 			A.RecvMessageFromServer(responce);
 			if (responce == "ok")
 			{
-				A.RecvFileFromServer();
-				std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+				if(A.RecvFileFromServer())
+					std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+				else 
+					std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
 			}
 			else
 			{

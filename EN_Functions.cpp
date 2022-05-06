@@ -95,7 +95,7 @@ namespace EN
 		return ReturnVector;
 	}
 
-	bool SendFile(EN_SOCKET& FileSendSocket, std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool SendFile(EN_SOCKET& FileSendSocket, std::string FileName, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
@@ -130,10 +130,15 @@ namespace EN
 
 			while (SendMessageSize < FileSize - SendFileBufLen)
 			{
+				if (IsStop == true)
+				{
+					IsStop = false;
+					return false;
+				}
 				// Print sending status
 				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
 				{
-					ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
+					//ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
 					LastSendMessageSize = SendMessageSize;
 					t = std::time(0);
 				}
@@ -184,7 +189,7 @@ namespace EN
 		return true;
 	}
 
-	bool RecvFile(EN_SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool RecvFile(EN_SOCKET& FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
@@ -217,6 +222,14 @@ namespace EN
 
 			while (ReceivedMessageSize < FileSize - SendFileBufLen)
 			{
+				if (IsStop == true)
+				{
+					IsStop = false;
+					ReceivedFile.close();
+					remove(("r" + FileName).c_str());
+					return false;
+				}
+
 				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
 				{
 					ProgressFunction(ReceivedMessageSize, FileSize, ReceivedMessageSize - LastReceivedMessageSize, (FileSize - ReceivedMessageSize) / (ReceivedMessageSize - LastReceivedMessageSize));

@@ -20,12 +20,12 @@ public:
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
-
+		bool f = false;
 		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
 		if (message.find("send file") != -1)
 		{
-			EN::RecvFile(ClientSockets[ClientID], EN::DownloadStatus);
+			EN::RecvFile(ClientSockets[ClientID], f, EN::DownloadStatus);
 			return;
 		}
 
@@ -34,7 +34,7 @@ public:
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
 				EN::Send(ClientSockets[ClientID], "ok");
-				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], EN::DownloadStatus);
+				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], f, EN::DownloadStatus);
 			}
 			else
 				EN::Send(ClientSockets[ClientID], "bad");

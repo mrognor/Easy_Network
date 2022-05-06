@@ -41,10 +41,10 @@ namespace EN
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString);
 
 	// Functions gets socket and filename and send file to socket
-	bool SendFile(EN_SOCKET& FileSendSocket, std::string FilePath, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool SendFile(EN_SOCKET& FileSendSocket, std::string FilePath, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	// This function will wait file
-	bool RecvFile(EN_SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool RecvFile(EN_SOCKET& FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	// This function will print information about file downloading
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
