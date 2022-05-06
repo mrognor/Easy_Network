@@ -19,17 +19,24 @@ namespace EN
 		#endif
 	}
 
-	int EN_TCP_Client::Connect()
+	bool EN_TCP_Client::IsConnected()
+	{
+		if (ServerConnectionSocket != INVALID_SOCKET)
+			return true;
+		else return false;
+	}
+
+	bool EN_TCP_Client::Connect()
 	{
 		return Connect(IpAddres, Port);
 	}
 
-	int EN_TCP_Client::Connect(int port)
+	bool EN_TCP_Client::Connect(int port)
 	{
 		return Connect(IpAddres, port);
 	}
 
-	int EN_TCP_Client::Connect(std::string ipAddr, int port)
+	bool EN_TCP_Client::Connect(std::string ipAddr, int port)
 	{
 		IpAddres = ipAddr;
 		Port = port;
@@ -53,13 +60,16 @@ namespace EN
 		int OperationRes;
 		OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
 
-		if (OperationRes != 0)
-			std::cerr << "Error: failed connect to server." << std::endl; 
-		else
+		if (OperationRes == 0)
+		{
 			AfterConnect();
-		
-		
-		return OperationRes;
+			return true;
+		}
+		else
+		{
+			std::cerr << "Error: failed connect to server." << std::endl;
+			return false;
+		}
 	}
 
 	void EN_TCP_Client::Run()
@@ -102,12 +112,11 @@ namespace EN
 
 		#ifdef WIN32
 		closesocket(ServerConnectionSocket);
-		ServerConnectionSocket = INVALID_SOCKET;
 		WSACleanup();
 		#else 
 		close(ServerConnectionSocket);
-		ServerConnectionSocket = INVALID_SOCKET;
 		#endif
+		ServerConnectionSocket = INVALID_SOCKET;
 	}
 
 	EN_TCP_Client::~EN_TCP_Client()

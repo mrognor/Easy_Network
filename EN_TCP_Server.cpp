@@ -113,7 +113,12 @@ namespace EN
 					#endif
 				}
 				#ifdef WIN32
+				closesocket(IncomingConnection); 
+				closesocket(ServerListenSocket);
 				WSACleanup();
+				#else
+				close(IncomingConnection);
+				close(ServerListenSocket);
 				#endif
 
 				break;
@@ -216,10 +221,10 @@ namespace EN
 			std::cerr << "Error: failed connect to server." << std::endl;
 		
 		#ifdef WIN32
-		closesocket(ClientSockets[ServerConnectionSocket]);
+		closesocket(ServerConnectionSocket);
 		WSACleanup();
 		#else
-		close(ClientSockets[ServerConnectionSocket]);
+		close(ServerConnectionSocket);
 		#endif		
 	}
 }

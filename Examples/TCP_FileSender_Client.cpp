@@ -8,22 +8,59 @@ int main()
 	getline(std::cin, ip);
 
 	EN_TCP_FileSender A;
-	A.Connect(ip, 1111);
+	
+	if (A.Connect(ip, 1111) == false)
+	{
+		std::cout << "Failed to connect" << std::endl;
+		return 0;
+	}
+
+	if(A.IsConnected())
+		A.SendToServer("FileSender client connected");
+
+	std::cout << "Connected to server" << std::endl;
 
 	std::string message;
 
 	while (true)
 	{
 		getline(std::cin, message);
-			
-		if (message.find("send file") != -1)
+
+		if (A.IsConnected() == false)
+			break;
+
+		std::vector<std::string> IntrepretedMessage = EN::Split(message);
+
+		if (message.find("send file") != -1 )
 		{
-			A.SendToServer("send file");
-			A.SendFileToServer(EN::Split(message)[2], EN::DownloadStatus);
+			if (EN::IsFileExist(IntrepretedMessage[2]))
+			{
+				A.SendToServer(message);
+				A.SendFileToServer(IntrepretedMessage[2], EN::DownloadStatus);
+			}
+			else 
+				std::cout << "No file: " << IntrepretedMessage[2] << " on this directory" << std::endl;
 			continue;
 		}
 
-		A.SendToServer(message);
+		if (message.find("get file") != -1 )
+		{
+			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
+			std::string responce;
+			A.SendToServer(message);
+			A.RecvMessageFromServer(responce);
+			if (responce == "ok")
+			{
+				A.RecvFileFromServer();
+				std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+			}
+			else
+			{
+				std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
+			}
+
+			continue;
+		}
 	}
 	A.Disconnect();
 

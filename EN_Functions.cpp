@@ -9,11 +9,11 @@ namespace EN
 		send(sock, (char*)&msg_size, sizeof(int), NULL);
 		send(sock, message.c_str(), message.length(), NULL);
 
-#ifdef WIN32
+		#ifdef WIN32
 		Sleep(MessageDelay);
-#else
+		#else
 		usleep(MessageDelay);
-#endif
+		#endif
 	}
 
 	int Recv(EN_SOCKET& sock, std::string& message)
@@ -25,11 +25,11 @@ namespace EN
 		{
 			message = "";
 
-#ifdef WIN32
+			#ifdef WIN32
 			closesocket(sock);
-#else 
+			#else 
 			close(sock);
-#endif
+			#endif
 
 			return ConnectionStatus;
 		}
@@ -43,11 +43,11 @@ namespace EN
 		{
 			message = "";
 
-#ifdef WIN32
+			#ifdef WIN32
 			closesocket(sock);
-#else 
+			#else 
 			close(sock);
-#endif
+			#endif
 
 			return ConnectionStatus;
 		}
@@ -95,7 +95,7 @@ namespace EN
 		return ReturnVector;
 	}
 
-	void SendFile(EN_SOCKET& FileSendSocket, std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool SendFile(EN_SOCKET& FileSendSocket, std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
@@ -116,6 +116,8 @@ namespace EN
 
 		// Sended kbytes
 		uint64_t SendMessageSize = 0;
+
+		int SendBytes;
 
 		if (SendingFile.is_open())
 		{
@@ -139,13 +141,13 @@ namespace EN
 				// Read binary data
 				SendingFile.read(MessageBuf, SendFileBufLen);
 				// Send data to server
-				int SendBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
+				SendBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
 
 				if (SendBytes <= 0)
 				{
 					std::cerr << "\nFailed to send file: " << FileName << std::endl;
 					SendingFile.close();
-					return;
+					return false;
 				}
 
 				// Add sending bytes
@@ -157,7 +159,14 @@ namespace EN
 		SendLittleFile:
 
 			SendingFile.read(MessageBuf, SendFileBufLen);
-			send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
+			SendBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
+
+			if (SendBytes <= 0)
+			{
+				std::cerr << "\nFailed to send file: " << FileName << std::endl;
+				SendingFile.close();
+				return false;
+			}
 
 			if (ProgressFunction != nullptr)
 				ProgressFunction(FileSize, FileSize, 0, 0);
@@ -165,14 +174,26 @@ namespace EN
 			SendingFile.close();
 		}
 
+		else
+		{
+			std::cerr << "\nFailed to open file: " << FileName << std::endl;
+			return false;
+		}
+
 		delete[] MessageBuf;
+		return true;
 	}
 
-	void RecvFile(EN_SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool RecvFile(EN_SOCKET& FileSendSocket, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
-		EN::Recv(FileSendSocket, FileInfo);
+		if (EN::Recv(FileSendSocket, FileInfo) <= 0)
+		{
+			std::cerr << "\nFailed to received file name" << std::endl;
+			return false;
+		}
+		
 
 		std::string FileName = Split(FileInfo)[0];
 		uint64_t FileSize = std::stoll(Split(FileInfo)[1]);
@@ -210,7 +231,7 @@ namespace EN
 					std::cerr << "\nFailed to received file: " << FileName << std::endl;
 					ReceivedFile.close();
 					remove(("r" + FileName).c_str());
-					return;
+					return false;
 				}
 
 				ReceivedMessageSize += ReceiveBytes;
@@ -227,7 +248,7 @@ namespace EN
 				std::cerr << "\nFailed to received file: " << FileName << std::endl;
 				ReceivedFile.close();
 				remove(("r" + FileName).c_str());
-				return;
+				return false;
 			}
 
 			ReceivedFile.write(MessageBuf, FileSize);
@@ -238,7 +259,14 @@ namespace EN
 
 			ReceivedFile.close();
 		}
+		else
+		{
+			std::cerr << "\nFailed to send file: " << FileName << std::endl;
+			return false;
+		}
+		
 		delete[] MessageBuf;
+		return true;
 	}
 
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)
@@ -280,5 +308,17 @@ namespace EN
 
 		if (current == all)
 			std::cout << "\nEnd file transfering" << std::endl;
+	}
+
+	bool IsFileExist(std::string filePath)
+	{
+		bool isExist = false;
+		std::ifstream fin(filePath.c_str());
+
+		if (fin.is_open())
+			isExist = true;
+
+		fin.close();
+		return isExist;
 	}
 }

@@ -69,14 +69,20 @@ namespace EN
 		// Socket getter
 		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
 
-		// Connect to localhost and default port
-		int Connect();
+		// Function return true if client connected to server
+		bool IsConnected();
 
-		// Connect to localhost and current port
-		int Connect(int port);
+		// Connect to localhost and default port. Return low-level function connect result.
+		// See platform documentation if you want get more information about errors
+		bool Connect();
 
-		// Connect to server with current ip and port
-		int Connect(std::string ipAddr, int port);
+		// Connect to localhost and current port. Return low-level function connect result.
+		// See platform documentation if you want get more information about errors
+		bool Connect(int port);
+
+		// Connect to server with current ip and port. Return low-level function connect result.
+		// See platform documentation if you want get more information about errors
+		bool Connect(std::string ipAddr, int port);
 
 		// Method to start server. Starts a thread to process server responses
 		// You have to determine BeforeDisconnect() and ServerMessageHandler()

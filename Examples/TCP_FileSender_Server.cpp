@@ -13,7 +13,6 @@ public:
 	void OnClientConnected(int ClientID)
 	{
 		std::cout << "Client Connected! id: " << ClientID << std::endl;
-		EN::Send(ClientSockets[ClientID], "Welcome. You are connected to server.");
 	}
 
 	void ClientMessageHandler(std::string message, int ClientID)
@@ -22,9 +21,23 @@ public:
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
 
-		if (message == "send file")
+		std::vector<std::string> InterpretedMessage = EN::Split(message);
+
+		if (message.find("send file") != -1)
 		{
 			EN::RecvFile(ClientSockets[ClientID], EN::DownloadStatus);
+			return;
+		}
+
+		if (message.find("get file") != -1)
+		{
+			if (EN::IsFileExist(InterpretedMessage[2]))
+			{
+				EN::Send(ClientSockets[ClientID], "ok");
+				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], EN::DownloadStatus);
+			}
+			else
+				EN::Send(ClientSockets[ClientID], "bad");
 			return;
 		}
 	}
