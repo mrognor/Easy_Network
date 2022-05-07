@@ -15,10 +15,16 @@ int main()
 		return 0;
 	}
 
+	std::cout << "Connected to server" << std::endl;
+
 	if(A.IsConnected())
 		A.SendToServer("FileSender client connected");
-
-	std::cout << "Connected to server" << std::endl;
+	else
+	{
+		std::cout << "Server disconnected" << std::endl;
+		return 0;
+	}
+	
 
 	std::string message;
 
@@ -27,8 +33,10 @@ int main()
 		getline(std::cin, message);
 
 		if (A.IsConnected() == false)
+		{
+			std::cout << "Server disconnected" << std::endl;
 			break;
-
+		}
 		std::vector<std::string> IntrepretedMessage = EN::Split(message);
 
 		if (message.find("send file") != -1 )

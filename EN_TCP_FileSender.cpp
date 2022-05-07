@@ -16,10 +16,22 @@ bool EN_TCP_FileSender::RecvFileFromServer()
 	return false;
 }
 
-void EN_TCP_FileSender::RecvMessageFromServer(std::string& msg)
+bool EN_TCP_FileSender::RecvMessageFromServer(std::string& msg)
 {
 	if (IsConnected())
-		EN::Recv(ServerConnectionSocket, msg);
+	{
+		bool IsServerConnected = EN::Recv(ServerConnectionSocket, msg);
+
+		if (IsServerConnected == false)
+		{
+			std::cerr << "Error! Failed receive message from server" << std::endl;
+			return false;
+		}
+	}
 	else
+	{
 		std::cerr << "Error! Failed receive message from server" << std::endl;
+		return false;
+	}
+	return true;
 }

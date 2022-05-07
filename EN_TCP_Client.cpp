@@ -80,15 +80,15 @@ namespace EN
 
 	void EN_TCP_Client::ServerHandler()
 	{
-		int serverStatus = 1;
+		bool IsServerConnected = true;
 		std::string message;
 
 		while (true)
 		{
-			serverStatus = Recv(ServerConnectionSocket, message);
+			IsServerConnected = Recv(ServerConnectionSocket, message);
 
-			// Means what socket closed
-			if (serverStatus <= 0)
+			// Means what server was disconnected
+			if (IsServerConnected == false)
 			{
 				Disconnect();
 				return;

@@ -32,7 +32,7 @@ namespace EN
 	void Send(EN_SOCKET& sock, std::string message, int MessageDelay = 10);
 
 	// Wrapper over the recv function. Allows you to recv std::string. Return 0 if socket disconnect, return < 0 if any errors.
-	int Recv(EN_SOCKET& sock, std::string& message);
+	bool Recv(EN_SOCKET& sock, std::string& message);
 
 	// Divides the string to std::vector<std::string> by " "(space).
 	std::vector<std::string> Split(std::string StringToSplit);

@@ -28,7 +28,7 @@ public:
 	bool RecvFileFromServer();
 
 	// Function to get message from server
-	void RecvMessageFromServer(std::string& msg);
+	bool RecvMessageFromServer(std::string& msg);
 
 	void StopDownloading() { IsStop = true; }
 };

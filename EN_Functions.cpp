@@ -16,7 +16,7 @@ namespace EN
 		#endif
 	}
 
-	int Recv(EN_SOCKET& sock, std::string& message)
+	bool Recv(EN_SOCKET& sock, std::string& message)
 	{
 		int msg_size;
 		int ConnectionStatus = recv(sock, (char*)&msg_size, sizeof(int), MSG_WAITALL);
@@ -31,7 +31,7 @@ namespace EN
 			close(sock);
 			#endif
 
-			return ConnectionStatus;
+			return false;
 		}
 
 		char* msg = new char[msg_size + 1];
@@ -49,12 +49,12 @@ namespace EN
 			close(sock);
 			#endif
 
-			return ConnectionStatus;
+			return false;
 		}
 
 		message = msg;
 		delete[] msg;
-		return ConnectionStatus;
+		return true;
 	}
 
 	std::vector<std::string> Split(std::string StringToSplit)
@@ -193,7 +193,7 @@ namespace EN
 	{
 		// Get file name and file size
 		std::string FileInfo;
-		if (EN::Recv(FileSendSocket, FileInfo) <= 0)
+		if (EN::Recv(FileSendSocket, FileInfo) == false)
 		{
 			std::cerr << "\nFailed to received file name" << std::endl;
 			return false;
