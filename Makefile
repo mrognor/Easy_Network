@@ -1,34 +1,30 @@
+all: file_sender chat
 
-all:
-	mkdir -p bin 
-	g++ EN_TCP_Server.cpp EN_Functions.cpp Examples/TCPServer.cpp -pthread -o bin/TCPServer.sh 
-	g++ EN_TCP_Client.cpp EN_Functions.cpp Examples/TCPClient.cpp -pthread -o bin/TCPClient.sh 
+file_sender: lib 
+	g++ Examples/TCP_FileSender_Server.cpp bin/libEasyNetwork.a -pthread -o bin/TCP_FileSender_Server.sh 
+	g++ Examples/TCP_FileSender_Client.cpp bin/libEasyNetwork.a -pthread -o bin/TCP_FileSender_Client.sh
 
-#TCPServer: EN_TCP_Server.o EN_Functions.o TCPServer.o
-#	mkdir bin
-#	g++ EN_TCP_Server.o EN_Functions.o Examples/TCPServer.o -pthread -o TCPServer.sh 
+chat: lib
+	g++ Examples/TCP_Chat_Server.cpp bin/libEasyNetwork.a -pthread -o bin/TCP_Chat_Server.sh 
+	g++ Examples/TCP_Chat_Client.cpp bin/libEasyNetwork.a -pthread -o bin/TCP_Chat_Client.sh 
 
-#TCPServer.o: Examples/TCPServer.cpp
-#	mkdir -p bin
-#	g++ -c Examples/TCPServer.cpp -o bin/TCPServer.o
-
-#Example_TCP_Client: EN_TCP_Client.o EN_Functions.o Client.o
-#	g++ EN_TCP_Client.o EN_Functions.o Client.o -pthread -o client.sh 
-
-lib: EN_Functions.o EN_TCP_Client.o EN_TCP_Server.o
-	mkdir -p bin
-	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o
+lib: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o
+	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o
 	ranlib bin/libEasyNetwork.a
-	
-EN_TCP_Server.o: EN_TCP_Server.cpp
+
+bin/EN_TCP_FileSender.o: EN_TCP_FileSender.cpp
+	mkdir -p bin
+	g++ -c EN_TCP_FileSender.cpp -o bin/EN_TCP_FileSender.o
+
+bin/EN_TCP_Server.o: EN_TCP_Server.cpp
 	mkdir -p bin
 	g++ -c EN_TCP_Server.cpp -o bin/EN_TCP_Server.o
 
-EN_TCP_Client.o: EN_TCP_Client.cpp
+bin/EN_TCP_Client.o: EN_TCP_Client.cpp
 	mkdir -p bin
 	g++ -c EN_TCP_Client.cpp -o bin/EN_TCP_Client.o
 
-EN_Functions.o: EN_Functions.cpp
+bin/EN_Functions.o: EN_Functions.cpp
 	mkdir -p bin
 	g++ -c EN_Functions.cpp -o bin/EN_Functions.o
 
