@@ -85,7 +85,7 @@ namespace EN
 
 		while (true)
 		{
-			IsServerConnected = Recv(ServerConnectionSocket, message);
+			IsServerConnected = TCP_Recv(ServerConnectionSocket, message);
 
 			// Means what server was disconnected
 			if (IsServerConnected == false)
@@ -102,7 +102,7 @@ namespace EN
 	void EN_TCP_Client::SendToServer(std::string message, int MessageDelay)
 	{
 		if (ServerConnectionSocket != INVALID_SOCKET)
-			Send(ServerConnectionSocket, message);
+			TCP_Send(ServerConnectionSocket, message);
 		else std::cerr << "Error: the server is not connected" << std::endl;
 	}
 

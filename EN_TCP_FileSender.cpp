@@ -20,7 +20,7 @@ bool EN_TCP_FileSender::RecvMessageFromServer(std::string& msg)
 {
 	if (IsConnected())
 	{
-		bool IsServerConnected = EN::Recv(ServerConnectionSocket, msg);
+		bool IsServerConnected = EN::TCP_Recv(ServerConnectionSocket, msg);
 
 		if (IsServerConnected == false)
 		{

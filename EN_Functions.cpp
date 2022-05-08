@@ -2,7 +2,7 @@
 
 namespace EN
 {
-	void Send(EN_SOCKET& sock, std::string message, int MessageDelay)
+	void TCP_Send(EN_SOCKET& sock, std::string message, int MessageDelay)
 	{
 		int msg_size = message.length();
 
@@ -16,7 +16,7 @@ namespace EN
 		#endif
 	}
 
-	bool Recv(EN_SOCKET& sock, std::string& message)
+	bool TCP_Recv(EN_SOCKET& sock, std::string& message)
 	{
 		int msg_size;
 		int ConnectionStatus = recv(sock, (char*)&msg_size, sizeof(int), MSG_WAITALL);
@@ -109,7 +109,7 @@ namespace EN
 		uint64_t FileSize = SendingFile.tellg();
 
 		// Send file name and file size
-		EN::Send(FileSendSocket, FileName + " " + std::to_string(FileSize));
+		EN::TCP_Send(FileSendSocket, FileName + " " + std::to_string(FileSize));
 
 		// See file start
 		SendingFile.seekg(0, std::ios::beg);
@@ -193,7 +193,7 @@ namespace EN
 	{
 		// Get file name and file size
 		std::string FileInfo;
-		if (EN::Recv(FileSendSocket, FileInfo) == false)
+		if (EN::TCP_Recv(FileSendSocket, FileInfo) == false)
 		{
 			std::cerr << "\nFailed to received file name" << std::endl;
 			return false;
