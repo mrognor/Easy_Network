@@ -1,73 +1,79 @@
-/*
-	Simple udp client
-*/
-#include<stdio.h>
-#include<winsock2.h>
+#include <iostream>
+#include "../EN_TCP_FileSender.h"
 
-#pragma comment(lib,"ws2_32.lib") //Winsock Library
-
-#define SERVER "127.0.0.1"	//ip address of udp server
-#define BUFLEN 512	//Max length of buffer
-#define PORT 8888	//The port on which to listen for incoming data
-
-int main(void)
+int main()
 {
-	struct sockaddr_in si_other;
-	int s, slen = sizeof(si_other);
-	char buf[BUFLEN];
-	char message[BUFLEN];
-	WSADATA wsa;
+	std::cout << "Write server ip" << std::endl;
+	std::string ip;
+	getline(std::cin, ip);
 
-	//Initialise winsock
-	printf("\nInitialising Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
-	}
-	printf("Initialised.\n");
+	EN_TCP_FileSender A;
 
-	//create socket
-	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
+	if (A.Connect(ip, 1111) == false)
 	{
-		printf("socket() failed with error code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
+		std::cout << "Failed to connect" << std::endl;
+		return 0;
 	}
 
-	//setup address structure
-	memset((char*)&si_other, 0, sizeof(si_other));
-	si_other.sin_family = AF_INET;
-	si_other.sin_port = htons(PORT);
-	si_other.sin_addr.S_un.S_addr = inet_addr(SERVER);
+	std::cout << "Connected to server" << std::endl;
 
-	//start communication
-	while (1)
+	if (A.IsConnected())
+		A.SendToServer("FileSender client connected");
+	else
 	{
-		printf("Enter message : ");
-		gets(message);
+		std::cout << "Server disconnected" << std::endl;
+		return 0;
+	}
 
-		//send the message
-		if (sendto(s, message, strlen(message), 0, (struct sockaddr*)&si_other, slen) == SOCKET_ERROR)
+
+	std::string message;
+
+	while (true)
+	{
+		getline(std::cin, message);
+
+		if (A.IsConnected() == false)
 		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
+			std::cout << "Server disconnected" << std::endl;
+			break;
+		}
+		std::vector<std::string> IntrepretedMessage = EN::Split(message);
+
+		if (message.find("send file") != -1)
+		{
+			if (EN::IsFileExist(IntrepretedMessage[2]))
+			{
+				A.SendToServer(message);
+				A.SendFileToServer(IntrepretedMessage[2], EN::DownloadStatus);
+			}
+			else
+				std::cout << "No file: " << IntrepretedMessage[2] << " on this directory" << std::endl;
+			continue;
 		}
 
-		//receive a reply and print it
-		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN);
-		//try to receive some data, this is a blocking call
-		if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr*)&si_other, &slen) == SOCKET_ERROR)
+		if (message.find("get file") != -1)
 		{
-			printf("recvfrom() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
+			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
+			std::string responce;
+			A.SendToServer(message);
+			A.RecvMessageFromServer(responce);
+			if (responce == "ok")
+			{
+				if (A.RecvFileFromServer())
+					std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+				else
+					std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
+			}
+			else
+			{
+				std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
+			}
+
+			continue;
 		}
-
-		puts(buf);
 	}
+	A.Disconnect();
 
-	closesocket(s);
-	WSACleanup();
-
+	system("pause");
 	return 0;
 }

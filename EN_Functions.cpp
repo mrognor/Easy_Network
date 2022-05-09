@@ -138,7 +138,7 @@ namespace EN
 				// Print sending status
 				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
 				{
-					//ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
+					ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
 					LastSendMessageSize = SendMessageSize;
 					t = std::time(0);
 				}

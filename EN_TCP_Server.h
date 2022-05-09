@@ -35,7 +35,7 @@ namespace EN
 		// A method that processes messages from clients. Sends a message to the function ClientMessageHandler().
 		void ClientHandler(int ClientID);
 
-		// The method that receives messages from the server. The first parameter is the socket index in the vector
+		// The method that receives messages from the client. The first parameter is the socket index in the vector
 		int RecvFromClient(int ClientSocketID, std::string& message);
 
 	protected:

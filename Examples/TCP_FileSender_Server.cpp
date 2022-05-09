@@ -1,80 +1,79 @@
-#include<stdio.h>
-#include<winsock2.h>
+#include <iostream>
+#include "../EN_TCP_Server.h"
 
-#pragma comment(lib,"ws2_32.lib") //Winsock Library
+class MyServer : public EN::EN_TCP_Server
+{
+public:
+	MyServer(std::string ip)
+	{
+		IpAddress = ip; //Default set to localhost
+		// Port = <put int here> to set port. Default port is 1111
+	}
 
-#define BUFLEN 512	//Max length of buffer
-#define PORT 8888	//The port on which to listen for incoming data
+	void OnClientConnected(int ClientID)
+	{
+		std::cout << "Client Connected! id: " << ClientID << std::endl;
+	}
+
+	void ClientMessageHandler(std::string message, int ClientID)
+	{
+		// Important. This function is run in a separate thread. 
+		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
+		std::cout << message << std::endl;
+		bool ShouldShutdown = false;
+		std::vector<std::string> InterpretedMessage = EN::Split(message);
+
+		if (message.find("send file") != -1)
+		{
+			EN::RecvFile(ClientSockets[ClientID], ShouldShutdown, EN::DownloadStatus);
+			return;
+		}
+
+		if (message.find("get file") != -1)
+		{
+			if (EN::IsFileExist(InterpretedMessage[2]))
+			{
+				EN::TCP_Send(ClientSockets[ClientID], "ok");
+				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus);
+			}
+			else
+				EN::TCP_Send(ClientSockets[ClientID], "bad");
+			return;
+		}
+	}
+
+	void OnClientDisconnect(int ClientID)
+	{
+		std::cout << "Client disconnected! ID: " << ClientID << std::endl;
+	}
+};
+
 
 int main()
 {
-	SOCKET s;
-	struct sockaddr_in server, si_other;
-	int slen, recv_len;
-	char buf[BUFLEN];
-	WSADATA wsa;
+	std::cout << "Write server ip" << std::endl;
+	std::string ip;
+	getline(std::cin, ip);
+	MyServer A(ip);
+	A.Run();
 
-	slen = sizeof(si_other);
 
-	//Initialise winsock
-	printf("\nInitialising Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	// Uncomment this code to make server standart console input.
+	// Using this you can write logic to kick clients or shutdown server
+	/*
+	MyServer A;
+	std::thread th([&A]() { A.Run(); });
+	th.detach();
+	std::string message;
+	while (true)
 	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
-	}
-	printf("Initialised.\n");
-
-	//Create a socket
-	if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
-	{
-		printf("Could not create socket : %d", WSAGetLastError());
-	}
-	printf("Socket created.\n");
-
-	//Prepare the sockaddr_in structure
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons(PORT);
-
-	//Bind
-	if (bind(s, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
-	{
-		printf("Bind failed with error code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
-	}
-	puts("Bind done");
-
-	//keep listening for data
-	while (1)
-	{
-		printf("Waiting for data...");
-		fflush(stdout);
-
-		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN);
-
-		//try to receive some data, this is a blocking call
-		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr*)&si_other, &slen)) == SOCKET_ERROR)
+		getline(std::cin, message);
+		if (message == "f")
 		{
-			printf("recvfrom() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
-		}
-
-		//print details of the client/peer and the data received
-		printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-		printf("Data: %s\n", buf);
-
-		//now reply the client with the same data
-		if (sendto(s, buf, recv_len, 0, (struct sockaddr*)&si_other, slen) == SOCKET_ERROR)
-		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
+			A.Shutdown();
+			break;
 		}
 	}
-
-	closesocket(s);
-	WSACleanup();
-
-	return 0;
+	*/
+	system("pause");
 }
