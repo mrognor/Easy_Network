@@ -32,6 +32,11 @@ int main()
 		if (msg == "exit()")
 			break;
 		
+		if (msg == "stress test")
+		{
+			for (int i = 0; i < 100; i++)
+				A.SendToServer("No bitches?");
+		}
 		A.SendToServer(msg);
 	}
 

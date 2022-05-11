@@ -20,6 +20,12 @@ typedef int EN_SOCKET;
 #endif
 
 #include "EN_Functions.h"
+#include <thread>
+#include <mutex>
+#include <queue>
+#include <vector>
+#include <string>
+#include <condition_variable>
 
 namespace EN
 {
@@ -37,6 +43,8 @@ namespace EN
 
 		EN_SOCKET s;
 
+		int ThreadAmount = 8;
+
 		// Method that processes incoming messages
 		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr) = 0;
 
@@ -45,6 +53,8 @@ namespace EN
 		sockaddr_in server;
 
 	public:
+
+		void Call(std::string message, sockaddr_in ClientSocketAddr) { ClientMessageHandler(message, ClientSocketAddr); }
 
 		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
 		EN_UDP_Server();

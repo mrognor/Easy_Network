@@ -11,6 +11,7 @@ public:
 		// MaxMessageSize = <put int here> to set max message size. Default set to 256.
 		// You have to set synchronizied it with client
 		MaxMessageSize = 512;
+		ThreadAmount = 1;
 	}
 
 	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr)
@@ -20,6 +21,8 @@ public:
 
 		std::cout << "Message: " << message << " Ip: " << str <<
 			" Port: " << ntohs(ClientSocketAddr.sin_port) << std::endl;
+
+		Sleep(1000);
 
 		if (message == "f")
 			Shutdown();

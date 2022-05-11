@@ -2,6 +2,23 @@
 
 namespace EN
 {
+	void ThreadQueueHandler(EN_UDP_Server* server, std::queue<std::string>* Queue, std::queue<sockaddr_in>* QueueAddr, std::condition_variable* cv)
+	{
+		std::mutex mtx;
+		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
+		while (true)
+		{
+			while (!Queue->empty())
+			{
+				server->Call(Queue->front(), QueueAddr->front());
+				//std::cout << Queue->front() << std::endl;
+				Queue->pop();
+				QueueAddr->pop();
+			}
+			cv->wait(unique_lock_mutex);
+		}
+	}
+
 	EN_UDP_Server::EN_UDP_Server()
 	{
 		#ifdef WIN32
@@ -45,6 +62,29 @@ namespace EN
 
 		slen = sizeof(si_other);
 
+		std::queue<std::string>** QueueVec = new std::queue<std::string>*[ThreadAmount];
+		std::queue<sockaddr_in>** QueueAddrVec = new std::queue<sockaddr_in>*[ThreadAmount];
+		std::condition_variable** CondVarVec = new std::condition_variable * [ThreadAmount];
+		std::thread* ThreadVec = new std::thread[ThreadAmount];
+
+
+		for (int i = 0; i < ThreadAmount; i++)
+		{
+			sockaddr_in addr;
+			//Prepare the sockaddr_in structure
+			addr.sin_family = AF_INET;
+			addr.sin_port = htons(Port);
+
+			// Set ip address
+			inet_pton(AF_INET, IpAddress.c_str(), &addr.sin_addr);
+
+			QueueVec[i] = new std::queue<std::string>;
+			CondVarVec[i] = new std::condition_variable;
+			QueueAddrVec[i] = new std::queue<sockaddr_in>;;
+			ThreadVec[i] = std::thread(ThreadQueueHandler, this, QueueVec[i], QueueAddrVec[i], CondVarVec[i]);
+			ThreadVec[i].detach();
+		}
+
 		//keep listening for data
 		while (true)
 		{
@@ -61,9 +101,32 @@ namespace EN
 				exit(EXIT_FAILURE);
 			}
 
-			if(std::string(buf) != "")
-				ClientMessageHandler(buf, si_other);
+			if (std::string(buf) != "")
+			{
+				int IndexMinQueue = 0;
+				for (int i = 1; i < ThreadAmount; i++)
+				{
+					if (QueueVec[i]->size() < QueueVec[IndexMinQueue]->size())
+						IndexMinQueue = i;
+				}
+
+				QueueVec[IndexMinQueue]->push(buf);
+				QueueAddrVec[IndexMinQueue]->push(si_other);
+				CondVarVec[IndexMinQueue]->notify_one();
+			}
 		}	
+
+		for (int i = 0; i < ThreadAmount; i++)
+		{
+			delete QueueVec[i];
+			delete QueueAddrVec[i];
+			delete CondVarVec[i];
+		}
+
+		delete[] QueueVec;
+		delete[] QueueAddrVec;
+		delete[] CondVarVec;
+		delete[] ThreadVec;
 
 		delete[] buf;
 		#ifdef WIN32
