@@ -40,16 +40,16 @@ namespace EN
 	void EN_UDP_Client::ServerHandler()
 	{
 		// Get port from os
-		sendto(ServerConnectionSocket, "", BUFLEN, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
+		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
 
-		char Message[BUFLEN];
-		memset(Message, '\0', BUFLEN);
+		char* Message = new char[MaxMessageSize];
+		memset(Message, '\0', MaxMessageSize);
 
 		int sizeofaddr = sizeof(ServerSockAddr);
 		int OperationRes;
 		while (true)
 		{
-			OperationRes = recvfrom(ServerConnectionSocket, Message, BUFLEN, 0, (sockaddr*)&ServerSockAddr, &sizeofaddr);
+			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, &sizeofaddr);
 
 			if (OperationRes > 0)
 			{
@@ -61,11 +61,13 @@ namespace EN
 				break;
 			}
 		}
+
+		delete[] Message;
 	}
 
 	void EN_UDP_Client::SendToServer(std::string message, int MessageDelay)
 	{
-		if (sendto(ServerConnectionSocket, message.c_str(), BUFLEN, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr)) == SOCKET_ERROR)
+		if (sendto(ServerConnectionSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr)) == SOCKET_ERROR)
 		{
 			printf("sendto() failed with error code : %d", WSAGetLastError());
 		}

@@ -43,6 +43,8 @@ namespace EN
 
 	protected:
 
+		int MaxMessageSize = 256;
+
 		// Socket to connect to server
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 

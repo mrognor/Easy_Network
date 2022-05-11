@@ -39,7 +39,7 @@ namespace EN
 	void EN_UDP_Server::Run()
 	{
 		int slen, recv_len;
-		char buf[BUFLEN];
+		char* buf = new char[MaxMessageSize];
 
 		sockaddr_in si_other;
 
@@ -52,10 +52,10 @@ namespace EN
 				break;
 			
 			//clear the buffer by filling null, it might have previously received data
-			memset(buf, '\0', BUFLEN);
+			memset(buf, '\0', MaxMessageSize);
 
 			//try to receive some data, this is a blocking call
-			if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (sockaddr*)&si_other, &slen)) == SOCKET_ERROR)
+			if ((recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen)) == SOCKET_ERROR)
 			{
 				printf("recvfrom() failed with error code : %d", WSAGetLastError());
 				exit(EXIT_FAILURE);
@@ -65,6 +65,7 @@ namespace EN
 				ClientMessageHandler(buf, si_other);
 		}	
 
+		delete[] buf;
 		#ifdef WIN32
 		closesocket(s);
 		#else
@@ -76,7 +77,7 @@ namespace EN
 	{ 
 		IsShutdown = true; 
 
-		if (sendto(s, "", BUFLEN, 0, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
+		if (sendto(s, "", MaxMessageSize, 0, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
 		{
 			printf("sendto() failed with error code : %d", WSAGetLastError());
 		}
@@ -85,7 +86,7 @@ namespace EN
 	void EN_UDP_Server::SendToClient(std::string msg, sockaddr_in ClientSocketAddr)
 	{
 		//now reply the client with the same data
-		if (sendto(s, msg.c_str(), BUFLEN, 0, (sockaddr*)&ClientSocketAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(s, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientSocketAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
 			printf("sendto() failed with error code : %d", WSAGetLastError());
 			exit(EXIT_FAILURE);

@@ -25,7 +25,6 @@ typedef int EN_SOCKET;
 #include <fstream>
 
 #define SendFileBufLen 1024
-#define BUFLEN 256
 
 namespace EN
 {

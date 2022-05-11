@@ -9,6 +9,7 @@ public:
 	{
 		// IpAddress = "192.168.1.69"; Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
+		MaxMessageSize = 512;
 	}
 
 	void ServerMessageHandler(std::string message)

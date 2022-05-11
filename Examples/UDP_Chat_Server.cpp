@@ -8,6 +8,9 @@ public:
 	{
 		// IpAddress = "192.168.1.69"; Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
+		// MaxMessageSize = <put int here> to set max message size. Default set to 256.
+		// You have to set synchronizied it with client
+		MaxMessageSize = 512;
 	}
 
 	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr)

@@ -30,6 +30,8 @@ namespace EN
 		// Default port
 		int Port = 1111;
 
+		int MaxMessageSize = 256;
+
 		// Server ip address string. Default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
@@ -41,6 +43,7 @@ namespace EN
 		bool IsShutdown = false;
 
 		sockaddr_in server;
+
 	public:
 
 		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
