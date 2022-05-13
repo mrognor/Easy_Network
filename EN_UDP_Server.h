@@ -26,9 +26,18 @@ typedef int EN_SOCKET;
 #include <vector>
 #include <string>
 #include <condition_variable>
+#include <chrono>
+#include <stack>
+
+typedef std::chrono::system_clock::time_point EN_TimePoint;
 
 namespace EN
 {
+	enum EN_UDP_ServerBuferType
+	{
+		Queue, Stack
+	};
+
 	class EN_UDP_Server
 	{
 	protected:
@@ -46,15 +55,19 @@ namespace EN
 		int ThreadAmount = 8;
 
 		// Method that processes incoming messages
-		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr) = 0;
+		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
 
 		bool IsShutdown = false;
 
 		sockaddr_in server;
 
+		EN_UDP_ServerBuferType ServerBuferType = Queue;
+		
 	public:
 
-		void Call(std::string message, sockaddr_in ClientSocketAddr) { ClientMessageHandler(message, ClientSocketAddr); }
+		void SetServerBuferType(EN_UDP_ServerBuferType type) { ServerBuferType = type; }
+
+		void Call(std::string message, sockaddr_in ClientSocketAddr, double TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
 
 		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
 		EN_UDP_Server();

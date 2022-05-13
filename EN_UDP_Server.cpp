@@ -2,7 +2,7 @@
 
 namespace EN
 {
-	void ThreadQueueHandler(EN_UDP_Server* server, std::queue<std::string>* Queue, std::queue<sockaddr_in>* QueueAddr, std::condition_variable* cv)
+	void ThreadQueueHandler(EN_UDP_Server* server, std::queue<std::string>* Queue, std::queue<sockaddr_in>* QueueAddr, std::queue<EN_TimePoint>* QueueTime, std::condition_variable* cv)
 	{
 		std::mutex mtx;
 		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
@@ -10,10 +10,12 @@ namespace EN
 		{
 			while (!Queue->empty())
 			{
-				server->Call(Queue->front(), QueueAddr->front());
-				//std::cout << Queue->front() << std::endl;
+				Sleep(2000);
+				std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - QueueTime->front();
+				server->Call(Queue->front(), QueueAddr->front(), elapsed_seconds.count());
 				Queue->pop();
 				QueueAddr->pop();
+				QueueTime->pop();
 			}
 			cv->wait(unique_lock_mutex);
 		}
@@ -64,9 +66,9 @@ namespace EN
 
 		std::queue<std::string>** QueueVec = new std::queue<std::string>*[ThreadAmount];
 		std::queue<sockaddr_in>** QueueAddrVec = new std::queue<sockaddr_in>*[ThreadAmount];
-		std::condition_variable** CondVarVec = new std::condition_variable * [ThreadAmount];
+		std::queue<EN_TimePoint>** QueueTimeVec = new std::queue<EN_TimePoint>*[ThreadAmount];
+		std::condition_variable** CondVarVec = new std::condition_variable*[ThreadAmount];
 		std::thread* ThreadVec = new std::thread[ThreadAmount];
-
 
 		for (int i = 0; i < ThreadAmount; i++)
 		{
@@ -79,9 +81,11 @@ namespace EN
 			inet_pton(AF_INET, IpAddress.c_str(), &addr.sin_addr);
 
 			QueueVec[i] = new std::queue<std::string>;
+			QueueAddrVec[i] = new std::queue<sockaddr_in>;
+			QueueTimeVec[i] = new std::queue<EN_TimePoint>;
 			CondVarVec[i] = new std::condition_variable;
-			QueueAddrVec[i] = new std::queue<sockaddr_in>;;
-			ThreadVec[i] = std::thread(ThreadQueueHandler, this, QueueVec[i], QueueAddrVec[i], CondVarVec[i]);
+
+			ThreadVec[i] = std::thread(ThreadQueueHandler, this, QueueVec[i], QueueAddrVec[i], QueueTimeVec[i], CondVarVec[i]);
 			ThreadVec[i].detach();
 		}
 
@@ -112,6 +116,7 @@ namespace EN
 
 				QueueVec[IndexMinQueue]->push(buf);
 				QueueAddrVec[IndexMinQueue]->push(si_other);
+				QueueTimeVec[IndexMinQueue]->push(std::chrono::system_clock::now());
 				CondVarVec[IndexMinQueue]->notify_one();
 			}
 		}	
@@ -121,13 +126,14 @@ namespace EN
 			delete QueueVec[i];
 			delete QueueAddrVec[i];
 			delete CondVarVec[i];
+			delete QueueTimeVec[i];
 		}
 
 		delete[] QueueVec;
 		delete[] QueueAddrVec;
 		delete[] CondVarVec;
 		delete[] ThreadVec;
-
+		delete[] QueueTimeVec;
 		delete[] buf;
 		#ifdef WIN32
 		closesocket(s);
@@ -136,7 +142,7 @@ namespace EN
 		#endif		
 	}
 
-	void EN_UDP_Server::Shutdown() 
+	void EN_UDP_Server::Shutdown()
 	{ 
 		IsShutdown = true; 
 

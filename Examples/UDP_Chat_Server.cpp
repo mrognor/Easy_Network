@@ -14,15 +14,16 @@ public:
 		ThreadAmount = 1;
 	}
 
-	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr)
+	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeSincePackageArrived)
 	{
+		if (TimeSincePackageArrived > 7)
+			return;
+
 		char str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);
 
 		std::cout << "Message: " << message << " Ip: " << str <<
-			" Port: " << ntohs(ClientSocketAddr.sin_port) << std::endl;
-
-		Sleep(1000);
+			" Port: " << ntohs(ClientSocketAddr.sin_port) << " Time: " << TimeSincePackageArrived << std::endl;
 
 		if (message == "f")
 			Shutdown();
