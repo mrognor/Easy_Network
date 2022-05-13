@@ -10,14 +10,16 @@ public:
 		// Port = <put int here> to set port. Default port is 1111
 		// MaxMessageSize = <put int here> to set max message size. Default set to 256.
 		// You have to set synchronizied it with client
+		// ServerBuferType queue or stack
 		MaxMessageSize = 512;
 		ThreadAmount = 1;
+		ServerBuferType = EN::Stack;
 	}
 
 	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeSincePackageArrived)
 	{
-		if (TimeSincePackageArrived > 7)
-			return;
+		//if (TimeSincePackageArrived > 7)
+		//	return;
 
 		char str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);

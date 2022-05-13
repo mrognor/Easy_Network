@@ -2,20 +2,32 @@
 
 namespace EN
 {
-	void ThreadQueueHandler(EN_UDP_Server* server, std::queue<std::string>* Queue, std::queue<sockaddr_in>* QueueAddr, std::queue<EN_TimePoint>* QueueTime, std::condition_variable* cv)
+	void ThreadListHandler(EN_UDP_Server* server, std::list<std::string>* QueueMsg, std::list<sockaddr_in>* QueueAddr, std::list<EN_TimePoint>* QueueTime, std::condition_variable* cv, EN_UDP_ServerBuferType buffType)
 	{
 		std::mutex mtx;
 		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
 		while (true)
 		{
-			while (!Queue->empty())
+			while (!QueueMsg->empty())
 			{
-				Sleep(2000);
+				Sleep(5000);
 				std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - QueueTime->front();
-				server->Call(Queue->front(), QueueAddr->front(), elapsed_seconds.count());
-				Queue->pop();
-				QueueAddr->pop();
-				QueueTime->pop();
+				
+				switch (buffType)
+				{
+				case Queue:
+					server->Call(QueueMsg->front() , QueueAddr->front(), elapsed_seconds.count());
+					QueueMsg->pop_front();
+					QueueAddr->pop_front();
+					QueueTime->pop_front();
+					break;
+				case Stack:
+					server->Call(QueueMsg->front(), QueueAddr->front(), elapsed_seconds.count());
+					QueueMsg->pop_front();
+					QueueAddr->pop_front();
+					QueueTime->pop_front();
+					break;
+				}
 			}
 			cv->wait(unique_lock_mutex);
 		}
@@ -64,9 +76,9 @@ namespace EN
 
 		slen = sizeof(si_other);
 
-		std::queue<std::string>** QueueVec = new std::queue<std::string>*[ThreadAmount];
-		std::queue<sockaddr_in>** QueueAddrVec = new std::queue<sockaddr_in>*[ThreadAmount];
-		std::queue<EN_TimePoint>** QueueTimeVec = new std::queue<EN_TimePoint>*[ThreadAmount];
+		std::list<std::string>** QueueVec = new std::list<std::string>*[ThreadAmount];
+		std::list<sockaddr_in>** QueueAddrVec = new std::list<sockaddr_in>*[ThreadAmount];
+		std::list<EN_TimePoint>** QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
 		std::condition_variable** CondVarVec = new std::condition_variable*[ThreadAmount];
 		std::thread* ThreadVec = new std::thread[ThreadAmount];
 
@@ -80,12 +92,12 @@ namespace EN
 			// Set ip address
 			inet_pton(AF_INET, IpAddress.c_str(), &addr.sin_addr);
 
-			QueueVec[i] = new std::queue<std::string>;
-			QueueAddrVec[i] = new std::queue<sockaddr_in>;
-			QueueTimeVec[i] = new std::queue<EN_TimePoint>;
+			QueueVec[i] = new std::list<std::string>;
+			QueueAddrVec[i] = new std::list<sockaddr_in>;
+			QueueTimeVec[i] = new std::list<EN_TimePoint>;
 			CondVarVec[i] = new std::condition_variable;
 
-			ThreadVec[i] = std::thread(ThreadQueueHandler, this, QueueVec[i], QueueAddrVec[i], QueueTimeVec[i], CondVarVec[i]);
+			ThreadVec[i] = std::thread(ThreadListHandler, this, QueueVec[i], QueueAddrVec[i], QueueTimeVec[i], CondVarVec[i], ServerBuferType);
 			ThreadVec[i].detach();
 		}
 
@@ -114,10 +126,23 @@ namespace EN
 						IndexMinQueue = i;
 				}
 
-				QueueVec[IndexMinQueue]->push(buf);
-				QueueAddrVec[IndexMinQueue]->push(si_other);
-				QueueTimeVec[IndexMinQueue]->push(std::chrono::system_clock::now());
-				CondVarVec[IndexMinQueue]->notify_one();
+				switch (ServerBuferType)
+				{
+				case Queue:
+					QueueVec[IndexMinQueue]->push_back(buf);
+					QueueAddrVec[IndexMinQueue]->push_back(si_other);
+					QueueTimeVec[IndexMinQueue]->push_back(std::chrono::system_clock::now());
+					CondVarVec[IndexMinQueue]->notify_one();
+					break;
+
+				case Stack:
+					QueueVec[IndexMinQueue]->push_front(buf);
+					QueueAddrVec[IndexMinQueue]->push_front(si_other);
+					QueueTimeVec[IndexMinQueue]->push_front(std::chrono::system_clock::now());
+					CondVarVec[IndexMinQueue]->notify_one();
+					break;
+				}
+				
 			}
 		}	
 

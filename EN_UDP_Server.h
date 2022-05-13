@@ -28,6 +28,7 @@ typedef int EN_SOCKET;
 #include <condition_variable>
 #include <chrono>
 #include <stack>
+#include <list>
 
 typedef std::chrono::system_clock::time_point EN_TimePoint;
 
