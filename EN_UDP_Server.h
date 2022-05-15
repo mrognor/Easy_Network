@@ -58,13 +58,22 @@ namespace EN
 		// Method that processes incoming messages
 		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
 
+		// Method that processes incoming messages
+		virtual void ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
+
 		bool IsShutdown = false;
 
 		sockaddr_in server;
 
 		EN_UDP_ServerBuferType ServerBuferType = Queue;
 		
+		std::list<std::string>** QueueMessageVec;
+		std::list<sockaddr_in>** QueueAddrVec;
+		std::list<EN_TimePoint>** QueueTimeVec;
+		std::condition_variable** CondVarVec;
 	public:
+
+		bool* WhichThreadFlushing;
 
 		void SetServerBuferType(EN_UDP_ServerBuferType type) { ServerBuferType = type; }
 
@@ -86,6 +95,9 @@ namespace EN
 		void Shutdown();
 
 		void SendToClient(std::string msg, sockaddr_in ClientSocketAddr);
+
+		// Function to flush thread buffer. If no paramters get flush all threads
+		void FlushThread(int i = -1);
 
 		~EN_UDP_Server();
 	};

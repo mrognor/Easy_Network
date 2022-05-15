@@ -20,7 +20,7 @@ public:
 	{
 		//if (TimeSincePackageArrived > 7)
 		//	return;
-
+		Sleep(3000);
 		char str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);
 
@@ -33,6 +33,10 @@ public:
 		SendToClient(message, ClientSocketAddr);
 	}
 
+	void ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived)
+	{
+		std::cout << "Important! " << message << std::endl;
+	}
 };
 
 
@@ -41,5 +45,8 @@ int main()
 	MyServer A;
 	A.Run();
 
+	std::cout << "Wiat" << std::endl;
+	char c;
+	std::cin >> c;
 	system("pause");
 }
