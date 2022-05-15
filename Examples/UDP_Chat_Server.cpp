@@ -13,7 +13,7 @@ public:
 		// ServerBuferType queue or stack
 		MaxMessageSize = 512;
 		ThreadAmount = 1;
-		ServerBuferType = EN::Stack;
+		ServerBuferType = EN::Queue;
 	}
 
 	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeSincePackageArrived)

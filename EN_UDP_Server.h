@@ -96,9 +96,6 @@ namespace EN
 
 		void SendToClient(std::string msg, sockaddr_in ClientSocketAddr);
 
-		// Function to flush thread buffer. If no paramters get flush all threads
-		void FlushThread(int i = -1);
-
 		~EN_UDP_Server();
 	};
 }
