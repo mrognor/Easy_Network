@@ -104,7 +104,8 @@ namespace EN
 
 			if (std::string(buf) != "")
 			{
-				ImportantClientMessageHandler(buf, si_other, 0);
+				if (ImportantClientMessageHandler(buf, si_other, 0) == false)
+					continue;
 
 				int IndexMinQueue = 0;
 				for (int i = 1; i < ThreadAmount; i++)

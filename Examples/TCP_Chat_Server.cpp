@@ -14,7 +14,7 @@ public:
 	void OnClientConnected(int ClientID)
 	{
 		std::cout << "Client Connected! id: " << ClientID << std::endl;
-		EN::TCP_Send(ClientSockets[ClientID], "Welcome. You are connected to server.");
+		SendToClient(ClientID, "Welcome. You are connected to server.");
 	}
 
 	void ClientMessageHandler(std::string message, int ClientID)
@@ -26,10 +26,10 @@ public:
 		if (message == "d")
 			DisconnectClient(ClientID); 
 
-		for (int j = 0; j < ClientSockets.size(); j++)
+		for (int j = 0; j < GetConnectionsCount(); j++)
 		{
 			if (j != ClientID)
-				EN::TCP_Send(ClientSockets[j], message);
+				SendToClient(j, message);
 		}
 	}
 

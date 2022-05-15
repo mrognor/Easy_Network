@@ -59,7 +59,7 @@ namespace EN
 		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
 
 		// Method that processes incoming messages
-		virtual void ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
+		virtual bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
 
 		bool IsShutdown = false;
 

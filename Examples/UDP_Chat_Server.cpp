@@ -33,9 +33,13 @@ public:
 		SendToClient(message, ClientSocketAddr);
 	}
 
-	void ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived)
+	// Function work between putting message in buffer. Return true if you want to put message in thread
+	bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived)
 	{
 		std::cout << "Important! " << message << std::endl;
+		if (message == "oleg")
+			return false;
+		return true;
 	}
 };
 

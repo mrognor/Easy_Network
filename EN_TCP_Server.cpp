@@ -227,4 +227,9 @@ namespace EN
 		close(ServerConnectionSocket);
 		#endif		
 	}
+
+	void EN_TCP_Server::SendToClient(int ClientId, std::string message)
+	{
+		EN::TCP_Send(ClientSockets[ClientId], message);
+	}
 }
