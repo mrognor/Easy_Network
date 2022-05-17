@@ -97,8 +97,14 @@ namespace EN
 			memset(buf, '\0', MaxMessageSize);
 
 			//try to receive some data, this is a blocking call
+			recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, (socklen_t*)&slen);
+			#ifdef WIN32
+			//try to receive some data, this is a blocking call
 			recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen);
-			
+			#else
+			//try to receive some data, this is a blocking call
+			recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, (socklen_t*)&slen);
+			#endif
 
 			if (std::string(buf) != "")
 			{

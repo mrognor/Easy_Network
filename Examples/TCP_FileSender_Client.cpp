@@ -7,7 +7,7 @@ int main()
 	std::string ip;
 	getline(std::cin, ip);
 
-	EN_TCP_FileSender A;
+	EN::EN_TCP_FileSender A;
 
 	if (A.Connect(ip, 1111) == false)
 	{

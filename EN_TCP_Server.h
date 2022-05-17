@@ -38,9 +38,6 @@ namespace EN
 		// The method that receives messages from the client. The first parameter is the socket index in the vector
 		int RecvFromClient(int ClientSocketID, std::string& message);
 
-		// Connected clients
-		std::vector<EN_SOCKET> ClientSockets;
-
 	protected:
 
 		// Default port
@@ -49,6 +46,9 @@ namespace EN
 		// Server ip address string. Default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
+		// Connected clients
+		std::vector<EN_SOCKET> ClientSockets;
+		
 		// The method that is executed when the client connects to the server
 		virtual void OnClientConnected(int ClientID) = 0;
 

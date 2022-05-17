@@ -49,8 +49,12 @@ namespace EN
 		int OperationRes;
 		while (true)
 		{
+			#ifdef WIN32
 			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, &sizeofaddr);
-
+			#else
+			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, (socklen_t*)&sizeofaddr);
+			#endif
+			
 			if (OperationRes > 0)
 			{
 				ServerMessageHandler(Message);

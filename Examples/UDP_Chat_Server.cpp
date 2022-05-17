@@ -20,7 +20,13 @@ public:
 	{
 		if (TimeSincePackageArrived > 700)
 			return;
+			
+		#ifdef WIN32
 		Sleep(1000);
+		#else
+		usleep(1000);
+		#endif
+
 		char str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);
 
