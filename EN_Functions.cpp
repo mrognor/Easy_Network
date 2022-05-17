@@ -48,7 +48,7 @@ namespace EN
 			#else 
 			close(sock);
 			#endif
-
+			delete[] msg;
 			return false;
 		}
 
@@ -133,6 +133,7 @@ namespace EN
 				if (IsStop == true)
 				{
 					IsStop = false;
+					delete[] MessageBuf;
 					return false;
 				}
 				// Print sending status
@@ -152,6 +153,7 @@ namespace EN
 				{
 					std::cerr << "\nFailed to send file: " << FileName << std::endl;
 					SendingFile.close();
+					delete[] MessageBuf;
 					return false;
 				}
 
@@ -170,6 +172,7 @@ namespace EN
 			{
 				std::cerr << "\nFailed to send file: " << FileName << std::endl;
 				SendingFile.close();
+				delete[] MessageBuf;
 				return false;
 			}
 
@@ -182,6 +185,7 @@ namespace EN
 		else
 		{
 			std::cerr << "\nFailed to open file: " << FileName << std::endl;
+			delete[] MessageBuf;
 			return false;
 		}
 
@@ -227,6 +231,7 @@ namespace EN
 					IsStop = false;
 					ReceivedFile.close();
 					remove(("r" + FileName).c_str());
+					delete[] MessageBuf;
 					return false;
 				}
 
@@ -244,6 +249,7 @@ namespace EN
 					std::cerr << "\nFailed to received file: " << FileName << std::endl;
 					ReceivedFile.close();
 					remove(("r" + FileName).c_str());
+					delete[] MessageBuf;
 					return false;
 				}
 
@@ -261,6 +267,7 @@ namespace EN
 				std::cerr << "\nFailed to received file: " << FileName << std::endl;
 				ReceivedFile.close();
 				remove(("r" + FileName).c_str());
+				delete[] MessageBuf;
 				return false;
 			}
 
@@ -275,6 +282,7 @@ namespace EN
 		else
 		{
 			std::cerr << "\nFailed to send file: " << FileName << std::endl;
+			delete[] MessageBuf;
 			return false;
 		}
 		

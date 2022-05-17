@@ -1,3 +1,4 @@
+\mainpage
 # Easy_Network
 Simple C++ network library
 # Library usage 

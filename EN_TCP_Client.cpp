@@ -28,17 +28,17 @@ namespace EN
 
 	bool EN_TCP_Client::Connect()
 	{
-		return Connect(IpAddres, Port);
+		return Connect(ServerIpAddres, Port);
 	}
 
 	bool EN_TCP_Client::Connect(int port)
 	{
-		return Connect(IpAddres, port);
+		return Connect(ServerIpAddres, port);
 	}
 
 	bool EN_TCP_Client::Connect(std::string ipAddr, int port)
 	{
-		IpAddres = ipAddr;
+		ServerIpAddres = ipAddr;
 		Port = port;
 
 		sockaddr_in addr;

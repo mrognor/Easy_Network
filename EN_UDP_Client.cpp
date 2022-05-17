@@ -20,15 +20,15 @@ namespace EN
 
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 		{
-			printf("socket() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
+			std::cerr << "Failed to create socket" << std::endl;
+			exit(1);
 		}
 
 		ServerSockAddr.sin_family = AF_INET;
 		ServerSockAddr.sin_port = htons(Port);
 
 		// Set ip address
-		inet_pton(AF_INET, IpAddres.c_str(), &ServerSockAddr.sin_addr);
+		inet_pton(AF_INET, ServerIpAddres.c_str(), &ServerSockAddr.sin_addr);
 	}
 
 	void EN_UDP_Client::Run()
@@ -57,7 +57,6 @@ namespace EN
 			}
 			if (OperationRes == 0)
 			{
-				std::cout << "exit here" << std::endl;
 				break;
 			}
 		}
@@ -69,7 +68,7 @@ namespace EN
 	{
 		if (sendto(ServerConnectionSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr)) == SOCKET_ERROR)
 		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
+			std::cerr << "Failed to send" << std::endl;
 		}
 		
 		#ifdef WIN32

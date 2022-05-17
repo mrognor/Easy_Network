@@ -47,7 +47,7 @@ namespace EN
 			#else 
 			close(ClientSockets[ClientSocketID]);
 			#endif
-
+			delete[] msg;
 			return ConnectionStatus;
 		}
 

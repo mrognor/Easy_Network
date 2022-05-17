@@ -56,10 +56,10 @@ namespace EN
 		int ThreadAmount = 8;
 
 		// Method that processes incoming messages
-		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
+		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 		// Method that processes incoming messages
-		virtual bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived) = 0;
+		virtual bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 		bool IsShutdown = false;
 
@@ -77,7 +77,7 @@ namespace EN
 
 		void SetServerBuferType(EN_UDP_ServerBuferType type) { ServerBuferType = type; }
 
-		void Call(std::string message, sockaddr_in ClientSocketAddr, double TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
+		void Call(std::string message, sockaddr_in ClientSocketAddr, long long TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
 
 		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
 		EN_UDP_Server();

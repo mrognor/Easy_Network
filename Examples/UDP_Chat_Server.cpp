@@ -15,12 +15,12 @@ public:
 		ThreadAmount = 1;
 		ServerBuferType = EN::Queue;
 	}
-
-	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeSincePackageArrived)
+	// Third parametr in milliseconds
+	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeSincePackageArrived)
 	{
-		//if (TimeSincePackageArrived > 7)
-		//	return;
-		Sleep(3000);
+		if (TimeSincePackageArrived > 700)
+			return;
+		Sleep(1000);
 		char str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);
 
@@ -34,7 +34,7 @@ public:
 	}
 
 	// Function work between putting message in buffer. Return true if you want to put message in thread
-	bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, double TimeWhenPackageArrived)
+	bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeWhenPackageArrived)
 	{
 		std::cout << "Important! " << message << std::endl;
 		if (message == "oleg")
@@ -49,8 +49,5 @@ int main()
 	MyServer A;
 	A.Run();
 
-	std::cout << "Wiat" << std::endl;
-	char c;
-	std::cin >> c;
 	system("pause");
 }

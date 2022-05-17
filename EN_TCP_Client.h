@@ -36,7 +36,7 @@ namespace EN
 		int Port = 1111;
 
 		// Server ip address string. Default set to localhost
-		std::string IpAddres = "127.0.0.1";
+		std::string ServerIpAddres = "127.0.0.1";
 
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
@@ -64,7 +64,7 @@ namespace EN
 		int GetPort() { return Port; }
 
 		// Ip getter
-		std::string GetIpAddr() { return IpAddres; }
+		std::string GetIpAddr() { return ServerIpAddres; }
 
 		// Socket getter
 		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }

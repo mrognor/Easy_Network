@@ -14,7 +14,7 @@ namespace EN
 				if (QueueMsg->front() == "")
 					return;
 
-				std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - QueueTime->front();
+				std::chrono::milliseconds elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - QueueTime->front());
 				auto f1 = QueueMsg->front();
 				auto f2 = QueueAddr->front();
 
@@ -45,9 +45,8 @@ namespace EN
 		//Create a socket
 		if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
-			printf("Could not create socket : %d", WSAGetLastError());
+			std::cerr << "Could not create socket" << std::endl;
 		}
-		printf("Socket created.\n");
 
 		//Prepare the sockaddr_in structure
 		server.sin_family = AF_INET;
@@ -59,7 +58,7 @@ namespace EN
 		//Bind
 		if (bind(s, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
 		{
-			printf("Bind failed with error code : %d", WSAGetLastError());
+			std::cerr << "Bind failed" << std::endl;
 		}
 	}
 
@@ -98,11 +97,8 @@ namespace EN
 			memset(buf, '\0', MaxMessageSize);
 
 			//try to receive some data, this is a blocking call
-			if ((recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen)) == SOCKET_ERROR)
-			{
-				printf("recvfrom() failed with error code : %d", WSAGetLastError());
-				// Get error if client disconnected but packages still goes down
-			}
+			recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen);
+			
 
 			if (std::string(buf) != "")
 			{
@@ -172,7 +168,7 @@ namespace EN
 
 		if (sendto(s, "", MaxMessageSize, 0, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
 		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
+			std::cerr << "sendto failed" << std::endl;
 		}
 
 		switch (ServerBuferType)
@@ -194,7 +190,7 @@ namespace EN
 		//now reply the client with the same data
 		if (sendto(s, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientSocketAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
+			std::cerr << "sendto failed" << std::endl;
 		}
 	}
 
