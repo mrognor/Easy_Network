@@ -6,7 +6,7 @@ class MyServer : public EN::EN_UDP_Server
 public:
 	MyServer()
 	{
-		// IpAddress = "192.168.1.69"; Default set to localhost
+		IpAddress = "192.168.1.64"; // Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
 		// MaxMessageSize = <put int here> to set max message size. Default set to 256.
 		// You have to set synchronizied it with client
@@ -18,8 +18,8 @@ public:
 	// Third parametr in milliseconds
 	void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeSincePackageArrived)
 	{
-		if (TimeSincePackageArrived > 700)
-			return;
+		//if (TimeSincePackageArrived > 700)
+		//	return;
 			
 		#ifdef WIN32
 		Sleep(1000);

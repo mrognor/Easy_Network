@@ -34,9 +34,6 @@ namespace EN
 		// Default port
 		int Port = 1111;
 
-		// Server ip address string. Default set to localhost
-		std::string ServerIpAddres = "127.0.0.1";
-
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
@@ -44,6 +41,9 @@ namespace EN
 	protected:
 
 		int MaxMessageSize = 256;
+
+		// Server ip address string. Default set to localhost
+		std::string ServerIpAddres = "127.0.0.1";
 
 		// Socket to connect to server
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
