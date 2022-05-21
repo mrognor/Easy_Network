@@ -17,7 +17,10 @@ namespace EN
 			exit(1);
 		}
 		#endif
+	}
 
+	void EN_UDP_Client::Run()
+	{
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 		{
 			std::cerr << "Failed to create socket" << std::endl;
@@ -29,10 +32,7 @@ namespace EN
 
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddres.c_str(), &ServerSockAddr.sin_addr);
-	}
 
-	void EN_UDP_Client::Run()
-	{
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
 	}

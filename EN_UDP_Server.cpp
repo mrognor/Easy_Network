@@ -41,7 +41,10 @@ namespace EN
 			exit(1);
 		}
 		#endif
+	}
 
+	void EN_UDP_Server::Run()
+	{
 		//Create a socket
 		if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
@@ -60,10 +63,7 @@ namespace EN
 		{
 			std::cerr << "Bind failed" << std::endl;
 		}
-	}
 
-	void EN_UDP_Server::Run()
-	{
 		int slen, recv_len;
 		char* buf = new char[MaxMessageSize];
 

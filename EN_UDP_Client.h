@@ -31,14 +31,14 @@ namespace EN
 	{
 	private:
 
-		// Default port
-		int Port = 1111;
-
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
 
 	protected:
+
+		// Default port
+		int Port = 1111;
 
 		int MaxMessageSize = 256;
 

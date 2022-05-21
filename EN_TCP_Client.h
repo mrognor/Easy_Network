@@ -27,16 +27,19 @@ typedef int EN_SOCKET;
 
 namespace EN
 {
-	// Easy network class
+	/// Base tcp client class
 	class EN_TCP_Client
 	{
 	private:
 
 		// Default port
-		int Port = 1111;
+		int ServerPort = 1111;
 
 		// Server ip address string. Default set to localhost
-		std::string ServerIpAddres = "127.0.0.1";
+		std::string ServerIpAddress = "127.0.0.1";
+
+		// Socket to connect to server. Library wrapper for your operating system socket
+		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
@@ -44,55 +47,81 @@ namespace EN
 
 	protected:
 
-		// Socket to connect to server
-		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
-
-		// A function to be defined by the user. It is used for logic after connection
+		/**
+			\brief The function must be defined by the library user. 
+			
+			This function is called after connecting to the server
+		*/
 		virtual void AfterConnect() = 0;
 
-		// A function to be defined by the user. It is used to process incoming messages from the server
+		/**
+			\brief The function must be defined by the library user. 
+			
+			The function processes all incoming messages
+		*/
 		virtual void ServerMessageHandler(std::string message) = 0;
 
-		// A function to be defined by the user. Performed before disconnected from the server
+		/**
+			\brief The function must be defined by the library user.
+
+			The function is called before disconnecting from the server.
+			Important! If disconnection occurs from the server side or connection lost, the IsConnected() function returns false
+		*/
 		virtual void BeforeDisconnect() = 0;
 
 	public:
-		// Default constructor. Initiate winsock api
+		/// Default constructor. On Windows initiate winsock api
 		EN_TCP_Client();
 
-		// Port getter
-		int GetPort() { return Port; }
+		/// Server port getter
+		int GetServerPort() { return ServerPort; }
 
-		// Ip getter
-		std::string GetIpAddr() { return ServerIpAddres; }
+		/// Server ip getter
+		std::string GetServerIpAddress() { return ServerIpAddress; }
 
-		// Socket getter
+		/// Socket getter
 		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
 
-		// Function return true if client connected to server
+		/// Function return true if client connected to server
 		bool IsConnected();
 
-		// Connect to localhost and default port. Return low-level function connect result.
-		// See platform documentation if you want get more information about errors
+		/**
+			\brief Connect to localhost and default port. 
+			\return Returns true in case of success, false otherwise
+		*/ 
 		bool Connect();
 
-		// Connect to localhost and current port. Return low-level function connect result.
-		// See platform documentation if you want get more information about errors
+		/**
+			\brief Connect to localhost and current port.
+			\param[in] port port to connect
+			\return Returns true in case of success, false otherwise
+		*/
 		bool Connect(int port);
 
-		// Connect to server with current ip and port. Return low-level function connect result.
-		// See platform documentation if you want get more information about errors
+		/**
+			\brief Connect to current ip and current port.
+			\param[in] ip server ip address
+			\param[in] port port to connect
+			\return Returns true in case of success, false otherwise
+		*/
 		bool Connect(std::string ipAddr, int port);
 
-		// Method to start server. Starts a thread to process server responses
-		// You have to determine BeforeDisconnect() and ServerMessageHandler()
+		/**
+			\brief Method to start server.
+
+			Starts a thread to process server responses
+			Important! You have to determine AfterConnect(), ServerMessageHandler() and BeforeDisconnect()
+		*/
 		void Run();
 
-		// Function for sending a message to a connected server
-		// As an additional parameter, it takes the delay in executing the code to send the message
+		/**
+			\brief Function for sending a message to a connected server.
+			\param[in] message the message string to send to the server
+			\param[in] MessageDelay Optional parameter. the time that will pass after sending the message to the server
+		*/
 		void SendToServer(std::string message, int MessageDelay = 10);
 
-		// This function disconnect client from server
+		/// This function disconnect client from server
 		void Disconnect();
 
 		// Default destructor

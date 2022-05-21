@@ -5,7 +5,7 @@ namespace EN
 	bool EN_TCP_FileSender::SendFileToServer(std::string FileName, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		if (IsConnected())
-			return EN::SendFile(ServerConnectionSocket, FileName, IsStop, ProgressFunction);
+			return EN::SendFile(*GetSocket(), FileName, IsStop, ProgressFunction);
 		else std::cerr << "Error: the server is not connected" << std::endl;
 		std::cout << "File transfer ended" << std::endl;
 		return false;
@@ -14,7 +14,7 @@ namespace EN
 	bool EN_TCP_FileSender::RecvFileFromServer()
 	{
 		if (IsConnected())
-			return EN::RecvFile(ServerConnectionSocket, IsStop, EN::DownloadStatus);
+			return EN::RecvFile(*GetSocket(), IsStop, EN::DownloadStatus);
 		return false;
 	}
 
@@ -22,7 +22,7 @@ namespace EN
 	{
 		if (IsConnected())
 		{
-			bool IsServerConnected = EN::TCP_Recv(ServerConnectionSocket, msg);
+			bool IsServerConnected = EN::TCP_Recv(*GetSocket(), msg);
 
 			if (IsServerConnected == false)
 			{
