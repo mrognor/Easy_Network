@@ -3,9 +3,9 @@
 
 namespace EN
 {
-	void ThreadListHandler(EN_UDP_Server* server, std::list<std::string>* QueueMsg, std::list<sockaddr_in>* QueueAddr, std::list<EN_TimePoint>* QueueTime, std::condition_variable* cv, EN_UDP_ServerBuferType buffType)
+	void ThreadListHandler(EN_UDP_Server* server, std::mutex* ThreadMutex, std::list<std::string>* QueueMsg, std::list<sockaddr_in>* QueueAddr, std::list<EN_TimePoint>* QueueTime, std::condition_variable* cv, EN_UDP_ServerBuferType buffType)
 	{
-		std::mutex mtx, mtx1;
+		std::mutex mtx;
 		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
 		while (true)
 		{
@@ -15,16 +15,33 @@ namespace EN
 					return;
 
 				std::chrono::milliseconds elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - QueueTime->front());
+				
 				auto f1 = QueueMsg->front();
 				auto f2 = QueueAddr->front();
+				
+				switch (buffType)
+				{
+				case (Stack):
 
-				mtx1.lock();
-				QueueMsg->pop_front();
-				QueueAddr->pop_front();
-				QueueTime->pop_front();
-				mtx1.unlock();
+					ThreadMutex->lock();
+					QueueMsg->pop_front();
+					QueueAddr->pop_front();
+					QueueTime->pop_front();
+					ThreadMutex->unlock();
 
-				server->Call(f1, f2, elapsed_seconds.count());
+					server->Call(f1, f2, elapsed_seconds.count());
+					break;
+
+				case (Queue):
+					server->Call(f1, f2, elapsed_seconds.count());
+
+					ThreadMutex->lock();
+					QueueMsg->pop_front();
+					QueueAddr->pop_front();
+					QueueTime->pop_front();
+					ThreadMutex->unlock();
+					break;
+				}
 			}
 			cv->wait(unique_lock_mutex);
 		}
@@ -72,19 +89,21 @@ namespace EN
 		slen = sizeof(si_other);
 
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
-		QueueAddrVec = new std::list<sockaddr_in>*[ThreadAmount];
-		QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
-		CondVarVec = new std::condition_variable*[ThreadAmount];
+		std::list<sockaddr_in>**  QueueAddrVec = new std::list<sockaddr_in>*[ThreadAmount];
+		std::list<EN_TimePoint>** QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
+		std::condition_variable** CondVarVec = new std::condition_variable*[ThreadAmount];
 		std::thread* ThreadVec = new std::thread[ThreadAmount];
-		std::mutex mtx;
+		std::mutex** Mutexes = new std::mutex*[ThreadAmount];
+		
 		for (int i = 0; i < ThreadAmount; i++)
 		{
 			QueueMessageVec[i] = new std::list<std::string>;
 			QueueAddrVec[i] = new std::list<sockaddr_in>;
 			QueueTimeVec[i] = new std::list<EN_TimePoint>;
 			CondVarVec[i] = new std::condition_variable;
+			Mutexes[i] = new std::mutex;
 
-			ThreadVec[i] = std::thread(ThreadListHandler, this, QueueMessageVec[i], QueueAddrVec[i], QueueTimeVec[i], CondVarVec[i], ServerBuferType);
+			ThreadVec[i] = std::thread(ThreadListHandler, this, Mutexes[i], QueueMessageVec[i], QueueAddrVec[i], QueueTimeVec[i], CondVarVec[i], ServerBuferType);
 		}
 
 		//keep listening for data
@@ -119,21 +138,30 @@ namespace EN
 				switch (ServerBuferType)
 				{
 				case Queue:
-					mtx.lock();
+					Mutexes[IndexMinQueue]->lock();
 					QueueMessageVec[IndexMinQueue]->push_back(buf);
 					QueueAddrVec[IndexMinQueue]->push_back(si_other);
 					QueueTimeVec[IndexMinQueue]->push_back(std::chrono::system_clock::now());
+					Mutexes[IndexMinQueue]->unlock();
+
 					CondVarVec[IndexMinQueue]->notify_one();
-					mtx.unlock();
 					break;
 
 				case Stack:
-					mtx.lock();
+					Mutexes[IndexMinQueue]->lock();
 					QueueMessageVec[IndexMinQueue]->push_front(buf);
 					QueueAddrVec[IndexMinQueue]->push_front(si_other);
 					QueueTimeVec[IndexMinQueue]->push_front(std::chrono::system_clock::now());
+					
+					if (QueueMessageVec[IndexMinQueue]->size() > MaxStackBuffSize)
+					{
+						QueueMessageVec[IndexMinQueue]->pop_back();
+						QueueAddrVec[IndexMinQueue]->pop_back();
+						QueueTimeVec[IndexMinQueue]->pop_back();
+					}
+
+					Mutexes[IndexMinQueue]->unlock();
 					CondVarVec[IndexMinQueue]->notify_one();
-					mtx.unlock();
 					break;
 				}
 				
@@ -151,6 +179,7 @@ namespace EN
 			delete QueueAddrVec[i];
 			delete CondVarVec[i];
 			delete QueueTimeVec[i];
+			delete Mutexes[i];
 		}
 
 		delete[] QueueMessageVec;
@@ -158,6 +187,8 @@ namespace EN
 		delete[] CondVarVec;
 		delete[] ThreadVec;
 		delete[] QueueTimeVec;
+		delete[] Mutexes;
+
 		delete[] buf;
 		#ifdef WIN32
 		closesocket(s);

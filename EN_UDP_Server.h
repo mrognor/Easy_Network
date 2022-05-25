@@ -53,7 +53,9 @@ namespace EN
 
 		EN_SOCKET s;
 
-		int ThreadAmount = 8;
+		int ThreadAmount = 2;
+
+		int MaxStackBuffSize = 16;
 
 		// Method that processes incoming messages
 		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
@@ -68,9 +70,6 @@ namespace EN
 		EN_UDP_ServerBuferType ServerBuferType = Queue;
 		
 		std::list<std::string>** QueueMessageVec;
-		std::list<sockaddr_in>** QueueAddrVec;
-		std::list<EN_TimePoint>** QueueTimeVec;
-		std::condition_variable** CondVarVec;
 	public:
 
 		bool* WhichThreadFlushing;
