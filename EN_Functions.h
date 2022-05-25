@@ -34,11 +34,8 @@ namespace EN
 	/// Wrapper over the recv function. Allows you to recv std::string. 
 	bool TCP_Recv(EN_SOCKET& sock, std::string& message);
 
-	/// Divides the string to std::vector<std::string> by " "(space).
-	std::vector<std::string> Split(std::string StringToSplit);
-
-	/// Divides the string to std::vector<std::string>. Second string is string divider
-	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString);
+	/// Divides the string to std::vector<std::string>. Second string is string divider. By default set to space(" ")
+	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString=" ");
 
 	/// Functions gets socket and filename and send file to socket. Third parametr its refernce to bool to stop transmission. 
 	/// The fourth parameter is a pointer to a function to handle the remaining transfer time

@@ -57,11 +57,6 @@ namespace EN
 		return true;
 	}
 
-	std::vector<std::string> Split(std::string StringToSplit)
-	{
-		return Split(StringToSplit, " ");
-	}
-
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString)
 	{
 		std::vector<std::string> ReturnVector;
