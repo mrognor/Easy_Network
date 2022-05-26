@@ -203,7 +203,18 @@ namespace EN
 		uint64_t FileSize = std::stoll(Split(FileInfo)[1]);
 
 		// Create received file
-		std::ofstream ReceivedFile("r" + FileName, std::ios::binary | std::ios::trunc);
+		if (IsFileExist(FileName))
+		{
+			std::string Name = FileName.substr(0, FileName.rfind("."));
+			std::string Type = FileName.substr(FileName.rfind("."));
+			int i = 1;
+			while (IsFileExist(Name + " (" + std::to_string(i) + ")" + Type))
+				i += 1;
+			FileName = Name + " (" + std::to_string(i) + ")" + Type;
+		}
+		std::ofstream ReceivedFile(FileName, std::ios::binary | std::ios::trunc);
+
+
 		// Already received bytes
 		uint64_t ReceivedMessageSize = 0;
 
