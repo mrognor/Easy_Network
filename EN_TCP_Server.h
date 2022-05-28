@@ -25,6 +25,7 @@ typedef int EN_SOCKET;
 
 namespace EN
 {
+	/// Base tcp server class
 	class EN_TCP_Server
 	{
 	private:
@@ -40,46 +41,66 @@ namespace EN
 
 	protected:
 
-		// Default port
+		/// Server port. Default set to 1111
 		int Port = 1111;
 
-		// Server ip address string. Default set to localhost
+		/// Server ip address string. Default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
-		// Connected clients
+		/// vector of sockets of connected clients
 		std::vector<EN_SOCKET> ClientSockets;
 		
-		// The method that is executed when the client connects to the server
+		/**
+			\brief The function must be defined by the library user.
+
+			The method that is executed when the client connects to the server
+		*/
 		virtual void OnClientConnected(int ClientID) = 0;
 
-		// Method that processes incoming messages
+		/**
+			\brief The function must be defined by the library user.
+
+			Method that processes incoming messages
+		*/
 		virtual void ClientMessageHandler(std::string message, int ClientID) = 0;
 
-		// Method that runs after the client is disconnected
+		/**
+			\brief The function must be defined by the library user.
+
+			Method that runs after the client is disconnected
+		*/
 		virtual void OnClientDisconnect(int ClientID) = 0;
 
 	public:
 
-		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
+		/// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
 		EN_TCP_Server();
 
-		// Port getter
+		/// Port getter
 		int GetPort() { return Port; }
 
-		// Ip getter
+		/// Ip getter
 		std::string GetIpAddr() { return IpAddress; }
 
-		// Method to start server.
+		/// Method to start server.
 		void Run();
 
-		// Method that disconnects the client from the server
+		/**
+			\brief Method that disconnects the client from the server
+
+			\param[in] ClientID The number of the client to be disconnect
+		*/
 		void DisconnectClient(int ClientID);
 
-		// Method that stops the server
+		/// Method that stops the server
 		void Shutdown();
 		
-		void SendToClient(int ClientId, std::string message);
+		/**
+			\brief Method that send message to client
 
-		int GetConnectionsCount() { return ClientSockets.size(); }
+			\param[in] ClientID The number of the client 
+			\param[in] message The message to be sent to the client 
+		*/
+		void SendToClient(int ClientId, std::string message);
 	};
 }

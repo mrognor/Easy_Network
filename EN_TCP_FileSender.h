@@ -23,13 +23,13 @@ namespace EN
 	public:
 		EN_TCP_FileSender() : EN_TCP_Client() {};
 
-		// Function to send file to server. First parametr is file name. Second is pointer to progress function
+		/// Function to send file to server. First parametr is file name. Second is pointer to progress function
 		bool SendFileToServer(std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta));
 
-		// Function to recv file from server
+		/// Function to recv file from server
 		bool RecvFileFromServer();
 
-		// Function to get message from server
+		/// Function to get message from server
 		bool RecvMessageFromServer(std::string& msg);
 
 		void StopDownloading() { IsStop = true; }
