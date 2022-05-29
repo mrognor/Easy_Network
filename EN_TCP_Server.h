@@ -51,23 +51,23 @@ namespace EN
 		std::vector<EN_SOCKET> ClientSockets;
 		
 		/**
-			\brief The function must be defined by the library user.
+			\brief The method that is executed when the client connects to the server
 
-			The method that is executed when the client connects to the server
+			\warning Must be defined by the user
 		*/
 		virtual void OnClientConnected(int ClientID) = 0;
 
 		/**
-			\brief The function must be defined by the library user.
+			\brief Method that processes incoming messages
 
-			Method that processes incoming messages
+			\warning Must be defined by the user
 		*/
 		virtual void ClientMessageHandler(std::string message, int ClientID) = 0;
 
 		/**
-			\brief The function must be defined by the library user.
-
-			Method that runs after the client is disconnected
+			\brief Method that runs after the client is disconnected
+			
+			\warning Must be defined by the user
 		*/
 		virtual void OnClientDisconnect(int ClientID) = 0;
 

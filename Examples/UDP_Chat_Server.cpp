@@ -13,24 +13,27 @@ public:
 		// ServerBuferType queue or stack
 		MaxMessageSize = 512;
 		ThreadAmount = 1;
-		ServerBuferType = EN::Stack;
+		ServerBuferType = EN::Queue;
 		MaxStackBuffSize = 4;
 	}
+
 	// Third parametr in milliseconds
-	void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived)
+	void ClientMessageHandler(std::string message, UDP_Address ClientSocketAddr, long long TimeSincePackageArrived)
 	{
 		//if (TimeSincePackageArrived > 700)
 		//	return;
 			
-		#ifdef WIN32
+		#ifdef WIN32 
 		Sleep(5000);
 		#else
-		usleep(1000);
+		usleep(5000);
 		#endif
 
 		char str[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);
 
-		std::cout << "Message: " << message << " From: " << ClientSocketAddr << " Time: " << TimeSincePackageArrived << std::endl;
+		std::cout << "Message: " << message << " Ip: " << str <<
+			" Port: " << ntohs(ClientSocketAddr.sin_port) << " Time: " << TimeSincePackageArrived << std::endl;
 
 		if (message == "f")
 			Shutdown();
@@ -39,7 +42,7 @@ public:
 	}
 
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
-	bool ImportantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
+	bool InstantClientMessageHandler(std::string message, UDP_Address ClientSocketAddr, long long TimeWhenPackageArrived)
 	{
 		std::cout << "Important! " << message << std::endl;
 		if (message == "oleg")

@@ -48,24 +48,25 @@ namespace EN
 	protected:
 
 		/**
-			\brief The function must be defined by the library user. 
+			\brief This function is called after connecting to the server
 			
-			This function is called after connecting to the server
+			\warning Must be defined by the user
 		*/
 		virtual void AfterConnect() = 0;
 
 		/**
-			\brief The function must be defined by the library user. 
+			\brief The function processes all incoming messages
 			
-			The function processes all incoming messages
+			
+			\warning Must be defined by the user
 		*/
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 		/**
-			\brief The function must be defined by the library user.
+			\brief The function is called before disconnecting from the server.
 
-			The function is called before disconnecting from the server.
 			Important! If disconnection occurs from the server side or connection lost, the IsConnected() function returns false
+			\warning Must be defined by the user
 		*/
 		virtual void BeforeDisconnect() = 0;
 

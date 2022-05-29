@@ -51,7 +51,8 @@ namespace EN
 		/// Server ip address string. Default set to localhost
 		std::string ServerIpAddres = "127.0.0.1";
 
-		/// A function to be defined by the user. It is used to process incoming messages from the server
+		/// It is used to process incoming messages from the server
+		/// \warning Must be defined by the user
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 	public:

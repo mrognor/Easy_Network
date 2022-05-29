@@ -3,53 +3,47 @@
 
 namespace EN
 {
-	void ThreadListHandler(EN_UDP_Server* ServerAddress, std::mutex* ThreadMutex, std::list<std::string>* QueueMsg, std::list<sockaddr_in>* QueueAddr, std::list<EN_TimePoint>* QueueTime, std::condition_variable* cv, EN_UDP_ServerBuferType buffType)
+	void EN_UDP_Server::ThreadListHandler(int ThreadID)
 	{
 		std::mutex mtx;
 		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
 		while (true)
 		{
-			while (!QueueMsg->empty())
+			while (!QueueMessageVec[ThreadID]->empty())
 			{
-				if (QueueMsg->front() == "")
+				if (QueueMessageVec[ThreadID]->front() == "")
 					return;
 
-				std::chrono::milliseconds elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - QueueTime->front());
-				
-				auto f1 = QueueMsg->front();
-				auto f2 = QueueAddr->front();
-				
-				char str[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &(f2.sin_addr), str, INET_ADDRSTRLEN);
-				std::string ClientAddress = str;
-				ClientAddress += ":";
-				ClientAddress += std::to_string(ntohs(f2.sin_port));
-				
-				switch (buffType)
+				std::chrono::milliseconds elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - QueueTimeVec[ThreadID]->front());
+
+				auto f1 = QueueMessageVec[ThreadID]->front();
+				auto f2 = QueueAddrVec[ThreadID]->front();
+
+				switch (ServerBuferType)
 				{
 				case (Stack):
 
-					ThreadMutex->lock();
-					QueueMsg->pop_front();
-					QueueAddr->pop_front();
-					QueueTime->pop_front();
-					ThreadMutex->unlock();
+					Mutexes[ThreadID]->lock();
+					QueueMessageVec[ThreadID]->pop_front();
+					QueueAddrVec[ThreadID]->pop_front();
+					QueueTimeVec[ThreadID]->pop_front();
+					Mutexes[ThreadID]->unlock();
 
-					ServerAddress->Call(f1, ClientAddress, elapsed_seconds.count());
+					ClientMessageHandler(f1, f2, elapsed_seconds.count());
 					break;
 
 				case (Queue):
-					ServerAddress->Call(f1, ClientAddress, elapsed_seconds.count());
+					ClientMessageHandler(f1, f2, elapsed_seconds.count());
 
-					ThreadMutex->lock();
-					QueueMsg->pop_front();
-					QueueAddr->pop_front();
-					QueueTime->pop_front();
-					ThreadMutex->unlock();
+					Mutexes[ThreadID]->lock();
+					QueueMessageVec[ThreadID]->pop_front();
+					QueueAddrVec[ThreadID]->pop_front();
+					QueueTimeVec[ThreadID]->pop_front();
+					Mutexes[ThreadID]->unlock();
 					break;
 				}
 			}
-			cv->wait(unique_lock_mutex);
+			CondVarVec[ThreadID]->wait(unique_lock_mutex);
 		}
 	}
 
@@ -87,19 +81,18 @@ namespace EN
 			std::cerr << "Bind failed" << std::endl;
 		}
 
-		int slen, recv_len;
-		char* buf = new char[MaxMessageSize];
+		char* IncomingMessageBuffer = new char[MaxMessageSize];
 
-		sockaddr_in si_other;
+		sockaddr_in ClientAddress;
 
-		slen = sizeof(si_other);
+		int sizeofaddr = sizeof(ClientAddress);
 
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
-		std::list<sockaddr_in>**  QueueAddrVec = new std::list<sockaddr_in>*[ThreadAmount];
-		std::list<EN_TimePoint>** QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
-		std::condition_variable** CondVarVec = new std::condition_variable*[ThreadAmount];
-		std::thread* ThreadVec = new std::thread[ThreadAmount];
-		std::mutex** Mutexes = new std::mutex*[ThreadAmount];
+		QueueAddrVec = new std::list<sockaddr_in>*[ThreadAmount];
+		QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
+		CondVarVec = new std::condition_variable*[ThreadAmount];
+		ThreadVec = new std::thread[ThreadAmount];
+		Mutexes = new std::mutex*[ThreadAmount];
 		
 		for (int i = 0; i < ThreadAmount; i++)
 		{
@@ -109,7 +102,8 @@ namespace EN
 			CondVarVec[i] = new std::condition_variable;
 			Mutexes[i] = new std::mutex;
 
-			ThreadVec[i] = std::thread(ThreadListHandler, this, Mutexes[i], QueueMessageVec[i], QueueAddrVec[i], QueueTimeVec[i], CondVarVec[i], ServerBuferType);
+			ThreadVec[i] = std::thread([this, i]() {this->ThreadListHandler(i); });
+			ThreadVec[i].detach();
 		}
 
 		//keep listening for data
@@ -119,25 +113,19 @@ namespace EN
 				break;
 			
 			//clear the buffer by filling null, it might have previously received data
-			memset(buf, '\0', MaxMessageSize);
+			memset(IncomingMessageBuffer, '\0', MaxMessageSize);
 
 			#ifdef WIN32
 			//try to receive some data, this is a blocking call
-			recv_len = recvfrom(ServerSocket, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen);
+			recvfrom(ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, &sizeofaddr);
 			#else
 			//try to receive some data, this is a blocking call
-			recv_len = recvfrom(ServerSocket, buf, MaxMessageSize, 0, (sockaddr*)&si_other, (socklen_t*)&slen);
+			recvfrom(ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, (socklen_t*)&sizeofaddr);
 			#endif
 
-			if (std::string(buf) != "")
+			if (std::string(IncomingMessageBuffer) != "")
 			{
-				char str[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &(si_other.sin_addr), str, INET_ADDRSTRLEN);
-				std::string ClientAddress = str; 
-				ClientAddress += ":"; 
-				ClientAddress += ntohs(si_other.sin_port);
-
-				if (ImportantClientMessageHandler(buf, ClientAddress, 0) == false)
+				if (InstantClientMessageHandler(IncomingMessageBuffer, ClientAddress, 0) == false)
 					continue;
 
 				int IndexMinQueue = 0;
@@ -151,8 +139,8 @@ namespace EN
 				{
 				case Queue:
 					Mutexes[IndexMinQueue]->lock();
-					QueueMessageVec[IndexMinQueue]->push_back(buf);
-					QueueAddrVec[IndexMinQueue]->push_back(si_other);
+					QueueMessageVec[IndexMinQueue]->push_back(IncomingMessageBuffer);
+					QueueAddrVec[IndexMinQueue]->push_back(ClientAddress);
 					QueueTimeVec[IndexMinQueue]->push_back(std::chrono::system_clock::now());
 					Mutexes[IndexMinQueue]->unlock();
 
@@ -161,8 +149,8 @@ namespace EN
 
 				case Stack:
 					Mutexes[IndexMinQueue]->lock();
-					QueueMessageVec[IndexMinQueue]->push_front(buf);
-					QueueAddrVec[IndexMinQueue]->push_front(si_other);
+					QueueMessageVec[IndexMinQueue]->push_front(IncomingMessageBuffer);
+					QueueAddrVec[IndexMinQueue]->push_front(ClientAddress);
 					QueueTimeVec[IndexMinQueue]->push_front(std::chrono::system_clock::now());
 					
 					if (QueueMessageVec[IndexMinQueue]->size() > MaxStackBuffSize)
@@ -201,7 +189,7 @@ namespace EN
 		delete[] QueueTimeVec;
 		delete[] Mutexes;
 
-		delete[] buf;
+		delete[] IncomingMessageBuffer;
 		#ifdef WIN32
 		closesocket(ServerSocket);
 		#else
@@ -221,29 +209,29 @@ namespace EN
 		switch (ServerBuferType)
 		{
 		case Queue:
-			for(int i = 0; i < ThreadAmount; i++)
+			for (int i = 0; i < ThreadAmount; i++)
+			{
+				Mutexes[i]->lock();
 				QueueMessageVec[i]->push_back("");
+				Mutexes[i]->unlock();
+			}
 			break;
 
 		case Stack:
 			for (int i = 0; i < ThreadAmount; i++)
+			{
+				Mutexes[i]->lock();
 				QueueMessageVec[i]->push_front("");
+				Mutexes[i]->unlock();
+			}
 			break;
 		}
 	}
 
-	void EN_UDP_Server::SendToClient(std::string msg, std::string ClientSocketAddr)
+	void EN_UDP_Server::SendToClient(std::string message, UDP_Address ClientSocketAddr)
 	{
-		//Prepare the sockaddr_in structure
-		sockaddr_in client;
-		client.sin_family = AF_INET;
-		client.sin_port = htons(std::atoi((ClientSocketAddr.substr(ClientSocketAddr.find(":")).c_str())));
-
-		// Set ip address
-		inet_pton(AF_INET, (ClientSocketAddr.substr(0, ClientSocketAddr.find(":"))).c_str(), &client.sin_addr);
-
 		//now reply the client with the same data
-		if (sendto(ServerSocket, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&client, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientSocketAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
 			std::cerr << "sendto failed" << std::endl;
 		}
