@@ -45,6 +45,13 @@ namespace EN
 		// Variable to shutdown server
 		bool IsShutdown = false;
 
+		/// Server address
+		sockaddr_in ServerAddress;
+
+		/// Server socket
+		EN_SOCKET ServerSocket;
+
+		std::list<std::string>** QueueMessageVec;
 	protected:
 
 		/// Server port. Default set to 1111
@@ -56,9 +63,6 @@ namespace EN
 		/// Server ip address string. Default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
-		/// Server socket
-		EN_SOCKET ServerSocket;
-
 		/// The number of threads in which incoming messages will be processed
 		int ThreadAmount = 2;
 
@@ -69,13 +73,8 @@ namespace EN
 		*/
 		int MaxStackBuffSize = 16;
 
-		/// Server address
-		sockaddr_in ServerAddress;
-
 		/// Incoming message buffer type
 		EN_UDP_ServerBuferType ServerBuferType = Queue;
-
-		std::list<std::string>** QueueMessageVec;
 
 		// Method that processes incoming messages
 		virtual void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
@@ -84,8 +83,6 @@ namespace EN
 		virtual bool ImportantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 	public:
-
-		void SetServerBuferType(EN_UDP_ServerBuferType type) { ServerBuferType = type; }
 
 		void Call(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
 
