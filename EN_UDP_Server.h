@@ -58,10 +58,10 @@ namespace EN
 		int MaxStackBuffSize = 16;
 
 		// Method that processes incoming messages
-		virtual void ClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
+		virtual void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 		// Method that processes incoming messages
-		virtual bool ImportantClientMessageHandler(std::string message, sockaddr_in ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
+		virtual bool ImportantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 		bool IsShutdown = false;
 
@@ -76,7 +76,7 @@ namespace EN
 
 		void SetServerBuferType(EN_UDP_ServerBuferType type) { ServerBuferType = type; }
 
-		void Call(std::string message, sockaddr_in ClientSocketAddr, long long TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
+		void Call(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
 
 		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
 		EN_UDP_Server();
@@ -93,7 +93,7 @@ namespace EN
 		// Method that stops the server
 		void Shutdown();
 
-		void SendToClient(std::string msg, sockaddr_in ClientSocketAddr);
+		void SendToClient(std::string msg, std::string ClientSocketAddr);
 
 		~EN_UDP_Server();
 	};

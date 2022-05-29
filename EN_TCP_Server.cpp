@@ -230,6 +230,7 @@ namespace EN
 
 	void EN_TCP_Server::SendToClient(int ClientId, std::string message)
 	{
-		EN::TCP_Send(ClientSockets[ClientId], message);
+		if(ClientSockets[ClientId] != INVALID_SOCKET)
+			EN::TCP_Send(ClientSockets[ClientId], message);
 	}
 }

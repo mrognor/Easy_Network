@@ -19,6 +19,12 @@ namespace EN
 				auto f1 = QueueMsg->front();
 				auto f2 = QueueAddr->front();
 				
+				char str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &(f2.sin_addr), str, INET_ADDRSTRLEN);
+				std::string ClientAddress = str;
+				ClientAddress += ":";
+				ClientAddress += std::to_string(ntohs(f2.sin_port));
+				
 				switch (buffType)
 				{
 				case (Stack):
@@ -29,11 +35,11 @@ namespace EN
 					QueueTime->pop_front();
 					ThreadMutex->unlock();
 
-					server->Call(f1, f2, elapsed_seconds.count());
+					server->Call(f1, ClientAddress, elapsed_seconds.count());
 					break;
 
 				case (Queue):
-					server->Call(f1, f2, elapsed_seconds.count());
+					server->Call(f1, ClientAddress, elapsed_seconds.count());
 
 					ThreadMutex->lock();
 					QueueMsg->pop_front();
@@ -125,7 +131,13 @@ namespace EN
 
 			if (std::string(buf) != "")
 			{
-				if (ImportantClientMessageHandler(buf, si_other, 0) == false)
+				char str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &(si_other.sin_addr), str, INET_ADDRSTRLEN);
+				std::string ClientAddress = str; 
+				ClientAddress += ":"; 
+				ClientAddress += ntohs(si_other.sin_port);
+
+				if (ImportantClientMessageHandler(buf, ClientAddress, 0) == false)
 					continue;
 
 				int IndexMinQueue = 0;
@@ -220,10 +232,18 @@ namespace EN
 		}
 	}
 
-	void EN_UDP_Server::SendToClient(std::string msg, sockaddr_in ClientSocketAddr)
+	void EN_UDP_Server::SendToClient(std::string msg, std::string ClientSocketAddr)
 	{
+		//Prepare the sockaddr_in structure
+		sockaddr_in client;
+		client.sin_family = AF_INET;
+		client.sin_port = htons(std::atoi((ClientSocketAddr.substr(ClientSocketAddr.find(":")).c_str())));
+
+		// Set ip address
+		inet_pton(AF_INET, (ClientSocketAddr.substr(0, ClientSocketAddr.find(":"))).c_str(), &client.sin_addr);
+
 		//now reply the client with the same data
-		if (sendto(s, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientSocketAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(s, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&client, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
 			std::cerr << "sendto failed" << std::endl;
 		}
