@@ -28,7 +28,7 @@ namespace EN
 		}
 
 		ServerSockAddr.sin_family = AF_INET;
-		ServerSockAddr.sin_port = htons(Port);
+		ServerSockAddr.sin_port = htons(ServerPort);
 
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddres.c_str(), &ServerSockAddr.sin_addr);
@@ -72,7 +72,7 @@ namespace EN
 	{
 		if (sendto(ServerConnectionSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr)) == SOCKET_ERROR)
 		{
-			std::cerr << "Failed to send" << std::endl;
+			std::cerr << "Error: Failed to send to server" << std::endl;
 		}
 		
 		#ifdef WIN32
@@ -95,7 +95,6 @@ namespace EN
 	{
 		#ifdef WIN32
 		WSACleanup();
-
 		#endif
 	}
 }

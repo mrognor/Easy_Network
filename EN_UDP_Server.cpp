@@ -3,7 +3,7 @@
 
 namespace EN
 {
-	void ThreadListHandler(EN_UDP_Server* server, std::mutex* ThreadMutex, std::list<std::string>* QueueMsg, std::list<sockaddr_in>* QueueAddr, std::list<EN_TimePoint>* QueueTime, std::condition_variable* cv, EN_UDP_ServerBuferType buffType)
+	void ThreadListHandler(EN_UDP_Server* ServerAddress, std::mutex* ThreadMutex, std::list<std::string>* QueueMsg, std::list<sockaddr_in>* QueueAddr, std::list<EN_TimePoint>* QueueTime, std::condition_variable* cv, EN_UDP_ServerBuferType buffType)
 	{
 		std::mutex mtx;
 		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
@@ -35,11 +35,11 @@ namespace EN
 					QueueTime->pop_front();
 					ThreadMutex->unlock();
 
-					server->Call(f1, ClientAddress, elapsed_seconds.count());
+					ServerAddress->Call(f1, ClientAddress, elapsed_seconds.count());
 					break;
 
 				case (Queue):
-					server->Call(f1, ClientAddress, elapsed_seconds.count());
+					ServerAddress->Call(f1, ClientAddress, elapsed_seconds.count());
 
 					ThreadMutex->lock();
 					QueueMsg->pop_front();
@@ -69,20 +69,20 @@ namespace EN
 	void EN_UDP_Server::Run()
 	{
 		//Create a socket
-		if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
+		if ((ServerSocket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
 			std::cerr << "Could not create socket" << std::endl;
 		}
 
 		//Prepare the sockaddr_in structure
-		server.sin_family = AF_INET;
-		server.sin_port = htons(Port);
+		ServerAddress.sin_family = AF_INET;
+		ServerAddress.sin_port = htons(Port);
 
 		// Set ip address
-		inet_pton(AF_INET, IpAddress.c_str(), &server.sin_addr);
+		inet_pton(AF_INET, IpAddress.c_str(), &ServerAddress.sin_addr);
 
 		//Bind
-		if (bind(s, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
+		if (bind(ServerSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
 		{
 			std::cerr << "Bind failed" << std::endl;
 		}
@@ -123,10 +123,10 @@ namespace EN
 
 			#ifdef WIN32
 			//try to receive some data, this is a blocking call
-			recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen);
+			recv_len = recvfrom(ServerSocket, buf, MaxMessageSize, 0, (sockaddr*)&si_other, &slen);
 			#else
 			//try to receive some data, this is a blocking call
-			recv_len = recvfrom(s, buf, MaxMessageSize, 0, (sockaddr*)&si_other, (socklen_t*)&slen);
+			recv_len = recvfrom(ServerSocket, buf, MaxMessageSize, 0, (sockaddr*)&si_other, (socklen_t*)&slen);
 			#endif
 
 			if (std::string(buf) != "")
@@ -203,9 +203,9 @@ namespace EN
 
 		delete[] buf;
 		#ifdef WIN32
-		closesocket(s);
+		closesocket(ServerSocket);
 		#else
-		close(s);
+		close(ServerSocket);
 		#endif		
 	}
 
@@ -213,7 +213,7 @@ namespace EN
 	{
 		IsShutdown = true;
 
-		if (sendto(s, "", MaxMessageSize, 0, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
+		if (sendto(ServerSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
 		{
 			std::cerr << "sendto failed" << std::endl;
 		}
@@ -243,7 +243,7 @@ namespace EN
 		inet_pton(AF_INET, (ClientSocketAddr.substr(0, ClientSocketAddr.find(":"))).c_str(), &client.sin_addr);
 
 		//now reply the client with the same data
-		if (sendto(s, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&client, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(ServerSocket, msg.c_str(), MaxMessageSize, 0, (sockaddr*)&client, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
 			std::cerr << "sendto failed" << std::endl;
 		}

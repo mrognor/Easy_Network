@@ -41,21 +41,41 @@ namespace EN
 
 	class EN_UDP_Server
 	{
+	private:
+		// Variable to shutdown server
+		bool IsShutdown = false;
+
 	protected:
 
-		// Default port
+		/// Server port. Default set to 1111
 		int Port = 1111;
 
+		/// Maximum number of characters in a message
 		int MaxMessageSize = 256;
 
-		// Server ip address string. Default set to localhost
+		/// Server ip address string. Default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
-		EN_SOCKET s;
+		/// Server socket
+		EN_SOCKET ServerSocket;
 
+		/// The number of threads in which incoming messages will be processed
 		int ThreadAmount = 2;
 
+		/**
+			\brief The maximum size of the incoming message stack. 
+
+			Used only if ServerBuferType set to EN::Stack
+		*/
 		int MaxStackBuffSize = 16;
+
+		/// Server address
+		sockaddr_in ServerAddress;
+
+		/// Incoming message buffer type
+		EN_UDP_ServerBuferType ServerBuferType = Queue;
+
+		std::list<std::string>** QueueMessageVec;
 
 		// Method that processes incoming messages
 		virtual void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
@@ -63,13 +83,6 @@ namespace EN
 		// Method that processes incoming messages
 		virtual bool ImportantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
-		bool IsShutdown = false;
-
-		sockaddr_in server;
-
-		EN_UDP_ServerBuferType ServerBuferType = Queue;
-		
-		std::list<std::string>** QueueMessageVec;
 	public:
 
 		bool* WhichThreadFlushing;

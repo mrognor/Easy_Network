@@ -82,6 +82,7 @@ namespace EN
 		/// Ip getter
 		std::string GetIpAddr() { return IpAddress; }
 
+		/// The function returns the number of connected devices
 		int GetConnectionsCount() { return ClientSockets.size(); }
 
 		/// Method to start server.

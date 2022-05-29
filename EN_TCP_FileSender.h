@@ -2,6 +2,7 @@
 
 namespace EN
 {
+	/// Client class for sending files to the server
 	class EN_TCP_FileSender : public EN::EN_TCP_Client
 	{
 	private:
@@ -18,20 +19,29 @@ namespace EN
 		// This method does nothing but we have to redefine it to work correctly
 		void BeforeDisconnect() {};
 
+		// Variable to stop file transmission
 		bool IsStop = false;
 
 	public:
 		EN_TCP_FileSender() : EN_TCP_Client() {};
 
-		/// Function to send file to server. First parametr is file name. Second is pointer to progress function
+		/**
+			\brief Function to send file to server.
+
+			\param[in] FileName name of file to be sent
+			\param[in] Pointer to progress function. By default set to library function which displays progress in terminal
+			\return Return true if file transmission success, false otherwise
+		*/
 		bool SendFileToServer(std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta));
 
 		/// Function to recv file from server
+		/// \return Return true if file transmission success, false otherwise
 		bool RecvFileFromServer();
 
 		/// Function to get message from server
-		bool RecvMessageFromServer(std::string& msg);
+		void RecvMessageFromServer(std::string& msg);
 
+		/// Function to stop file transmission
 		void StopDownloading() { IsStop = true; }
 	};
 }

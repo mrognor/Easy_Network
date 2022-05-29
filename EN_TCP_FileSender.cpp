@@ -18,23 +18,9 @@ namespace EN
 		return false;
 	}
 
-	bool EN_TCP_FileSender::RecvMessageFromServer(std::string& msg)
+	void EN_TCP_FileSender::RecvMessageFromServer(std::string& msg)
 	{
 		if (IsConnected())
-		{
 			bool IsServerConnected = EN::TCP_Recv(*GetSocket(), msg);
-
-			if (IsServerConnected == false)
-			{
-				std::cerr << "Error! Failed receive message from server" << std::endl;
-				return false;
-			}
-		}
-		else
-		{
-			std::cerr << "Error! Failed receive message from server" << std::endl;
-			return false;
-		}
-		return true;
 	}
 }

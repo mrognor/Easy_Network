@@ -26,10 +26,12 @@ typedef int EN_SOCKET;
 
 namespace EN
 {
-	// Easy network class
+	/// Base udp client class
 	class EN_UDP_Client
 	{
 	private:
+		// Server address
+		sockaddr_in ServerSockAddr;
 
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
@@ -37,43 +39,46 @@ namespace EN
 
 	protected:
 
-		// Default port
-		int Port = 1111;
+		/// Default port. Default set to 1111
+		int ServerPort = 1111;
 
+		/// Maximum number of characters in a message
 		int MaxMessageSize = 256;
 
-		// Server ip address string. Default set to localhost
+		/// Server ip address string. Default set to localhost
 		std::string ServerIpAddres = "127.0.0.1";
 
-		// Socket to connect to server
+		/// Socket to connect to server
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
-		sockaddr_in ServerSockAddr;
-
-		// A function to be defined by the user. It is used to process incoming messages from the server
+		/// A function to be defined by the user. It is used to process incoming messages from the server
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 	public:
 		// Default constructor. Initiate winsock api
 		EN_UDP_Client();
 
-		// Port getter
-		int GetPort() { return Port; }
+		/// Server port getter
+		int GetPort() { return ServerPort; }
 
-		// Ip getter
+		/// Ip getter
 		std::string GetIpAddr() { return ServerIpAddres; }
 
-		// Socket getter
+		/// Socket getter
 		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
 
-		// Method to start server. Starts a thread to process server responses
-		// You have to determine BeforeDisconnect() and ServerMessageHandler()
+		/// Method to start server. Starts a thread to process server responses
 		void Run();
 
-		// Function for sending a message to a connected server
-		// As an additional parameter, it takes the delay in executing the code to send the message
+		/**
+			\brief Function for sending a message to a connected server
+
+			\param[in] message string to send to server
+			\param[in] MessageDelay Additional parameter, it takes the delay in executing the code to send the message
+		*/
 		void SendToServer(std::string message, int MessageDelay = 10);
 
+		/// Function to close client
 		void Close();
 
 		// Default destructor
