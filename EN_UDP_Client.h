@@ -33,6 +33,9 @@ namespace EN
 		// Server address
 		sockaddr_in ServerSockAddr;
 
+		/// Socket to connect to server
+		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
+		
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
@@ -47,9 +50,6 @@ namespace EN
 
 		/// Server ip address string. Default set to localhost
 		std::string ServerIpAddres = "127.0.0.1";
-
-		/// Socket to connect to server
-		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
 		/// A function to be defined by the user. It is used to process incoming messages from the server
 		virtual void ServerMessageHandler(std::string message) = 0;
