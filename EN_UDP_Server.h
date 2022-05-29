@@ -85,8 +85,6 @@ namespace EN
 
 	public:
 
-		bool* WhichThreadFlushing;
-
 		void SetServerBuferType(EN_UDP_ServerBuferType type) { ServerBuferType = type; }
 
 		void Call(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived) { ClientMessageHandler(message, ClientSocketAddr, TimeSincePackageArrived); }
