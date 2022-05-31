@@ -31,7 +31,6 @@ typedef int EN_SOCKET;
 #include <list>
 
 typedef std::chrono::system_clock::time_point EN_TimePoint;
-typedef sockaddr_in UDP_Address;
 
 namespace EN
 {
@@ -97,7 +96,7 @@ namespace EN
 			Get message, UDP client address and time since message come to server
 			\warning Must be defined by the user
 		*/
-		virtual void ClientMessageHandler(std::string message, UDP_Address ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
+		virtual void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 		/**
 			\brief Method that processes incoming messages
@@ -107,7 +106,7 @@ namespace EN
 			Return true if you want to put message into bufer, false otherwise
 			\warning Must be defined by the user
 		*/
-		virtual bool InstantClientMessageHandler(std::string message, UDP_Address ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
+		virtual bool InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
 
 	public:
 
@@ -130,9 +129,9 @@ namespace EN
 			\brief function for sending a message to the client
 
 			\param[in] message string to send to server
-			\param[in] ClientSocketAddr variable with udp client address
+			\param[in] ClientSocketAddr string with server address. Format: 127.0.0.1:1111
 		*/
-		void SendToClient(std::string message, UDP_Address ClientSocketAddr);
+		void SendToClient(std::string message, std::string ClientSocketAddr);
 
 		~EN_UDP_Server();
 	};

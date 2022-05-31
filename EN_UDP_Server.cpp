@@ -16,8 +16,13 @@ namespace EN
 
 				std::chrono::milliseconds elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - QueueTimeVec[ThreadID]->front());
 
-				auto f1 = QueueMessageVec[ThreadID]->front();
-				auto f2 = QueueAddrVec[ThreadID]->front();
+				std::string TopMessage = QueueMessageVec[ThreadID]->front();
+
+				char str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &(QueueAddrVec[ThreadID]->front().sin_addr), str, INET_ADDRSTRLEN);
+				std::string StringServerAddress = str;
+				
+				StringServerAddress = StringServerAddress + ":" + std::to_string(ntohs(QueueAddrVec[ThreadID]->front().sin_port));
 
 				switch (ServerBuferType)
 				{
@@ -29,11 +34,11 @@ namespace EN
 					QueueTimeVec[ThreadID]->pop_front();
 					Mutexes[ThreadID]->unlock();
 
-					ClientMessageHandler(f1, f2, elapsed_seconds.count());
+					ClientMessageHandler(TopMessage, StringServerAddress, elapsed_seconds.count());
 					break;
 
 				case (Queue):
-					ClientMessageHandler(f1, f2, elapsed_seconds.count());
+					ClientMessageHandler(TopMessage, StringServerAddress, elapsed_seconds.count());
 
 					Mutexes[ThreadID]->lock();
 					QueueMessageVec[ThreadID]->pop_front();
@@ -125,7 +130,12 @@ namespace EN
 
 			if (std::string(IncomingMessageBuffer) != "")
 			{
-				if (InstantClientMessageHandler(IncomingMessageBuffer, ClientAddress, 0) == false)
+				char str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &(ClientAddress.sin_addr), str, INET_ADDRSTRLEN);
+				std::string StringClientAddress = str;
+				StringClientAddress = StringClientAddress + ":" + std::to_string(ntohs(ClientAddress.sin_port));
+				
+				if (InstantClientMessageHandler(IncomingMessageBuffer, StringClientAddress, 0) == false)
 					continue;
 
 				int IndexMinQueue = 0;
@@ -203,7 +213,7 @@ namespace EN
 
 		if (sendto(ServerSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
 		{
-			std::cerr << "sendto failed" << std::endl;
+			std::cerr << "Failed to send to shutdown server" << std::endl;
 		}
 
 		switch (ServerBuferType)
@@ -228,12 +238,21 @@ namespace EN
 		}
 	}
 
-	void EN_UDP_Server::SendToClient(std::string message, UDP_Address ClientSocketAddr)
+	void EN_UDP_Server::SendToClient(std::string message, std::string ClientSocketAddr)
 	{
+		auto SplittedAddr = Split(ClientSocketAddr, ":");
+		sockaddr_in ClientAddr;
+		//Prepare the sockaddr_in structure
+		ClientAddr.sin_family = AF_INET;
+		ClientAddr.sin_port = htons(std::atoi(SplittedAddr[1].c_str()));
+
+		// Set ip address
+		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
+
 		//now reply the client with the same data
-		if (sendto(ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientSocketAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
-			std::cerr << "sendto failed" << std::endl;
+			std::cerr << "Failed to send" << std::endl;
 		}
 	}
 

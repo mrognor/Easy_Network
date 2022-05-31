@@ -18,7 +18,7 @@ public:
 	}
 
 	// Third parametr in milliseconds
-	void ClientMessageHandler(std::string message, UDP_Address ClientSocketAddr, long long TimeSincePackageArrived)
+	void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived)
 	{
 		//if (TimeSincePackageArrived > 700)
 		//	return;
@@ -29,20 +29,16 @@ public:
 		usleep(5000);
 		#endif
 
-		char str[INET_ADDRSTRLEN];
-		inet_ntop(AF_INET, &(ClientSocketAddr.sin_addr), str, INET_ADDRSTRLEN);
-
-		std::cout << "Message: " << message << " Ip: " << str <<
-			" Port: " << ntohs(ClientSocketAddr.sin_port) << " Time: " << TimeSincePackageArrived << std::endl;
-
 		if (message == "f")
 			Shutdown();
+		
+		std::cout << message << std::endl;
 
 		SendToClient(message, ClientSocketAddr);
 	}
 
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
-	bool InstantClientMessageHandler(std::string message, UDP_Address ClientSocketAddr, long long TimeWhenPackageArrived)
+	bool InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
 	{
 		std::cout << "Important! " << message << std::endl;
 		if (message == "oleg")
