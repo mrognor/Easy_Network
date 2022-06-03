@@ -52,7 +52,7 @@ namespace EN
 		sockaddr_in ServerAddress;
 
 		// Server socket
-		EN_SOCKET ServerSocket;
+		EN_SOCKET UDP_ServerSocket;
 
 		// Array of pointer
 		std::list<std::string>** QueueMessageVec;

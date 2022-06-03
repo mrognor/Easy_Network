@@ -21,6 +21,9 @@ namespace EN
 
 	void EN_UDP_Client::Run()
 	{
+		// Get port from os
+		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
+
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 		{
 			std::cerr << "Failed to create socket" << std::endl;
@@ -39,9 +42,6 @@ namespace EN
 
 	void EN_UDP_Client::ServerHandler()
 	{
-		// Get port from os
-		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
-
 		char* Message = new char[MaxMessageSize];
 		memset(Message, '\0', MaxMessageSize);
 

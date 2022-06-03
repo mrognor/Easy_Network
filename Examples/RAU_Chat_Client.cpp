@@ -1,11 +1,9 @@
-﻿#include <iostream>
-#include "../EN_TCP_Client.h"
+#include "../EN_RAU_Client.h"
 
-
-class MyClient : public EN::EN_TCP_Client
+class MyClient : public EN::EN_RAU_Client
 {
 public:
-	MyClient(){}
+	MyClient() {}
 
 	// A function to be defined by the user. It is used for logic after connection
 	void AfterConnect() {}
@@ -43,6 +41,8 @@ int main()
 
 	std::string message;
 
+	int count = 0;
+
 	while (true)
 	{
 		getline(std::cin, message);
@@ -51,7 +51,12 @@ int main()
 			break;
 
 		if (A.IsConnected())
-			A.SendToServer(message);
+		{
+			if (count % 2 == 0)
+				A.SendToServer("TCP " + message, true);
+			else A.SendToServer("UDP " + message, false);
+			count++;
+		}
 		else break;
 	}
 

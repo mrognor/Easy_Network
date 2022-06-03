@@ -68,7 +68,7 @@ namespace EN
 	void EN_UDP_Server::Run()
 	{
 		//Create a socket
-		if ((ServerSocket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
+		if ((UDP_ServerSocket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
 			std::cerr << "Could not create socket" << std::endl;
 		}
@@ -81,7 +81,7 @@ namespace EN
 		inet_pton(AF_INET, IpAddress.c_str(), &ServerAddress.sin_addr);
 
 		//Bind
-		if (bind(ServerSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
+		if (bind(UDP_ServerSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
 		{
 			std::cerr << "Bind failed" << std::endl;
 		}
@@ -122,10 +122,10 @@ namespace EN
 
 			#ifdef WIN32
 			//try to receive some data, this is a blocking call
-			recvfrom(ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, &sizeofaddr);
+			recvfrom(UDP_ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, &sizeofaddr);
 			#else
 			//try to receive some data, this is a blocking call
-			recvfrom(ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, (socklen_t*)&sizeofaddr);
+			recvfrom(UDP_ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, (socklen_t*)&sizeofaddr);
 			#endif
 
 			if (std::string(IncomingMessageBuffer) != "")
@@ -201,9 +201,9 @@ namespace EN
 
 		delete[] IncomingMessageBuffer;
 		#ifdef WIN32
-		closesocket(ServerSocket);
+		closesocket(UDP_ServerSocket);
 		#else
-		close(ServerSocket);
+		close(UDP_ServerSocket);
 		#endif		
 	}
 
@@ -211,7 +211,7 @@ namespace EN
 	{
 		IsShutdown = true;
 
-		if (sendto(ServerSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
+		if (sendto(UDP_ServerSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
 		{
 			std::cerr << "Failed to send to shutdown server" << std::endl;
 		}
@@ -250,7 +250,7 @@ namespace EN
 		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
 
 		//now reply the client with the same data
-		if (sendto(ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(UDP_ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
 		{
 			std::cerr << "Failed to send" << std::endl;
 		}

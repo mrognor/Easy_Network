@@ -8,7 +8,8 @@ public:
 	MyClient()
 	{
 		// ServerIpAddres = "37.140.195.195"; //Default set to localhost
-		// Port = <put int here> to set port. Default port is 1111
+		// ServerPort = <put int here> to set port. Default port is 1111
+		ServerPort = 1111;
 		MaxMessageSize = 512;
 	}
 
@@ -35,7 +36,7 @@ int main()
 		if (msg == "stress test")
 		{
 			for (int i = 0; i < 100; i++)
-				A.SendToServer("No bitches?");
+				A.SendToServer("No");
 		}
 		A.SendToServer(msg);
 	}
