@@ -29,8 +29,9 @@ public:
 
 		for (int j = 0; j < GetConnectionsCount(); j++)
 		{
-			if (j != ClientID)
+			if(message.find("TCP") == 0)
 				SendToClient(j, message);
+			else SendToClient(j, message, false);
 		}
 	}
 

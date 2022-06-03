@@ -17,7 +17,10 @@ namespace EN
 			exit(1);
 		}
 		#endif
+	}
 
+	void EN_UDP_Client::Run()
+	{
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 		{
 			std::cerr << "Failed to create socket" << std::endl;
@@ -32,10 +35,7 @@ namespace EN
 
 		// Get port from os
 		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
-	}
 
-	void EN_UDP_Client::Run()
-	{
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
 	}
