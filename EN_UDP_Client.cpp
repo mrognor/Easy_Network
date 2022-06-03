@@ -17,12 +17,6 @@ namespace EN
 			exit(1);
 		}
 		#endif
-	}
-
-	void EN_UDP_Client::Run()
-	{
-		// Get port from os
-		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
 
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 		{
@@ -36,6 +30,12 @@ namespace EN
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddres.c_str(), &ServerSockAddr.sin_addr);
 
+		// Get port from os
+		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
+	}
+
+	void EN_UDP_Client::Run()
+	{
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
 	}
