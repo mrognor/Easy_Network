@@ -33,6 +33,8 @@ namespace EN
 	public:
 		EN_RAU_Client* RAU_Client;
 
+		void SetIpAndPort(std::string Ip, int port);
+
 		EN_RAU_UDP_Client(EN_RAU_Client* rau_Client);
 
 		void ServerMessageHandler(std::string message);

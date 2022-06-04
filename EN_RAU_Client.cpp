@@ -29,12 +29,16 @@ namespace EN
 		RAU_Client->BeforeDisconnect();
 	}
 
+	void EN_RAU_UDP_Client::SetIpAndPort(std::string Ip, int port)
+	{
+		ServerPort = port + 1;
+		ServerIpAddres = Ip;
+	}
+
 	// UDP client
 	EN_RAU_UDP_Client::EN_RAU_UDP_Client(EN_RAU_Client* rau_Client)
 	{
 		RAU_Client = rau_Client;
-		ServerPort = rau_Client->ServerPort + 1;
-		ServerIpAddres = rau_Client->ServerIpAddress;
 	}
 
 	void EN_RAU_UDP_Client::ServerMessageHandler(std::string message)
@@ -61,12 +65,14 @@ namespace EN
 
 	bool EN_RAU_Client::Connect(int port)
 	{
+		UDP_Client->SetIpAndPort("127.0.0.1", port);
 		ServerPort = port;
 		return TCP_Client->Connect(port);
 	}
 
 	bool EN_RAU_Client::Connect(std::string ipAddr, int port)
 	{
+		UDP_Client->SetIpAndPort(ipAddr, port);
 		ServerIpAddress = ipAddr;
 		ServerPort = port;
 		return TCP_Client->Connect(ipAddr, port);

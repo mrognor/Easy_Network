@@ -6,9 +6,6 @@ namespace EN
 	EN_RAU_TCP_Server::EN_RAU_TCP_Server(EN_RAU_Server* rau_Server)
 	{
 		RAU_Server = rau_Server;
-		IpAddress = rau_Server->IpAddress;
-		Port = rau_Server->Port;
-		std::cout << rau_Server->IpAddress << std::endl;
 	}
 
 	void EN_RAU_Server::ThreadQueueHandler(int ClientID)
@@ -97,11 +94,6 @@ namespace EN
 	EN_RAU_UDP_Server::EN_RAU_UDP_Server(EN_RAU_Server* rau_Server)
 	{
 		RAU_Server = rau_Server;
-		IpAddress = rau_Server->IpAddress;
-		Port = rau_Server->Port + 1;
-		MaxMessageSize = RAU_Server->MaxUnreliableMessageSize + 10;
-		ThreadAmount = 1;
-		ServerBuferType = EN::Queue;
 	}
 
 	bool EN_RAU_UDP_Server::InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
@@ -131,6 +123,17 @@ namespace EN
 
 	void EN_RAU_Server::Run()
 	{
+		// Setup ip and port on tcp server
+		TCP_Server->IpAddress = IpAddress;
+		TCP_Server->Port = Port;
+		
+		// Setup ip and port on udp server
+		UDP_Server->IpAddress = IpAddress;
+		UDP_Server->Port = Port + 1;
+		UDP_Server->MaxMessageSize = MaxUnreliableMessageSize + 10;
+		UDP_Server->ThreadAmount = 1;
+		UDP_Server->ServerBuferType = EN::Queue;
+
 		std::thread UDP_Thread([this]() {this->UDP_Server->Run(); });
 		UDP_Thread.detach();
 		TCP_Server->Run();
