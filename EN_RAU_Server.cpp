@@ -8,6 +8,7 @@ namespace EN
 		RAU_Server = rau_Server;
 		IpAddress = rau_Server->IpAddress;
 		Port = rau_Server->Port;
+		std::cout << rau_Server->IpAddress << std::endl;
 	}
 
 	void EN_RAU_Server::ThreadQueueHandler(int ClientID)
@@ -59,19 +60,12 @@ namespace EN
 
 		std::thread QueueThreadHandler([this, ClientID]() {this->RAU_Server->ThreadQueueHandler(ClientID); });
 		QueueThreadHandler.detach();
-
-		RAU_Server->OnClientConnected(ClientID);
 	}
 
 	void EN_RAU_TCP_Server::ClientMessageHandler(std::string message, int ClientID)
 	{
-		if (RAU_Server->UDPIpAddresses[ClientID] == "none")
-			RAU_Server->UDPIpAddresses[ClientID] = message;
-		else
-		{
-			RAU_Server->VectorQueuesMessages[ClientID]->push(message);
-			RAU_Server->VectorCondVars[ClientID]->notify_all();
-		}
+		RAU_Server->VectorQueuesMessages[ClientID]->push(message);
+		RAU_Server->VectorCondVars[ClientID]->notify_all();
 	}
 
 	void EN_RAU_TCP_Server::OnClientDisconnect(int ClientID)
@@ -113,8 +107,18 @@ namespace EN
 	bool EN_RAU_UDP_Server::InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
 	{
 		int ThreadID = std::atoi(message.substr(0, message.find(" ")).c_str());
-		RAU_Server->VectorQueuesMessages[ThreadID]->push(message.substr(message.find(" ") + 1));
-		RAU_Server->VectorCondVars[ThreadID]->notify_all();
+
+		if (RAU_Server->UDPIpAddresses[ThreadID] == "none")
+		{
+			RAU_Server->UDPIpAddresses[ThreadID] = ClientSocketAddr;
+			RAU_Server->TCP_Server->SendToClient(ThreadID, " ");
+			RAU_Server->OnClientConnected(ThreadID);
+		}
+		else
+		{
+			RAU_Server->VectorQueuesMessages[ThreadID]->push(message.substr(message.find(" ") + 1));
+			RAU_Server->VectorCondVars[ThreadID]->notify_all();
+		}
 		return false;
 	}
 

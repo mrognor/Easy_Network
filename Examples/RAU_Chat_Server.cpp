@@ -13,6 +13,8 @@ public:
 	{
 		std::cout << "Client Connected! id: " << ClientID << std::endl;
 		SendToClient(ClientID, "Welcome. You are connected to server.");
+		SendToClient(ClientID, "Reliable", true);
+		SendToClient(ClientID, "Unreliable", false);
 	}
 
 	void ClientMessageHandler(std::string message, int ClientID)

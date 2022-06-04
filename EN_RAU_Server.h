@@ -14,6 +14,7 @@ namespace EN
 	class EN_RAU_TCP_Server : public EN_TCP_Server
 	{
 	public:
+		friend EN_RAU_Server;
 		EN_RAU_Server* RAU_Server;
 
 		EN_RAU_TCP_Server(EN_RAU_Server* rau_Server);
@@ -28,6 +29,7 @@ namespace EN
 	class EN_RAU_UDP_Server : public EN_UDP_Server
 	{
 	public:
+		friend EN_RAU_Server;
 		EN_RAU_Server* RAU_Server;
 
 		EN_RAU_UDP_Server(EN_RAU_Server* rau_Server);

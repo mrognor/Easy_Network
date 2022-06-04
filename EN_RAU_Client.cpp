@@ -8,17 +8,20 @@ namespace EN
 		RAU_Client = rau_Client;
 	}
 
-	void EN_RAU_TCP_Client::AfterConnect()
-	{
-		SendToServer("UDP IP HERE");
-		RAU_Client->AfterConnect();
-	}
-
 	void EN_RAU_TCP_Client::ServerMessageHandler(std::string message)
 	{
 		if (RAU_Client->ServerThreadID != -1)
-			RAU_Client->ServerMessageHandler(message);
-		else RAU_Client->ServerThreadID = std::atoi(message.c_str());
+		{
+			if (RAU_Client->IsServerGetUDPAddress == false)
+			{
+				RAU_Client->IsServerGetUDPAddress = true;
+				RAU_Client->AfterConnect();
+			}
+			else
+				RAU_Client->ServerMessageHandler(message);
+		}
+		else 
+			RAU_Client->ServerThreadID = std::atoi(message.c_str());
 	}
 
 	void EN_RAU_TCP_Client::BeforeDisconnect()
@@ -36,7 +39,7 @@ namespace EN
 
 	void EN_RAU_UDP_Client::ServerMessageHandler(std::string message)
 	{
-		std::cout << "Message: " << message << std::endl;
+		RAU_Client->ServerMessageHandler(message);
 	}
 	
 	// RAU client
@@ -71,9 +74,17 @@ namespace EN
 
 	void EN_RAU_Client::Run()
 	{
-		std::thread TCP_Thread([this]() {TCP_Client->Run(); });
+		std::thread TCP_Thread([this]() { TCP_Client->Run(); });
 		TCP_Thread.detach();
 		UDP_Client->Run();
+
+		Sleep(300);
+
+		while (IsServerGetUDPAddress != true)
+		{
+			UDP_Client->SendToServer(std::to_string(ServerThreadID));
+			Sleep(1000);
+		}
 	}
 
 	void EN_RAU_Client::SendToServer(std::string message, bool IsReliable, int MessageDelay)
@@ -86,6 +97,7 @@ namespace EN
 
 	void EN_RAU_Client::Disconnect()
 	{
+		IsServerGetUDPAddress = true;
 		TCP_Client->Disconnect();
 		UDP_Client->Close();
 	}

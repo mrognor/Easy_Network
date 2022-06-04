@@ -19,7 +19,7 @@ namespace EN
 		EN_RAU_TCP_Client(EN_RAU_Client* rau_Client);
 
 		// A function to be defined by the user. It is used for logic after connection
-		void AfterConnect();
+		void AfterConnect() {};
 
 		// A function to be defined by the user. It is used to process incoming messages from the server
 		void ServerMessageHandler(std::string message);
@@ -49,6 +49,8 @@ namespace EN
 
 		int ServerThreadID = -1;
 
+		bool IsServerGetUDPAddress = false;
+
 		// Default port
 		int ServerPort = 1111;
 
@@ -56,6 +58,7 @@ namespace EN
 		std::string ServerIpAddress = "127.0.0.1";
 
 	protected:
+
 		// A function to be defined by the user. It is used for logic after connection
 		virtual void AfterConnect() = 0; 
 

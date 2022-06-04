@@ -8,7 +8,19 @@ public:
 	MyClient(){}
 
 	// A function to be defined by the user. It is used for logic after connection
-	void AfterConnect() {}
+	void AfterConnect() 
+	{
+		char myIP[16];
+		unsigned int myPort;
+		sockaddr_in my_addr;
+		socklen_t len = sizeof(my_addr);
+		getsockname(*GetSocket(), (struct sockaddr*)&my_addr, &len);
+		inet_ntop(AF_INET, &my_addr.sin_addr, myIP, sizeof(myIP));
+		myPort = ntohs(my_addr.sin_port);
+
+		printf("Local ip address: %s\n", myIP);
+		printf("Local port : %u\n", myPort);
+	}
 
 	// A function to be defined by the user. It is used to process incoming messages from the server
 	void ServerMessageHandler(std::string message)
