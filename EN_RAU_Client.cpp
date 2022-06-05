@@ -117,12 +117,21 @@ namespace EN
 		TCP_Thread.detach();
 		UDP_Client->Run();
 
+		#ifdef WIN32
 		Sleep(300);
+		#else
+		usleep(300);
+		#endif
 
 		while (IsServerGetUDPAddress != true)
 		{
 			UDP_Client->SendToServer(std::to_string(ServerThreadID));
+			
+			#ifdef WIN32
 			Sleep(1000);
+			#else
+			usleep(1000);
+			#endif
 		}
 
 		std::thread QueueHandlerThread([this]() {this->QueueMessageHandler(); });
