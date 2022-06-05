@@ -151,7 +151,11 @@ namespace EN
 		TCP_Client->Disconnect();
 		UDP_Client->Close();
 		
+		#ifdef WIN32
 		Sleep(300);
+		#else
+		usleep(300);
+		#endif
 		
 		IsServerGetUDPAddress = true;
 		IsShutdown = true;
