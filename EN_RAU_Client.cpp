@@ -18,7 +18,12 @@ namespace EN
 				RAU_Client->AfterConnect();
 			}
 			else
-				RAU_Client->ServerMessageHandler(message);
+			{
+				RAU_Client->Mtx.lock();
+				RAU_Client->Messages.push(message);
+				RAU_Client->Mtx.unlock();
+				RAU_Client->CondVar.notify_all();
+			}
 		}
 		else 
 			RAU_Client->ServerThreadID = std::atoi(message.c_str());
@@ -43,9 +48,37 @@ namespace EN
 
 	void EN_RAU_UDP_Client::ServerMessageHandler(std::string message)
 	{
-		RAU_Client->ServerMessageHandler(message);
+		RAU_Client->Mtx.lock();
+		RAU_Client->Messages.push(message);
+		RAU_Client->Mtx.unlock();
+		RAU_Client->CondVar.notify_all();
 	}
 	
+	void EN_RAU_Client::QueueMessageHandler()
+	{
+		std::mutex mtx;
+		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
+
+		while (true)
+		{
+			while (!Messages.empty())
+			{
+				ServerMessageHandler(Messages.front());
+				Mtx.lock();
+				Messages.pop();
+				Mtx.unlock();
+			}
+			
+			if (IsShutdown)
+				break;
+
+			CondVar.wait(unique_lock_mutex);
+
+			if (IsShutdown)
+				break;
+		}
+	}
+
 	// RAU client
 	EN_RAU_Client::EN_RAU_Client()
 	{
@@ -91,6 +124,9 @@ namespace EN
 			UDP_Client->SendToServer(std::to_string(ServerThreadID));
 			Sleep(1000);
 		}
+
+		std::thread QueueHandlerThread([this]() {this->QueueMessageHandler(); });
+		QueueHandlerThread.detach();
 	}
 
 	void EN_RAU_Client::SendToServer(std::string message, bool IsReliable, int MessageDelay)
@@ -104,6 +140,7 @@ namespace EN
 	void EN_RAU_Client::Disconnect()
 	{
 		IsServerGetUDPAddress = true;
+		IsShutdown = true;
 		TCP_Client->Disconnect();
 		UDP_Client->Close();
 	}

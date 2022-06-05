@@ -53,6 +53,14 @@ namespace EN
 
 		bool IsServerGetUDPAddress = false;
 
+		bool IsShutdown = false;
+
+		std::queue<std::string> Messages;
+		std::condition_variable CondVar;
+		std::mutex Mtx;
+
+		void QueueMessageHandler();
+
 		// Default port
 		int ServerPort = 1111;
 
