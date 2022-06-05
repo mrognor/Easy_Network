@@ -1,4 +1,8 @@
-all: file_sender tcp_chat udp_chat
+all: file_sender tcp_chat udp_chat rau_chat
+
+rau_chat: lib
+	g++ Examples/RAU_Chat_Server.cpp bin/libEasyNetwork.a -pthread -o bin/RAU_Chat_Server.sh 
+	g++ Examples/RAU_Chat_Client.cpp bin/libEasyNetwork.a -pthread -o bin/RAU_Chat_Client.sh
 
 file_sender: lib 
 	g++ Examples/TCP_FileSender_Server.cpp bin/libEasyNetwork.a -pthread -o bin/TCP_FileSender_Server.sh 
@@ -12,9 +16,17 @@ udp_chat: lib
 	g++ Examples/UDP_Chat_Server.cpp bin/libEasyNetwork.a -pthread -o bin/UDP_Chat_Server.sh 
 	g++ Examples/UDP_Chat_Client.cpp bin/libEasyNetwork.a -pthread -o bin/UDP_Chat_Client.sh 
 
-lib: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o
-	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o
+lib: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o
+	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o
 	ranlib bin/libEasyNetwork.a
+
+bin/EN_RAU_Client.o: EN_RAU_Client.cpp
+	mkdir -p bin
+	g++ -c EN_RAU_Client.cpp -o bin/EN_RAU_Client.o
+
+bin/EN_RAU_Server.o: EN_RAU_Server.cpp
+	mkdir -p bin
+	g++ -c EN_RAU_Server.cpp -o bin/EN_RAU_Server.o
 
 bin/EN_UDP_Client.o: EN_UDP_Client.cpp
 	mkdir -p bin
