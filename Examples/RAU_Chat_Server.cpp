@@ -3,6 +3,7 @@
 class RAU_Server : public EN::EN_RAU_Server
 {	
 public:
+	// Dont work with localhost
 	RAU_Server()
 	{
 		IpAddress = "192.168.1.64"; //Default set to localhost
@@ -23,10 +24,10 @@ public:
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
 
-		if (message == "d")
+		if (message == "TCP d" || message == "UDP d")
 			DisconnectClient(ClientID);
 
-		if (message == "F")
+		if (message == "TCP F" || message == "UDP F")
 			Shutdown();
 
 		for (int j = 0; j < GetConnectionsCount(); j++)

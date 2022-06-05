@@ -21,12 +21,12 @@ namespace EN
 				VectorQueuesMessages[ClientID]->pop();
 			}
 
-			if (IsShutdown)
+			if (IsShutdown || KillThreads[ClientID] == true)
 				break;
 
 			VectorCondVars[ClientID]->wait(unique_lock_mutex);
 
-			if (IsShutdown)
+			if (IsShutdown || KillThreads[ClientID] == true)
 				break;
 		}
 	}
@@ -45,6 +45,8 @@ namespace EN
 			RAU_Server->UDPIpAddresses.push_back("none");
 
 			RAU_Server->VectorCondVars.push_back(f2);
+
+			RAU_Server->KillThreads.push_back(false);
 		}
 		else
 		{
@@ -53,6 +55,8 @@ namespace EN
 			RAU_Server->UDPIpAddresses[ClientID] = "none";
 
 			RAU_Server->VectorCondVars[ClientID] = f2;
+			
+			RAU_Server->KillThreads[ClientID] = false;
 		}
 
 		std::thread QueueThreadHandler([this, ClientID]() {this->RAU_Server->ThreadQueueHandler(ClientID); });
@@ -68,12 +72,23 @@ namespace EN
 	void EN_RAU_TCP_Server::OnClientDisconnect(int ClientID)
 	{
 		RAU_Server->OnClientDisconnect(ClientID);
+		RAU_Server->KillThreads[ClientID] = true;
+		RAU_Server->VectorCondVars[ClientID]->notify_all();
+
+		#ifdef WIN32
+		Sleep(300);
+		#else
+		usleep(300);
+		#endif
 
 		delete RAU_Server->VectorQueuesMessages[ClientID];
 		delete RAU_Server->VectorCondVars[ClientID];
 
+
 		if (ClientID == RAU_Server->UDPIpAddresses.size() - 1)
 		{
+			RAU_Server->KillThreads.pop_back();
+
 			RAU_Server->VectorQueuesMessages.pop_back();
 
 			RAU_Server->UDPIpAddresses.pop_back();
@@ -82,6 +97,8 @@ namespace EN
 		}
 		else
 		{
+			RAU_Server->KillThreads[ClientID] = false;
+
 			RAU_Server->VectorQueuesMessages[ClientID] = nullptr;
 
 			RAU_Server->UDPIpAddresses[ClientID] = "none";

@@ -148,10 +148,13 @@ namespace EN
 
 	void EN_RAU_Client::Disconnect()
 	{
-		IsServerGetUDPAddress = true;
-		IsShutdown = true;
 		TCP_Client->Disconnect();
 		UDP_Client->Close();
+		
+		Sleep(300);
+		
+		IsServerGetUDPAddress = true;
+		IsShutdown = true;
 	}
 
 	EN_RAU_Client::~EN_RAU_Client()

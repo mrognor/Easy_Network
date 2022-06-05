@@ -52,7 +52,8 @@ namespace EN
 		std::vector<std::queue<std::string>*> VectorQueuesMessages;
 		std::vector<std::string> UDPIpAddresses;
 		std::vector<std::condition_variable*> VectorCondVars;
-		
+		std::vector<bool> KillThreads;
+
 		bool IsShutdown = false;
 
 		void ThreadQueueHandler(int ClientID);
