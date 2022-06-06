@@ -22,6 +22,7 @@ public:
 			SendToServer("Goodbye");
 			std::cout << "Server disconnected" << std::endl;
 		}
+		exit(1);
 	}
 };
 

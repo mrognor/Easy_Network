@@ -159,6 +159,8 @@ namespace EN
 		
 		IsServerGetUDPAddress = true;
 		IsShutdown = true;
+
+		CondVar.notify_all();
 	}
 
 	EN_RAU_Client::~EN_RAU_Client()
