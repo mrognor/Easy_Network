@@ -116,21 +116,13 @@ namespace EN
 		TCP_Client->Run(); 
 		UDP_Client->Run();
 
-		#ifdef WIN32
-		Sleep(300);
-		#else
-		usleep(300000);
-		#endif
+		Delay(300);
 
 		while (IsServerGetUDPAddress != true)
 		{
 			UDP_Client->SendToServer(std::to_string(ServerThreadID));
 			
-			#ifdef WIN32
-			Sleep(1000);
-			#else
-			usleep(1000000);
-			#endif
+			Delay(1000);
 		}
 
 		std::thread QueueHandlerThread([this]() {this->QueueMessageHandler(); });
@@ -150,11 +142,7 @@ namespace EN
 		TCP_Client->Disconnect();
 		UDP_Client->Close();
 		
-		#ifdef WIN32
-		Sleep(300);
-		#else
-		usleep(300000);
-		#endif
+		Delay(300);
 		
 		IsServerGetUDPAddress = true;
 		IsShutdown = true;

@@ -75,11 +75,7 @@ namespace EN
 		RAU_Server->KillThreads[ClientID] = true;
 		RAU_Server->VectorCondVars[ClientID]->notify_all();
 
-		#ifdef WIN32
-		Sleep(300);
-		#else
-		usleep(300);
-		#endif
+		Delay(300);
 
 		delete RAU_Server->VectorQueuesMessages[ClientID];
 		delete RAU_Server->VectorCondVars[ClientID];

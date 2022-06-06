@@ -9,11 +9,7 @@ namespace EN
 		send(sock, (char*)&msg_size, sizeof(int), NULL);
 		send(sock, message.c_str(), message.length(), NULL);
 
-		#ifdef WIN32
-		Sleep(MessageDelay);
-		#else
-		usleep(MessageDelay);
-		#endif
+		Delay(MessageDelay);
 	}
 
 	bool TCP_Recv(EN_SOCKET& sock, std::string& message)

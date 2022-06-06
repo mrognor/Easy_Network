@@ -22,12 +22,8 @@ public:
 	{
 		//if (TimeSincePackageArrived > 700)
 		//	return;
-			
-		#ifdef WIN32 
-		Sleep(5000);
-		#else
-		usleep(5000);
-		#endif
+		
+		EN::Delay(5000);
 
 		if (message == "f")
 			Shutdown();
