@@ -174,9 +174,12 @@ namespace EN
 
 	void EN_RAU_Server::SendToClient(int ClientId, std::string message, bool IsReliable)
 	{
-		if (IsReliable)
-			TCP_Server->SendToClient(ClientId, message);
-		else UDP_Server->SendToClient(message, UDPIpAddresses[ClientId]);
+		if (UDPIpAddresses[ClientId] != "none")
+		{
+			if (IsReliable)
+				TCP_Server->SendToClient(ClientId, message);
+			else UDP_Server->SendToClient(message, UDPIpAddresses[ClientId]);
+		}
 	}
 
 	EN_RAU_Server::~EN_RAU_Server()
