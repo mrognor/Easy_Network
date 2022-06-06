@@ -192,6 +192,7 @@ namespace EN
 		#ifdef WIN32
 		closesocket(ClientSockets[ClientID]);
 		#else
+		shutdown(ClientSockets[ClientID], 2);
 		close(ClientSockets[ClientID]);
 		#endif
 	}

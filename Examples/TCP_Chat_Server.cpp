@@ -26,6 +26,9 @@ public:
 		if (message == "d")
 			DisconnectClient(ClientID); 
 
+		if (message == "F")
+			Shutdown(); 
+
 		for (int j = 0; j < GetConnectionsCount(); j++)
 		{
 			if (j != ClientID)
