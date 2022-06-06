@@ -348,4 +348,13 @@ namespace EN
 		fin.close();
 		return isExist;
 	}
+
+	void Delay(int milliseconds)
+	{
+		#ifdef WIN32
+		Sleep(milliseconds);
+		#else
+		usleep(milliseconds * 1000);
+		#endif
+	}
 }

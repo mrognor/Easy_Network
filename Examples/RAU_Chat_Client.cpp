@@ -32,7 +32,7 @@ int main()
 {
 	MyClient A;
 	// Dont work with localhost
-	if (A.Connect("192.168.1.64", 1111) == false)
+	if (A.Connect() == false)
 	{
 		std::cout << "Failed to connect" << std::endl;
 		return 0;

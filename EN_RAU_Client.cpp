@@ -113,14 +113,13 @@ namespace EN
 
 	void EN_RAU_Client::Run()
 	{
-		std::thread TCP_Thread([this]() { TCP_Client->Run(); });
-		TCP_Thread.detach();
+		TCP_Client->Run(); 
 		UDP_Client->Run();
 
 		#ifdef WIN32
 		Sleep(300);
 		#else
-		usleep(300);
+		usleep(300000);
 		#endif
 
 		while (IsServerGetUDPAddress != true)
@@ -130,7 +129,7 @@ namespace EN
 			#ifdef WIN32
 			Sleep(1000);
 			#else
-			usleep(1000);
+			usleep(1000000);
 			#endif
 		}
 
@@ -154,7 +153,7 @@ namespace EN
 		#ifdef WIN32
 		Sleep(300);
 		#else
-		usleep(300);
+		usleep(300000);
 		#endif
 		
 		IsServerGetUDPAddress = true;

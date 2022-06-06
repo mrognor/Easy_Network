@@ -50,4 +50,6 @@ namespace EN
 
 	/// Return true if file exists, otherwise rerurn false
 	bool IsFileExist(std::string filePath);
+
+	void Delay(int milliseconds);
 }
