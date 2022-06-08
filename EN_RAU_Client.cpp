@@ -10,7 +10,7 @@ namespace EN
 
 	void EN_RAU_TCP_Client::ServerMessageHandler(std::string message)
 	{
-		if (RAU_Client->ServerThreadID != -1)
+		if (RAU_Client->ClientId != -1)
 		{
 			if (RAU_Client->IsServerGetUDPAddress == false)
 			{
@@ -26,7 +26,7 @@ namespace EN
 			}
 		}
 		else 
-			RAU_Client->ServerThreadID = std::atoi(message.c_str());
+			RAU_Client->ClientId = std::atoi(message.c_str());
 	}
 
 	void EN_RAU_TCP_Client::BeforeDisconnect()
@@ -120,7 +120,7 @@ namespace EN
 
 		while (IsServerGetUDPAddress != true)
 		{
-			UDP_Client->SendToServer(std::to_string(ServerThreadID));
+			UDP_Client->SendToServer(std::to_string(ClientId));
 			
 			Delay(1000);
 		}
@@ -134,7 +134,7 @@ namespace EN
 		if (IsReliable)
 			TCP_Client->SendToServer(message, MessageDelay);
 		else
-			UDP_Client->SendToServer(std::to_string(ServerThreadID) + " " + message, MessageDelay);
+			UDP_Client->SendToServer(std::to_string(ClientId) + " " + message, MessageDelay);
 	}
 
 	void EN_RAU_Client::Disconnect()

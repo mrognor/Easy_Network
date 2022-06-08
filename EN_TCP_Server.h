@@ -73,7 +73,6 @@ namespace EN
 
 	public:
 
-		/// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
 		EN_TCP_Server();
 
 		/// Port getter

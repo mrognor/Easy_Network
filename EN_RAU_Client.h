@@ -9,8 +9,10 @@
 
 namespace EN
 {
+	// EN_RAU_Client class definition
 	class EN_RAU_Client;
 
+	/// \cond HIDDEN_SYMBOLS
 	class EN_RAU_TCP_Client : public EN_TCP_Client
 	{
 	public:
@@ -39,26 +41,37 @@ namespace EN
 
 		void ServerMessageHandler(std::string message);
 	};
-
-	/// Server class with connection and the possibility of reliable and unreliable sending
+	/// \endcond
+	
+	/// Client class with connection and the possibility of reliable and unreliable sending and receiveng
 	class EN_RAU_Client 
 	{
 	private:
+		// RAU_TCP_Client and RAU_UDP_Client pointers
 		friend EN_RAU_TCP_Client;
 		friend EN_RAU_UDP_Client;
 		EN_RAU_TCP_Client* TCP_Client;
 		EN_RAU_UDP_Client* UDP_Client;
 
-		int ServerThreadID = -1;
+		// Client number on the server
+		int ClientId = -1;
 
+		// Boolean variable for tracking the connection status. 
+		// When the server receives the client's IP address, 
+		// it will send a message via tsp and this variable will become true
 		bool IsServerGetUDPAddress = false;
 
+		// Variable to shutdown server
 		bool IsShutdown = false;
 
+		// Incoming messages buffer
 		std::queue<std::string> Messages;
+		// Condition variable to wake up server messahe handle thread
 		std::condition_variable CondVar;
+		// Mutex to make code thread-safety
 		std::mutex Mtx;
 
+		// Incoming messages handler
 		void QueueMessageHandler();
 
 		// Default port
@@ -69,17 +82,16 @@ namespace EN
 
 	protected:
 
-		// A function to be defined by the user. It is used for logic after connection
+		/// A function to be defined by the user. It is used for logic after connection
 		virtual void AfterConnect() = 0; 
 
-		// A function to be defined by the user. It is used to process incoming messages from the server
+		/// A function to be defined by the user. It is used to process incoming messages from the server
 		virtual void ServerMessageHandler(std::string message) = 0;
 
-		// A function to be defined by the user. Performed before disconnected from the server
+		/// A function to be defined by the user. Performed before disconnected from the server
 		virtual void BeforeDisconnect() = 0;
 
 	public:
-		/// Default constructor
 		EN_RAU_Client();
 
 		/// Server port getter
@@ -130,7 +142,6 @@ namespace EN
 		/// This function disconnect client from server
 		void Disconnect();
 
-		/// Default destructor
 		~EN_RAU_Client();
 	};
 }

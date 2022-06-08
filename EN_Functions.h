@@ -51,5 +51,6 @@ namespace EN
 	/// Return true if file exists, otherwise rerurn false
 	bool IsFileExist(std::string filePath);
 
+	/// Crossplatform function for program suspension
 	void Delay(int milliseconds);
 }

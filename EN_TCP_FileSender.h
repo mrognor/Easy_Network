@@ -7,19 +7,19 @@ namespace EN
 	{
 	private:
 
-		// A function to be defined by the user. It is used for logic after connection
+		/// A function to be defined by the user. It is used for logic after connection
 		void AfterConnect() {};
 
-		// This method does nothing but we have to redefine it to work correctly
+		/// This method does nothing but we have to redefine it to work correctly
 		void Run() {};
 
-		// This method does nothing but we have to redefine it to work correctly
+		/// This method does nothing but we have to redefine it to work correctly
 		void ServerMessageHandler(std::string message) {};
 
-		// This method does nothing but we have to redefine it to work correctly
+		/// This method does nothing but we have to redefine it to work correctly
 		void BeforeDisconnect() {};
 
-		// Variable to stop file transmission
+		/// Variable to stop file transmission
 		bool IsStop = false;
 
 	public:

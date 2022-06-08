@@ -9,8 +9,10 @@
 
 namespace EN
 {
+	// EN_RAU_Server class definition
 	class EN_RAU_Server;
 
+	/// \cond HIDDEN_SYMBOLS
 	class EN_RAU_TCP_Server : public EN_TCP_Server
 	{
 	public:
@@ -40,35 +42,50 @@ namespace EN
 		// Function work between putting message in buffer. Return true if you want to put message in buffer
 		bool InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived);
 	};
+	/// \endcond
 
 	/// Server class with connection and the possibility of reliable and unreliable sending
 	class EN_RAU_Server 
 	{
 	private:
+		// RAU_TCP_Server and RAU_UDP_Server pointers
 		friend EN_RAU_TCP_Server;
 		friend EN_RAU_UDP_Server;
 		EN_RAU_TCP_Server* TCP_Server;
 		EN_RAU_UDP_Server* UDP_Server;
+
+		// Vector of queues for storing incoming messages
 		std::vector<std::queue<std::string>*> VectorQueuesMessages;
+		// Vector of clients udp addresses
 		std::vector<std::string> UDPIpAddresses;
+		// Vector of condition variavles
 		std::vector<std::condition_variable*> VectorCondVars;
+		// Vector of bools to stop client handler threads
 		std::vector<bool> KillThreads;
 
+		// Varibale to shutdown server
 		bool IsShutdown = false;
 
+		// Incoming message handler
 		void ThreadQueueHandler(int ClientID);
 
 	protected:
+		/// Server port. By default set to 1111
 		int Port = 1111;
 
+		/// Server ip address. By default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
+		/// Max size of unreliable message 
 		int MaxUnreliableMessageSize = 64;
 
+		/// A function to be defined by the user. It is used for logic after client connection
 		virtual void OnClientConnected(int ClientID) = 0;
 
+		/// A function to be defined by the user. It is used to process incoming messages from the clients
 		virtual void ClientMessageHandler(std::string message, int ClientID) = 0;
 
+		/// A function to be defined by the user. Performed before client disconnected from the server
 		virtual void OnClientDisconnect(int ClientID) = 0;
 
 	public:

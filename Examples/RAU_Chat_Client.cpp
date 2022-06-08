@@ -6,7 +6,7 @@ public:
 	MyClient() {}
 
 	// A function to be defined by the user. It is used for logic after connection
-	void AfterConnect() {}
+	void AfterConnect() { SendToServer("Hallo"); }
 
 	// A function to be defined by the user. It is used to process incoming messages from the server
 	void ServerMessageHandler(std::string message)
@@ -32,7 +32,7 @@ int main()
 {
 	MyClient A;
 	// Dont work with localhost
-	if (A.Connect("192.168.1.75", 1111) == false)
+	if (A.Connect("192.168.1.64", 1111) == false)
 	{
 		std::cout << "Failed to connect" << std::endl;
 		return 0;
