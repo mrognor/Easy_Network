@@ -34,16 +34,16 @@ namespace EN
 		RAU_Client->BeforeDisconnect();
 	}
 
-	void EN_RAU_UDP_Client::SetIpAndPort(std::string Ip, int port)
-	{
-		ServerPort = port + 1;
-		ServerIpAddres = Ip;
-	}
-
 	// UDP client
 	EN_RAU_UDP_Client::EN_RAU_UDP_Client(EN_RAU_Client* rau_Client)
 	{
 		RAU_Client = rau_Client;
+	}
+
+	void EN_RAU_UDP_Client::SetIpAndPort(std::string Ip, int port)
+	{
+		ServerPort = port + 1;
+		ServerIpAddres = Ip;
 	}
 
 	void EN_RAU_UDP_Client::ServerMessageHandler(std::string message)
@@ -52,31 +52,6 @@ namespace EN
 		RAU_Client->Messages.push(message);
 		RAU_Client->Mtx.unlock();
 		RAU_Client->CondVar.notify_all();
-	}
-	
-	void EN_RAU_Client::QueueMessageHandler()
-	{
-		std::mutex mtx;
-		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
-
-		while (true)
-		{
-			while (!Messages.empty())
-			{
-				ServerMessageHandler(Messages.front());
-				Mtx.lock();
-				Messages.pop();
-				Mtx.unlock();
-			}
-			
-			if (IsShutdown)
-				break;
-
-			CondVar.wait(unique_lock_mutex);
-
-			if (IsShutdown)
-				break;
-		}
 	}
 
 	// RAU client
@@ -109,6 +84,31 @@ namespace EN
 		ServerIpAddress = ipAddr;
 		ServerPort = port;
 		return TCP_Client->Connect(ipAddr, port);
+	}
+
+	void EN_RAU_Client::QueueMessageHandler()
+	{
+		std::mutex mtx;
+		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
+
+		while (true)
+		{
+			while (!Messages.empty())
+			{
+				ServerMessageHandler(Messages.front());
+				Mtx.lock();
+				Messages.pop();
+				Mtx.unlock();
+			}
+
+			if (IsShutdown)
+				break;
+
+			CondVar.wait(unique_lock_mutex);
+
+			if (IsShutdown)
+				break;
+		}
 	}
 
 	void EN_RAU_Client::Run()

@@ -8,29 +8,6 @@ namespace EN
 		RAU_Server = rau_Server;
 	}
 
-	void EN_RAU_Server::ThreadQueueHandler(int ClientID)
-	{
-		std::mutex mtx;
-		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
-
-		while (true)
-		{
-			while (!VectorQueuesMessages[ClientID]->empty())
-			{
-				ClientMessageHandler(VectorQueuesMessages[ClientID]->front(), ClientID);
-				VectorQueuesMessages[ClientID]->pop();
-			}
-
-			if (IsShutdown || KillThreads[ClientID] == true)
-				break;
-
-			VectorCondVars[ClientID]->wait(unique_lock_mutex);
-
-			if (IsShutdown || KillThreads[ClientID] == true)
-				break;
-		}
-	}
-
 	void EN_RAU_TCP_Server::OnClientConnected(int ClientID)
 	{
 		SendToClient(ClientID, std::to_string(ClientID));
@@ -132,6 +109,29 @@ namespace EN
 	{
 		TCP_Server = new EN_RAU_TCP_Server(this);
 		UDP_Server = new EN_RAU_UDP_Server(this);
+	}
+
+	void EN_RAU_Server::ThreadQueueHandler(int ClientID)
+	{
+		std::mutex mtx;
+		std::unique_lock<std::mutex> unique_lock_mutex(mtx);
+
+		while (true)
+		{
+			while (!VectorQueuesMessages[ClientID]->empty())
+			{
+				ClientMessageHandler(VectorQueuesMessages[ClientID]->front(), ClientID);
+				VectorQueuesMessages[ClientID]->pop();
+			}
+
+			if (IsShutdown || KillThreads[ClientID] == true)
+				break;
+
+			VectorCondVars[ClientID]->wait(unique_lock_mutex);
+
+			if (IsShutdown || KillThreads[ClientID] == true)
+				break;
+		}
 	}
 
 	void EN_RAU_Server::Run()
