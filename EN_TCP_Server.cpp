@@ -231,7 +231,7 @@ namespace EN
 
 	void EN_TCP_Server::SendToClient(int ClientId, std::string message)
 	{
-		if(ClientSockets[ClientId] != INVALID_SOCKET)
+		if (ClientId < ClientSockets.size() && ClientSockets[ClientId] != INVALID_SOCKET)
 			EN::TCP_Send(ClientSockets[ClientId], message);
 	}
 }
