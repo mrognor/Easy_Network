@@ -6,8 +6,7 @@ https://mrognor.github.io/Easy_Network_Documentation/doc/html/index.html
 
 # Library usage 
 Before you start, I advise you to download the code examples. For linux, you can save files to one folder, and for visual studio, you will need to add these files to different projects  
-Full client example: https://github.com/mrognor/Easy_Network/blob/master/Client.cpp  
-Full server example: https://github.com/mrognor/Easy_Network/blob/master/Server.cpp  
+Examples available here: https://github.com/mrognor/Easy_Network/tree/master/Examples
 
 ## Windows library usage guide
 1. Download the latest release from github
