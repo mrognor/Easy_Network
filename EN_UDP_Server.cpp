@@ -238,9 +238,9 @@ namespace EN
 		}
 	}
 
-	void EN_UDP_Server::SendToClient(std::string message, std::string ClientSocketAddr)
+	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message)
 	{
-		auto SplittedAddr = Split(ClientSocketAddr, ":");
+		auto SplittedAddr = Split(ClientIpAddress, ":");
 		sockaddr_in ClientAddr;
 		//Prepare the sockaddr_in structure
 		ClientAddr.sin_family = AF_INET;
@@ -250,7 +250,7 @@ namespace EN
 		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
 
 		//now reply the client with the same data
-		if (sendto(UDP_ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientAddr, sizeof(ClientSocketAddr)) == SOCKET_ERROR)
+		if (sendto(UDP_ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientAddr, sizeof(ClientIpAddress)) == SOCKET_ERROR)
 		{
 			std::cerr << "Failed to send" << std::endl;
 		}

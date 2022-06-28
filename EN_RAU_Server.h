@@ -79,13 +79,25 @@ namespace EN
 		/// Max size of unreliable message 
 		int MaxUnreliableMessageSize = 64;
 
-		/// A function to be defined by the user. It is used for logic after client connection
+		/**
+			\brief The method that is executed when the client connects to the server
+
+			\warning Must be defined by the user
+		*/
 		virtual void OnClientConnected(int ClientID) = 0;
 
-		/// A function to be defined by the user. It is used to process incoming messages from the clients
+		/**
+			\brief Method that processes incoming messages
+
+			\warning Must be defined by the user
+		*/
 		virtual void ClientMessageHandler(std::string message, int ClientID) = 0;
 
-		/// A function to be defined by the user. Performed before client disconnected from the server
+		/**
+			\brief Method that runs after the client is disconnected
+			
+			\warning Must be defined by the user
+		*/
 		virtual void OnClientDisconnect(int ClientID) = 0;
 
 	public:

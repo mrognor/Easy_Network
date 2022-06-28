@@ -174,7 +174,7 @@ namespace EN
 		{
 			if (IsReliable)
 				TCP_Server->SendToClient(ClientId, message);
-			else UDP_Server->SendToClient(message, UDPIpAddresses[ClientId]);
+			else UDP_Server->SendToClient(UDPIpAddresses[ClientId], message);
 		}
 	}
 

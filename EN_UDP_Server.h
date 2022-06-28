@@ -96,7 +96,7 @@ namespace EN
 			Get message, UDP client address and time since message come to server
 			\warning Must be defined by the user
 		*/
-		virtual void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
+		virtual void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) = 0;
 
 		/**
 			\brief Method that processes incoming messages
@@ -106,7 +106,7 @@ namespace EN
 			Return true if you want to put message into bufer, false otherwise
 			\warning Must be defined by the user
 		*/
-		virtual bool InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived) = 0;
+		virtual bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) = 0;
 
 	public:
 
@@ -131,7 +131,7 @@ namespace EN
 			\param[in] message string to send to server
 			\param[in] ClientSocketAddr string with server address. Format: 127.0.0.1:1111
 		*/
-		void SendToClient(std::string message, std::string ClientSocketAddr);
+		void SendToClient(std::string ClientIpAddress, std::string message);
 
 		~EN_UDP_Server();
 	};

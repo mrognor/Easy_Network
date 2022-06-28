@@ -82,13 +82,27 @@ namespace EN
 
 	protected:
 
-		/// A function to be defined by the user. It is used for logic after connection
+		/**
+			\brief This function is called after connecting to the server
+			
+			\warning Must be defined by the user
+		*/
 		virtual void AfterConnect() = 0; 
 
-		/// A function to be defined by the user. It is used to process incoming messages from the server
+		/**
+			\brief The function processes all incoming messages
+			
+			
+			\warning Must be defined by the user
+		*/
 		virtual void ServerMessageHandler(std::string message) = 0;
 
-		/// A function to be defined by the user. Performed before disconnected from the server
+		/**
+			\brief The function is called before disconnecting from the server.
+
+			Important! If disconnection occurs from the server side or connection lost, the IsConnected() function returns false
+			\warning Must be defined by the user
+		*/
 		virtual void BeforeDisconnect() = 0;
 
 	public:

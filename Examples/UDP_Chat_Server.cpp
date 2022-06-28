@@ -18,7 +18,7 @@ public:
 	}
 
 	// Third parametr in milliseconds
-	void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived)
+	void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeSincePackageArrived)
 	{
 		//if (TimeSincePackageArrived > 700)
 		//	return;
@@ -30,11 +30,11 @@ public:
 		
 		std::cout << message << std::endl;
 
-		SendToClient(message, ClientSocketAddr);
+		SendToClient(ClientIpAddress, message);
 	}
 
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
-	bool InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
+	bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived)
 	{
 		std::cout << "Important! " << message << std::endl;
 		if (message == "oleg")
