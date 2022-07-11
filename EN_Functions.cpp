@@ -128,7 +128,7 @@ namespace EN
 					return false;
 				}
 				// Print sending status
-				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
+				if (ProgressFunction != nullptr && std::time(0) > t)
 				{
 					ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
 					LastSendMessageSize = SendMessageSize;
@@ -232,12 +232,12 @@ namespace EN
 				{
 					IsStop = false;
 					ReceivedFile.close();
-					remove(("r" + FileName).c_str());
+					remove(FileName.c_str());
 					delete[] MessageBuf;
 					return false;
 				}
 
-				if (ProgressFunction != nullptr && std::time(0) - 1 == t)
+				if (ProgressFunction != nullptr && std::time(0) > t)
 				{
 					ProgressFunction(ReceivedMessageSize, FileSize, ReceivedMessageSize - LastReceivedMessageSize, (FileSize - ReceivedMessageSize) / (ReceivedMessageSize - LastReceivedMessageSize));
 					LastReceivedMessageSize = ReceivedMessageSize;
@@ -250,7 +250,7 @@ namespace EN
 				{
 					std::cerr << "\nFailed to received file: " << FileName << std::endl;
 					ReceivedFile.close();
-					remove(("r" + FileName).c_str());
+					remove(FileName.c_str());
 					delete[] MessageBuf;
 					return false;
 				}
@@ -268,13 +268,13 @@ namespace EN
 			{
 				std::cerr << "\nFailed to received file: " << FileName << std::endl;
 				ReceivedFile.close();
-				remove(("r" + FileName).c_str());
+				remove(FileName.c_str());
 				delete[] MessageBuf;
 				return false;
 			}
-
-			ReceivedFile.write(MessageBuf, FileSize);
-
+			
+			//ReceivedFile.write(MessageBuf, FileSize);
+			ReceivedFile.write(MessageBuf, SendFileBufLen);
 
 			if (ProgressFunction != nullptr)
 				ProgressFunction(FileSize, FileSize, 0, 0);
@@ -322,12 +322,12 @@ namespace EN
 		}
 		if (eta > 3600)
 		{
-			Eta = std::to_string(eta / 3600) + " h " + std::to_string(eta - (3600 * (eta / 3600)) / 60) + " m";
+			Eta = std::to_string(eta / 3600) + " h " + std::to_string((eta % 3600) / 60) + " m";
 		}
 
 		std::cout << "\rDownloaded: " << current / AllMeasureSize << " " << AllMeasureName << " All: " << all / AllMeasureSize
-			<< " " << (100 * current / all) << " % " << AllMeasureName << " Speed : " << speed / SpeedSize << " " << SpeedName
-			<< " ETA : " << Eta << "                                 " << std::flush;
+			<< " " << AllMeasureName << " " << (100 * current / all) << " % " << " Speed : " << speed / SpeedSize << " " << SpeedName
+			<< " ETA : " << Eta << "                     " << std::flush;
 
 		if (current == all)
 			std::cout << "\nEnd file transfering" << std::endl;

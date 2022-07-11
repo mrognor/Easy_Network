@@ -28,7 +28,7 @@ public:
 			EN::RecvFile(ClientSockets[ClientID], ShouldShutdown, EN::DownloadStatus);
 			return;
 		}
-
+		
 		if (message.find("get file") != -1)
 		{
 			if (EN::IsFileExist(InterpretedMessage[2]))

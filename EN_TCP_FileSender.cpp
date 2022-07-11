@@ -11,10 +11,10 @@ namespace EN
 		return false;
 	}
 
-	bool EN_TCP_FileSender::RecvFileFromServer()
+	bool EN_TCP_FileSender::RecvFileFromServer(void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		if (IsConnected())
-			return EN::RecvFile(*GetSocket(), IsStop, EN::DownloadStatus);
+			return EN::RecvFile(*GetSocket(), IsStop, ProgressFunction);
 		return false;
 	}
 
