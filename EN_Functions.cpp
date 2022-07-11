@@ -273,8 +273,7 @@ namespace EN
 				return false;
 			}
 			
-			//ReceivedFile.write(MessageBuf, FileSize);
-			ReceivedFile.write(MessageBuf, SendFileBufLen);
+			ReceivedFile.write(MessageBuf, FileSize % SendFileBufLen);
 
 			if (ProgressFunction != nullptr)
 				ProgressFunction(FileSize, FileSize, 0, 0);
