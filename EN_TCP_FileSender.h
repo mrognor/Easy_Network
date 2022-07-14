@@ -32,7 +32,7 @@ namespace EN
 			\param[in] Pointer to progress function. By default set to library function which displays progress in terminal
 			\return Return true if file transmission success, false otherwise
 		*/
-		bool SendFileToServer(std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta));
+		bool SendFileToServer(std::string FileName, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int DelayInMilliseconds = 0);
 
 		/// Function to recv file from server
 		/// \return Return true if file transmission success, false otherwise

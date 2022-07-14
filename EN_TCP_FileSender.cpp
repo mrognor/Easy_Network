@@ -2,10 +2,10 @@
 
 namespace EN
 {
-	bool EN_TCP_FileSender::SendFileToServer(std::string FileName, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool EN_TCP_FileSender::SendFileToServer(std::string FileName, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int DelayInMilliseconds)
 	{
 		if (IsConnected())
-			return EN::SendFile(*GetSocket(), FileName, IsStop, ProgressFunction);
+			return EN::SendFile(*GetSocket(), FileName, IsStop, ProgressFunction, DelayInMilliseconds);
 		else std::cerr << "Error: the server is not connected" << std::endl;
 		std::cout << "File transfer ended" << std::endl;
 		return false;

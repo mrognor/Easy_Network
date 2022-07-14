@@ -86,7 +86,8 @@ namespace EN
 		return ReturnVector;
 	}
 
-	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop,
+		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int DelayInMilliseconds)
 	{
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
@@ -134,6 +135,10 @@ namespace EN
 					LastSendMessageSize = SendMessageSize;
 					t = std::time(0);
 				}
+
+				// Regulate transfering speed
+				if (DelayInMilliseconds != 0)
+					EN::Delay(DelayInMilliseconds);
 
 				// Read binary data
 				SendingFile.read(MessageBuf, SendFileBufLen);
