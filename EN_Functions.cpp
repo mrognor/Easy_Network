@@ -294,6 +294,9 @@ namespace EN
 
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)
 	{
+		if (all <= 0)
+			return;
+
 		std::string AllMeasureName, SpeedName, Eta;
 		int AllMeasureSize, SpeedSize, EtaSize;
 
