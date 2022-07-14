@@ -146,10 +146,10 @@ namespace EN
 				}
 				if (WasReusedSocket == false)
 				{
+					ClientSockets.push_back(IncomingConnection);
+
 					std::thread ClientHandlerThread([this]() { this->ClientHandler(ClientSockets.size() - 1); });
 					ClientHandlerThread.detach();
-
-					ClientSockets.push_back(IncomingConnection);
 				}
 			}
 		}
