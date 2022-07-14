@@ -86,7 +86,7 @@ namespace EN
 		return ReturnVector;
 	}
 
-	bool SendFile(EN_SOCKET& FileSendSocket, std::string FileName, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
@@ -105,7 +105,7 @@ namespace EN
 		// See file start
 		SendingFile.seekg(0, std::ios::beg);
 
-		// Sended kbytes
+		// Sended bytes
 		uint64_t SendMessageSize = 0;
 
 		int SendBytes;
@@ -143,6 +143,7 @@ namespace EN
 				if (SendBytes <= 0)
 				{
 					std::cerr << "\nFailed to send file: " << FileName << std::endl;
+					std::cout << WSAGetLastError() << std::endl;
 					SendingFile.close();
 					delete[] MessageBuf;
 					return false;
@@ -214,7 +215,7 @@ namespace EN
 		// Already received bytes
 		uint64_t ReceivedMessageSize = 0;
 
-		// Receivef file buffer 
+		// Received file buffer 
 		char* MessageBuf = new char[SendFileBufLen];
 
 		if (ReceivedFile.is_open())
