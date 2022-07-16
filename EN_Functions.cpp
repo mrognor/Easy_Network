@@ -148,7 +148,6 @@ namespace EN
 				if (SendBytes <= 0)
 				{
 					std::cerr << "\nFailed to send file: " << FileName << std::endl;
-					std::cout << WSAGetLastError() << std::endl;
 					SendingFile.close();
 					delete[] MessageBuf;
 					return false;
