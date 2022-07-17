@@ -2,7 +2,7 @@
 
 namespace EN
 {
-	void TCP_Send(EN_SOCKET& sock, std::string message, int MessageDelay)
+	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay)
 	{
 		int msg_size = message.length();
 
@@ -12,7 +12,7 @@ namespace EN
 		Delay(MessageDelay);
 	}
 
-	bool TCP_Recv(EN_SOCKET& sock, std::string& message)
+	bool TCP_Recv(EN_SOCKET sock, std::string& message)
 	{
 		int msg_size;
 		int ConnectionStatus = recv(sock, (char*)&msg_size, sizeof(int), MSG_WAITALL);
@@ -189,7 +189,7 @@ namespace EN
 		return true;
 	}
 
-	bool RecvFile(EN_SOCKET& FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool RecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;

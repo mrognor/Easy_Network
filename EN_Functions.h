@@ -29,10 +29,10 @@ typedef int EN_SOCKET;
 namespace EN
 { 
 	///Wrapper over the send function. Allows you to send std::string. 
-	void TCP_Send(EN_SOCKET& sock, std::string message, int MessageDelay = 10);
+	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay = 10);
 
 	/// Wrapper over the recv function. Allows you to recv std::string. 
-	bool TCP_Recv(EN_SOCKET& sock, std::string& message);
+	bool TCP_Recv(EN_SOCKET sock, std::string& message);
 
 	/// Divides the string to std::vector<std::string>. Second string is string divider. By default set to space(" ")
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString=" ");
@@ -45,7 +45,7 @@ namespace EN
 
 	/// This function will wait file. Second parametr its refernce to bool to stop transmission. 
 	/// The fird parameter is a pointer to a function to handle the remaining transfer time
-	bool RecvFile(EN_SOCKET& FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool RecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	/// This function will print information about file downloading
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
