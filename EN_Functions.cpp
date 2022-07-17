@@ -296,6 +296,102 @@ namespace EN
 		return true;
 	}
 
+	bool ResendFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	{
+		// Get file name and file size
+		std::string FileInfo;
+		if (EN::TCP_Recv(SourceFileSocket, FileInfo) == false)
+		{
+			std::cerr << "\nFailed to received file name" << std::endl;
+			return false;
+		}
+		
+		EN::TCP_Send(DestinationFileSocket, FileInfo);
+
+		uint64_t FileSize = std::stoll(Split(FileInfo)[1]);
+
+		// Already received bytes
+		uint64_t ReceivedMessageSize = 0;
+
+		// Received file buffer 
+		char* MessageBuf = new char[SendFileBufLen];
+
+		std::time_t t = std::time(0);
+		uint64_t LastReceivedMessageSize = 0;
+
+		// Skip while loop if file size less when send buffer
+		if (FileSize < SendFileBufLen)
+			goto RecvLittleFile;
+
+		while (ReceivedMessageSize < FileSize - SendFileBufLen)
+		{
+			if (IsStop == true)
+			{
+				IsStop = false;
+				delete[] MessageBuf;
+				return false;
+			}
+
+			if (ProgressFunction != nullptr && std::time(0) > t)
+			{
+				ProgressFunction(ReceivedMessageSize, FileSize, ReceivedMessageSize - LastReceivedMessageSize, (FileSize - ReceivedMessageSize) / (ReceivedMessageSize - LastReceivedMessageSize));
+				LastReceivedMessageSize = ReceivedMessageSize;
+				t = std::time(0);
+			}
+
+			int ReceiveBytes = recv(SourceFileSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+
+			if (ReceiveBytes <= 0)
+			{
+				std::cerr << "\nFailed to resend file" << std::endl;
+
+				delete[] MessageBuf;
+				return false;
+			}
+
+			// Send data to client
+			int SendBytes = send(DestinationFileSocket, MessageBuf, SendFileBufLen, 0);
+
+			if (SendBytes <= 0)
+			{
+				std::cerr << "\nFailed to resend file" << std::endl;
+				delete[] MessageBuf;
+				return false;
+			}
+
+			ReceivedMessageSize += SendBytes;
+			memset(MessageBuf, NULL, SendFileBufLen);
+		}
+
+	// End skipping while loop
+	RecvLittleFile:
+
+		int ReceiveBytes = recv(SourceFileSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+
+		if (ReceiveBytes <= 0)
+		{
+			std::cerr << "\nFailed to resend file" << std::endl;
+			delete[] MessageBuf;
+			return false;
+		}
+
+		// Send data to client
+		int SendBytes = send(DestinationFileSocket, MessageBuf, SendFileBufLen, 0);
+
+		if (SendBytes <= 0)
+		{
+			std::cerr << "\nFailed to resend file" << std::endl;
+			delete[] MessageBuf;
+			return false;
+		}
+
+		if (ProgressFunction != nullptr)
+			ProgressFunction(FileSize, FileSize, 0, 0);		
+
+		delete[] MessageBuf;
+		return true;
+	}
+
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)
 	{
 		if (all <= 0)

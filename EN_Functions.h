@@ -47,6 +47,13 @@ namespace EN
 	/// The fird parameter is a pointer to a function to handle the remaining transfer time
 	bool RecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
+	/// This function will resend file from one socket to another. 
+	/// First parametr is source socket
+	/// Second parametr is destination socket
+	/// Third parametr its refernce to bool to stop transmission. 
+	/// The fird parameter is a pointer to a function to handle the remaining transfer time
+	bool ResendFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+
 	/// This function will print information about file downloading
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
 
