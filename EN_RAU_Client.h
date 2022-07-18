@@ -43,7 +43,11 @@ namespace EN
 	};
 	/// \endcond
 	
-	/// Client class with connection and the possibility of reliable and unreliable sending and receiveng
+	/**
+		\brief Client class with connection and the possibility of reliable and unreliable sending and receiveng
+		
+		\warning This class does not work with local ip
+	*/
 	class EN_RAU_Client 
 	{
 	private:

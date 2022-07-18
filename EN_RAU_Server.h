@@ -44,7 +44,11 @@ namespace EN
 	};
 	/// \endcond
 
-	/// Server class with connection and the possibility of reliable and unreliable sending
+	/**
+		\brief Server class with connection and the possibility of reliable and unreliable sending
+		
+		\warning This class does not work with local ip
+	*/
 	class EN_RAU_Server 
 	{
 	private:
