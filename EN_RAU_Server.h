@@ -33,7 +33,7 @@ namespace EN
 	public:
 		friend EN_RAU_Server;
 		EN_RAU_Server* RAU_Server;
-
+		
 		EN_RAU_UDP_Server(EN_RAU_Server* rau_Server);
 
 		// Third parametr in milliseconds

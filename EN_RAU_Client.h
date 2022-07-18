@@ -16,6 +16,7 @@ namespace EN
 	class EN_RAU_TCP_Client : public EN_TCP_Client
 	{
 	public:
+		friend EN_RAU_Client;
 		EN_RAU_Client* RAU_Client;
 
 		EN_RAU_TCP_Client(EN_RAU_Client* rau_Client);
@@ -33,12 +34,13 @@ namespace EN
 	class EN_RAU_UDP_Client : public EN_UDP_Client
 	{
 	public:
+		friend EN_RAU_Client;
 		EN_RAU_Client* RAU_Client;
 
 		void SetIpAndPort(std::string Ip, int port);
 
 		EN_RAU_UDP_Client(EN_RAU_Client* rau_Client);
-
+		
 		void ServerMessageHandler(std::string message);
 	};
 	/// \endcond
@@ -85,6 +87,9 @@ namespace EN
 		std::string ServerIpAddress = "127.0.0.1";
 
 	protected:
+
+		/// Max size of unreliable message 
+		int MaxUnreliableMessageSize = 64;
 
 		/**
 			\brief This function is called after connecting to the server

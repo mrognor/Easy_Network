@@ -116,6 +116,8 @@ namespace EN
 		TCP_Client->Run(); 
 		UDP_Client->Run();
 
+		UDP_Client->MaxMessageSize = MaxUnreliableMessageSize;
+
 		Delay(300);
 
 		while (IsServerGetUDPAddress != true)
