@@ -59,6 +59,8 @@ namespace EN
 	{
 		TCP_Client = new EN_RAU_TCP_Client(this);
 		UDP_Client = new EN_RAU_UDP_Client(this);
+
+		UDP_Client->MaxMessageSize = MaxUnreliableMessageSize + 10;
 	}
 
 	bool EN_RAU_Client::IsConnected()
@@ -115,8 +117,6 @@ namespace EN
 	{
 		TCP_Client->Run(); 
 		UDP_Client->Run();
-
-		UDP_Client->MaxMessageSize = MaxUnreliableMessageSize;
 
 		Delay(300);
 
