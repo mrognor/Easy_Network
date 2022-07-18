@@ -3,11 +3,11 @@
 class RAU_Server : public EN::EN_RAU_Server
 {	
 public:
-	// Dont work with localhost
 	RAU_Server()
 	{
-		IpAddress = "192.168.1.71"; //Default set to localhost
+		//IpAddress = "192.168.1.71"; //Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
+		MaxUnreliableMessageSize = 512;
 	}
 
 	void OnClientConnected(int ClientID)

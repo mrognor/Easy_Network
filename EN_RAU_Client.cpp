@@ -40,12 +40,6 @@ namespace EN
 		RAU_Client = rau_Client;
 	}
 
-	void EN_RAU_UDP_Client::SetIpAndPort(std::string Ip, int port)
-	{
-		ServerPort = port + 1;
-		ServerIpAddres = Ip;
-	}
-
 	void EN_RAU_UDP_Client::ServerMessageHandler(std::string message)
 	{
 		RAU_Client->Mtx.lock();
@@ -59,8 +53,6 @@ namespace EN
 	{
 		TCP_Client = new EN_RAU_TCP_Client(this);
 		UDP_Client = new EN_RAU_UDP_Client(this);
-
-		UDP_Client->MaxMessageSize = MaxUnreliableMessageSize + 10;
 	}
 
 	bool EN_RAU_Client::IsConnected()
@@ -75,14 +67,12 @@ namespace EN
 
 	bool EN_RAU_Client::Connect(int port)
 	{
-		UDP_Client->SetIpAndPort("127.0.0.1", port);
 		ServerPort = port;
 		return TCP_Client->Connect(port);
 	}
 
 	bool EN_RAU_Client::Connect(std::string ipAddr, int port)
 	{
-		UDP_Client->SetIpAndPort(ipAddr, port);
 		ServerIpAddress = ipAddr;
 		ServerPort = port;
 		return TCP_Client->Connect(ipAddr, port);
@@ -115,6 +105,10 @@ namespace EN
 
 	void EN_RAU_Client::Run()
 	{
+		UDP_Client->ServerIpAddres = ServerIpAddress;
+		UDP_Client->ServerPort = ServerPort + 1;
+		UDP_Client->MaxMessageSize = MaxUnreliableMessageSize + 10;
+		
 		TCP_Client->Run(); 
 		UDP_Client->Run();
 

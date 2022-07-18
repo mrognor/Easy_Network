@@ -3,7 +3,7 @@
 class MyClient : public EN::EN_RAU_Client
 {
 public:
-	MyClient() {}
+	MyClient() { MaxUnreliableMessageSize = 512; }
 
 	// A function to be defined by the user. It is used for logic after connection
 	void AfterConnect() { SendToServer("Hallo"); }
@@ -31,8 +31,8 @@ public:
 int main()
 {
 	MyClient A;
-	// Dont work with localhost
-	if (A.Connect("192.168.1.71", 1111) == false)
+
+	if (A.Connect() == false)
 	{
 		std::cout << "Failed to connect" << std::endl;
 		return 0;

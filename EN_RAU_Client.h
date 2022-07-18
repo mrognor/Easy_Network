@@ -37,19 +37,14 @@ namespace EN
 		friend EN_RAU_Client;
 		EN_RAU_Client* RAU_Client;
 
-		void SetIpAndPort(std::string Ip, int port);
-
 		EN_RAU_UDP_Client(EN_RAU_Client* rau_Client);
 		
 		void ServerMessageHandler(std::string message);
 	};
 	/// \endcond
 	
-	/**
-		\brief Client class with connection and the possibility of reliable and unreliable sending and receiveng
-		
-		\warning This class does not work with local ip
-	*/
+	
+	/// Client class with connection and the possibility of reliable and unreliable sending and receiveng
 	class EN_RAU_Client 
 	{
 	private:
