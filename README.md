@@ -49,7 +49,7 @@ You can compile client using command:
 
 ![image](https://user-images.githubusercontent.com/47296449/166113135-c9fc8b7d-bf3a-4589-bdce-3582c5f7abd0.png)
 
-## Important  
+## Important
 I know that no one reads further than the readme, so I want to bring some important things here  
 1. When working with linux, you may notice that std::cout does not
 output characters to the console. Don't worry, 
