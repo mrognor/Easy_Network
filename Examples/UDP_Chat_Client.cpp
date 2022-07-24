@@ -7,7 +7,7 @@ class MyClient : public EN::EN_UDP_Client
 public:
 	MyClient()
 	{
-		// ServerIpAddres = "37.140.195.195"; //Default set to localhost
+		ServerIpAddres = "178.21.11.82"; //Default set to localhost
 		// ServerPort = <put int here> to set port. Default port is 1111
 		ServerPort = 1111;
 		MaxMessageSize = 512;

@@ -49,7 +49,7 @@ You can compile client using command:
 
 ![image](https://user-images.githubusercontent.com/47296449/166113135-c9fc8b7d-bf3a-4589-bdce-3582c5f7abd0.png)
 
-## Important
+# Important
 I know that no one reads further than the readme, so I want to bring some important things here  
 1. When working with linux, you may notice that std::cout does not
 output characters to the console. Don't worry, 
@@ -58,4 +58,6 @@ your code works as it should, you can check it yourself with cerr.
 the port may be blocked for a small amount of time. 
 Due to when trying to start the server again, 
 errors will come out. We just have to wait a little  
-3. 
+3. The UDP server cannot send a message to the client if it has not received a 
+message from this client before. This does not apply to unreliable sending of 
+messages in rau classes  
