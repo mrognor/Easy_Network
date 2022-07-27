@@ -31,7 +31,7 @@ namespace EN
 		ServerSockAddr.sin_port = htons(ServerPort);
 
 		// Set ip address
-		inet_pton(AF_INET, ServerIpAddres.c_str(), &ServerSockAddr.sin_addr);
+		inet_pton(AF_INET, ServerIpAddress.c_str(), &ServerSockAddr.sin_addr);
 
 		// Get port from os
 		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));

@@ -49,7 +49,7 @@ namespace EN
 		int MaxMessageSize = 256;
 
 		/// Server ip address string. Default set to localhost
-		std::string ServerIpAddres = "127.0.0.1";
+		std::string ServerIpAddress = "127.0.0.1";
 
 		/// It is used to process incoming messages from the server
 		/// \warning Must be defined by the user
@@ -63,7 +63,7 @@ namespace EN
 		int GetPort() { return ServerPort; }
 
 		/// Ip getter
-		std::string GetIpAddr() { return ServerIpAddres; }
+		std::string GetIpAddr() { return ServerIpAddress; }
 
 		/// Socket getter
 		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
