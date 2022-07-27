@@ -6,15 +6,14 @@ class MyServer : public EN::EN_UDP_Server
 public:
 	MyServer()
 	{
-		// IpAddress = "192.168.1.64"; // Default set to localhost
+		// IpAddress = "192.168.1.64"; Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
 		// MaxMessageSize = <put int here> to set max message size. Default set to 256.
 		// You have to set synchronizied it with client
-		// ServerBuferType queue or stack
-		MaxMessageSize = 512;
-		ThreadAmount = 1;
-		ServerBuferType = EN::Queue;
-		MaxStackBuffSize = 4;
+		// ServerBuferType = EN::Queue; Can be queue or stack
+		// ThreadAmount = 1; Shows how many threads will process incoming messages. Default set to 2
+		// MaxStackBuffSize = 4; Shows the maximum size of the incoming message stack. 
+		// Work only if ServerBuferType == EN::Stack
 	}
 
 	// Third parametr in milliseconds

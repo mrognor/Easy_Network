@@ -23,12 +23,15 @@ public:
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
 
+		// Disconnect client
 		if (message == "d")
 			DisconnectClient(ClientID); 
 
+		// Shutdown server
 		if (message == "F")
 			Shutdown(); 
 
+		// Send incoming message to all different clients 
 		for (int j = 0; j < GetConnectionsCount(); j++)
 		{
 			if (j != ClientID)

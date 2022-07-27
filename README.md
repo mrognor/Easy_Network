@@ -60,4 +60,33 @@ Due to when trying to start the server again,
 errors will come out. We just have to wait a little  
 3. The UDP server cannot send a message to the client if it has not received a 
 message from this client before. This does not apply to unreliable sending of 
-messages in rau classes  
+messages in rau classes
+
+# How to choose a class  
+This is a small overview of the library classes to simplify class selection
+
+## TCP classes
+These classes support connection and reliable message sending.  
+### EN_TCP_Server  
+You have to define 3 methods
+1. void OnClientConnected(int ClientID)  
+2. void ClientMessageHandler(std::string message, int ClientID)  
+3. void OnClientDisconnect(int ClientID)  
+
+The server ip address and port are set in the constructor.  
+To start the server, you need to call the Run method  
+An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/TCP_Chat_Server.cpp  
+
+### EN_TCP_Client  
+You have to define 3 methods  
+1. void AfterConnect()  
+2. void ServerMessageHandler(std::string message)  
+3. void BeforeDisconnect()  
+
+To connect to the server, you need to call the function Connect.  
+Before shutting down the program, you need to disconnect from the server using the method Disconnect  
+An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/TCP_Chat_Client.cpp  
+
+## UDP classes  
+These classes support unreliable message sending.  
+### EN_UDP_Server  

@@ -19,6 +19,10 @@ public:
 	// A function to be defined by the user. Performed before disconnected from the server
 	void BeforeDisconnect()
 	{
+		// Check if server still connected
+		// The connection can be terminated both from the client side and from the server side. 
+		// If the client is disconnected, then we can send the final message to the server. 
+		// If the server then we will not be able to send the message
 		if (IsConnected())
 		{
 			SendToServer("Goodbye");
@@ -33,28 +37,35 @@ int main()
 {
 	MyClient A;
 
+	// Check if connection success
 	if (A.Connect() == false)
 	{
 		std::cout << "Failed to connect" << std::endl;
 		return 0;
 	}
 
+	// Start client
 	A.Run();
 
 	std::string message;
 
 	while (true)
 	{
+		// Get line from standart input
 		getline(std::cin, message);
 
+		// Stop while loop 
 		if (message == "f")
 			break;
 
+		// Check if we still connected
 		if (A.IsConnected())
 			A.SendToServer(message);
+
 		else break;
 	}
 
+	// Disconnect from server
 	A.Disconnect();
 
 	return 0;
