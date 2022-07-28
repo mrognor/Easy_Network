@@ -7,10 +7,9 @@ class MyClient : public EN::EN_UDP_Client
 public:
 	MyClient()
 	{
-		ServerIpAddress = "178.21.11.82"; //Default set to localhost
+		// ServerIpAddress = "178.21.11.82"; Default set to localhost
 		// ServerPort = <put int here> to set port. Default port is 1111
-		ServerPort = 1111;
-		MaxMessageSize = 512;
+		// MaxMessageSize = <put int here>; Default set to 256
 	}
 
 	void ServerMessageHandler(std::string message)
@@ -24,23 +23,23 @@ public:
 int main()
 {
 	MyClient A;
+	// Start client
 	A.Run();
 
 	std::string msg;
 	while (true)
 	{
+		// Read line from standart input
 		getline(std::cin, msg);
+
+		// Exit from while loop
 		if (msg == "exit()")
 			break;
 		
-		if (msg == "stress test")
-		{
-			for (int i = 0; i < 100; i++)
-				A.SendToServer("No");
-		}
 		A.SendToServer(msg);
 	}
 
+	// Close cient
 	A.Close();
 
 	system("pause");

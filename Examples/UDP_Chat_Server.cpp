@@ -19,11 +19,11 @@ public:
 	// Third parametr in milliseconds
 	void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeSincePackageArrived)
 	{
-		//if (TimeSincePackageArrived > 700)
-		//	return;
-		
-		EN::Delay(5000);
+		// Checking how much time has passed since the arrival of the message
+		if (TimeSincePackageArrived > 700)
+			return;
 
+		// Shutdown server
 		if (message == "f")
 			Shutdown();
 		
@@ -35,8 +35,8 @@ public:
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
 	bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived)
 	{
-		std::cout << "Important! " << message << std::endl;
-		if (message == "oleg")
+		std::cout << "InstantHandle " << message << std::endl;
+		if (message == "false")
 			return false;
 		return true;
 	}
@@ -46,6 +46,7 @@ public:
 int main()
 {
 	MyServer A;
+	// Start server
 	A.Run();
 
 	system("pause");

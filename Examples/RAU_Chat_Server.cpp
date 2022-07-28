@@ -5,9 +5,10 @@ class RAU_Server : public EN::EN_RAU_Server
 public:
 	RAU_Server()
 	{
-		//IpAddress = "192.168.1.71"; //Default set to localhost
+		//IpAddress = "192.168.1.71"; Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
-		MaxUnreliableMessageSize = 512;
+		// MaxUnreliableMessageSize = 512; Default set to 64
+		// You have to set synchronizied it with client
 	}
 
 	void OnClientConnected(int ClientID)
@@ -24,9 +25,11 @@ public:
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
 
+		// Disconnect client
 		if (message == "TCP d" || message == "UDP d")
 			DisconnectClient(ClientID);
 
+		// Shutdown server
 		if (message == "TCP F" || message == "UDP F")
 			Shutdown();
 
@@ -47,5 +50,6 @@ public:
 int main()
 {
 	RAU_Server A;
+	// Start server
 	A.Run();
 }

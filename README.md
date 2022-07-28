@@ -66,7 +66,7 @@ messages in rau classes
 This is a small overview of the library classes to simplify class selection
 
 ## TCP classes
-These classes support connection and reliable message sending.  
+These classes support connection and have got only reliable message sending.  
 ### EN_TCP_Server  
 You have to define 3 methods
 1. void OnClientConnected(int ClientID)  
@@ -88,5 +88,44 @@ Before shutting down the program, you need to disconnect from the server using t
 An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/TCP_Chat_Client.cpp  
 
 ## UDP classes  
-These classes support unreliable message sending.  
+These classes do not support connection and have got only unreliable message sending.  
 ### EN_UDP_Server  
+You have to define 2 methods
+1. void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeSincePackageArrived)
+2. bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived)  
+
+The entire configuration of the server takes place in the constructor.  
+To start the server, you must call the method Run. 
+To stop the server, you need to call the method Shutdown.  
+An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/UDP_Chat_Server.cpp  
+
+### EN_UDP_Client  
+You have to define 1 method
+1. void ServerMessageHandler(std::string message)  
+
+To start the client's work, you must call the method Run.  
+To complete the work, you must call the method Close.  
+An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/UDP_Chat_Client.cpp  
+
+## RAU classes
+This class supports connection. There is both reliable sending of messages and unreliable.  
+The RAU differs from the TCP only in the ability to unreliable message send.  
+### EN_RAU_Server
+You have to define 3 methods
+1. void OnClientConnected(int ClientID)  
+2. void ClientMessageHandler(std::string message, int ClientID)  
+3. void OnClientDisconnect(int ClientID)  
+
+The entire configuration of the server takes place in the constructor  
+To start the server, you need to call the Run method  
+An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/RAU_Chat_Server.cpp  
+
+### EN_RAU_Client  
+You have to define 3 methods  
+1. void AfterConnect()  
+2. void ServerMessageHandler(std::string message)  
+3. void BeforeDisconnect()  
+
+To connect to the server, you need to call the function Connect.  
+Before shutting down the program, you need to disconnect from the server using the method Disconnect  
+An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/RAU_Chat_Client.cpp  
