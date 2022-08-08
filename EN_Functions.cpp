@@ -96,7 +96,7 @@ namespace EN
 		char* MessageBuf = new char[SendFileBufLen];
 		memset(MessageBuf, NULL, SendFileBufLen);
 
-		// Find file size in kbytes
+		// Find file size in bytes
 		SendingFile.seekg(0, std::ios::end);
 		uint64_t FileSize = SendingFile.tellg();
 
