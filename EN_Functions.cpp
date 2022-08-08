@@ -87,7 +87,7 @@ namespace EN
 	}
 
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop,
-		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int DelayInMilliseconds)
+		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int ChunksNumberBetweenDelay)
 	{
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
@@ -115,6 +115,7 @@ namespace EN
 		{
 			std::time_t t = std::time(0);
 			uint64_t LastSendMessageSize = 0;
+			int SpeedStep = 0;
 
 			// Skip while loop if file size less when send buffer
 			if (FileSize < SendFileBufLen)
@@ -137,8 +138,16 @@ namespace EN
 				}
 
 				// Regulate transfering speed
-				if (DelayInMilliseconds != 0)
-					EN::Delay(DelayInMilliseconds);
+				if (ChunksNumberBetweenDelay > 0)
+				{
+					if (SpeedStep > ChunksNumberBetweenDelay)
+					{
+						EN::Delay(20);
+						SpeedStep = 0;
+					}
+					else
+						SpeedStep++;
+				}
 
 				// Read binary data
 				SendingFile.read(MessageBuf, SendFileBufLen);
@@ -237,7 +246,8 @@ namespace EN
 				{
 					IsStop = false;
 					ReceivedFile.close();
-					remove(FileName.c_str());
+					rename(FileName.c_str(), (FileName + ".tmp").c_str());
+					//remove(FileName.c_str());
 					delete[] MessageBuf;
 					return false;
 				}
@@ -255,7 +265,8 @@ namespace EN
 				{
 					std::cerr << "\nFailed to received file: " << FileName << std::endl;
 					ReceivedFile.close();
-					remove(FileName.c_str());
+					rename(FileName.c_str(), (FileName + ".tmp").c_str());
+					//remove(FileName.c_str());
 					delete[] MessageBuf;
 					return false;
 				}
@@ -273,7 +284,8 @@ namespace EN
 			{
 				std::cerr << "\nFailed to received file: " << FileName << std::endl;
 				ReceivedFile.close();
-				remove(FileName.c_str());
+				rename(FileName.c_str(), (FileName + ".tmp").c_str());
+				//remove(FileName.c_str());
 				delete[] MessageBuf;
 				return false;
 			}

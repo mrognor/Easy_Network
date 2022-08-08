@@ -34,7 +34,7 @@ public:
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
 				SendToClient(ClientID, "ok");
-				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus, 10);
+				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus);
 			}
 			else
 				EN::TCP_Send(ClientSockets[ClientID], "bad");

@@ -39,9 +39,9 @@ namespace EN
 
 	/// Functions gets socket and filename and send file to socket. Third parametr its refernce to bool to stop transmission. 
 	/// The fourth parameter is a pointer to a function to handle the remaining transfer time
-	/// The fifth parameter is needed to regulate the file transfer rate. Gets milliseconds for the delay between sending chunks of the file
+	/// The fifth parameter is needed to regulate the file transfer rate. Gets amount of chunks between sending delay. 0 means no delay
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FilePath, bool& IsStop, 
-		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, int DelayInMilliseconds = 0);
+		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, int ChunksNumberBetweenDelay = 0);
 
 	/// This function will wait file. Second parametr its refernce to bool to stop transmission. 
 	/// The fird parameter is a pointer to a function to handle the remaining transfer time
@@ -61,5 +61,6 @@ namespace EN
 	bool IsFileExist(std::string filePath);
 
 	/// Crossplatform function for program suspension
+	/// Minimum time is 20
 	void Delay(int milliseconds);
 }
