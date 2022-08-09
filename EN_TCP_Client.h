@@ -81,7 +81,7 @@ namespace EN
 		std::string GetServerIpAddress() { return ServerIpAddress; }
 
 		/// Socket getter
-		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
+		EN_SOCKET GetSocket() { return ServerConnectionSocket; }
 
 		/// Function return true if client connected to server
 		bool IsConnected();

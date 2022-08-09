@@ -66,7 +66,7 @@ namespace EN
 		std::string GetIpAddr() { return ServerIpAddress; }
 
 		/// Socket getter
-		EN_SOCKET* GetSocket() { return &ServerConnectionSocket; }
+		EN_SOCKET GetSocket() { return ServerConnectionSocket; }
 
 		/// Method to start server. Starts a thread to process server responses
 		void Run();
