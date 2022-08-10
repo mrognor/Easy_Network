@@ -102,7 +102,7 @@ namespace EN
 		uint64_t FileSize = SendingFile.tellg();
 
 		// Send file name and file size
-		EN::TCP_Send(FileSendSocket, FileName + " " + std::to_string(FileSize));
+		EN::TCP_Send(FileSendSocket, FileName + " " + std::to_string(FileSize - PreviouslySendedSize));
 
 		// See file start
 		SendingFile.seekg(0, std::ios::beg);
@@ -335,18 +335,10 @@ namespace EN
 			return false;
 		}
 
-		// Open local file to get size
-		std::ifstream LocalFile(FileName, std::ios::binary);
-
-		// Find file size in bytes
-		LocalFile.seekg(0, std::ios::end);
-		uint64_t LocalFileSize = LocalFile.tellg();
-		LocalFile.close();
-
 		std::ofstream ReceivedFile(FileName, std::ios::app | std::ios::binary);
 	
 		// Already received bytes
-		uint64_t ReceivedMessageSize = LocalFileSize;
+		uint64_t ReceivedMessageSize = 0;
 
 		// Received file buffer 
 		char* MessageBuf = new char[SendFileBufLen];
