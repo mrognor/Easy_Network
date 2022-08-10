@@ -28,7 +28,7 @@ typedef int EN_SOCKET;
 
 namespace EN
 { 
-	///Wrapper over the send function. Allows you to send std::string. 
+	/// Wrapper over the send function. Allows you to send std::string. 
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay = 10);
 
 	/// Wrapper over the recv function. Allows you to recv std::string. 
