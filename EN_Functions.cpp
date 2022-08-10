@@ -422,7 +422,7 @@ namespace EN
 		return true;
 	}
 
-	bool ResendFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
@@ -469,7 +469,7 @@ namespace EN
 
 			if (ReceiveBytes <= 0)
 			{
-				std::cerr << "\nFailed to resend file" << std::endl;
+				std::cerr << "\nFailed to forward file" << std::endl;
 
 				delete[] MessageBuf;
 				return false;
@@ -480,7 +480,7 @@ namespace EN
 
 			if (SendBytes <= 0)
 			{
-				std::cerr << "\nFailed to resend file" << std::endl;
+				std::cerr << "\nFailed to forward file" << std::endl;
 				delete[] MessageBuf;
 				return false;
 			}
@@ -496,7 +496,7 @@ namespace EN
 
 		if (ReceiveBytes <= 0)
 		{
-			std::cerr << "\nFailed to resend file" << std::endl;
+			std::cerr << "\nFailed to forward file" << std::endl;
 			delete[] MessageBuf;
 			return false;
 		}
@@ -506,7 +506,7 @@ namespace EN
 
 		if (SendBytes <= 0)
 		{
-			std::cerr << "\nFailed to resend file" << std::endl;
+			std::cerr << "\nFailed to forward file" << std::endl;
 			delete[] MessageBuf;
 			return false;
 		}

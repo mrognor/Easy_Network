@@ -55,6 +55,9 @@ int main()
 		{
 			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
 			
+			// An important point. 
+			// If the file that you receive exists, an index will be assigned to the name of the new file,
+			// but when the download continues, the name of the file without indexes is indicated.
 			if (EN::IsFileExist(IntrepretedMessage[2] + ".tmp"))
 			{
 				// Open file
