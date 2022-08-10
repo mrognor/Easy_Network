@@ -87,8 +87,9 @@ namespace EN
 	}
 
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop,
-		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int ChunksNumberBetweenDelay)
-	{
+		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), 
+		uint64_t PreviouslySendedSize, int ChunksNumberBetweenDelay)
+	{	
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
 
@@ -109,7 +110,12 @@ namespace EN
 		// Sended bytes
 		uint64_t SendMessageSize = 0;
 
+		// Current iteration sended bytes
 		int SendBytes;
+		
+		// Amount of sended chunks previously
+		uint64_t BeforeSendedChunks = PreviouslySendedSize / SendFileBufLen;
+		uint64_t ChunksSended = 0;
 
 		if (SendingFile.is_open())
 		{
@@ -123,6 +129,14 @@ namespace EN
 
 			while (SendMessageSize < FileSize - SendFileBufLen)
 			{
+				if (ChunksSended < BeforeSendedChunks)
+				{
+					SendingFile.seekg(SendFileBufLen, std::ios::cur);
+					SendMessageSize += SendFileBufLen;
+					ChunksSended++;
+					continue;
+				}
+
 				if (IsStop == true)
 				{
 					IsStop = false;
@@ -246,8 +260,6 @@ namespace EN
 				{
 					IsStop = false;
 					ReceivedFile.close();
-					rename(FileName.c_str(), (FileName + ".tmp").c_str());
-					//remove(FileName.c_str());
 					delete[] MessageBuf;
 					return false;
 				}
@@ -265,8 +277,6 @@ namespace EN
 				{
 					std::cerr << "\nFailed to received file: " << FileName << std::endl;
 					ReceivedFile.close();
-					rename(FileName.c_str(), (FileName + ".tmp").c_str());
-					//remove(FileName.c_str());
 					delete[] MessageBuf;
 					return false;
 				}
@@ -284,8 +294,6 @@ namespace EN
 			{
 				std::cerr << "\nFailed to received file: " << FileName << std::endl;
 				ReceivedFile.close();
-				rename(FileName.c_str(), (FileName + ".tmp").c_str());
-				//remove(FileName.c_str());
 				delete[] MessageBuf;
 				return false;
 			}
@@ -304,6 +312,112 @@ namespace EN
 			return false;
 		}
 		
+		delete[] MessageBuf;
+		return true;
+	}
+
+	bool ContinueRecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	{
+		// Get file name and file size
+		std::string FileInfo;
+		if (EN::TCP_Recv(FileSendSocket, FileInfo) == false)
+		{
+			std::cerr << "\nFailed to received file name" << std::endl;
+			return false;
+		}
+
+		std::string FileName = Split(FileInfo)[0];
+		uint64_t FileSize = std::stoll(Split(FileInfo)[1]);
+
+		if (!IsFileExist(FileName))
+		{
+			std::cerr << "No file to re-receive!" << std::endl;
+			return false;
+		}
+
+		// Open local file to get size
+		std::ifstream LocalFile(FileName, std::ios::binary);
+
+		// Find file size in bytes
+		LocalFile.seekg(0, std::ios::end);
+		uint64_t LocalFileSize = LocalFile.tellg();
+		LocalFile.close();
+
+		std::ofstream ReceivedFile(FileName, std::ios::app | std::ios::binary);
+	
+		// Already received bytes
+		uint64_t ReceivedMessageSize = LocalFileSize;
+
+		// Received file buffer 
+		char* MessageBuf = new char[SendFileBufLen];
+
+		if (ReceivedFile.is_open())
+		{
+			std::time_t t = std::time(0);
+			uint64_t LastReceivedMessageSize = 0;
+
+			// Skip while loop if file size less when send buffer
+			if (FileSize < SendFileBufLen)
+				goto RecvLittleFile;
+
+			while (ReceivedMessageSize < FileSize - SendFileBufLen)
+			{
+				if (IsStop == true)
+				{
+					IsStop = false;
+					ReceivedFile.close();
+					delete[] MessageBuf;
+					return false;
+				}
+
+				if (ProgressFunction != nullptr && std::time(0) > t)
+				{
+					ProgressFunction(ReceivedMessageSize, FileSize, ReceivedMessageSize - LastReceivedMessageSize, (FileSize - ReceivedMessageSize) / (ReceivedMessageSize - LastReceivedMessageSize));
+					LastReceivedMessageSize = ReceivedMessageSize;
+					t = std::time(0);
+				}
+
+				int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+
+				if (ReceiveBytes <= 0)
+				{
+					std::cerr << "\nFailed to received file: " << FileName << std::endl;
+					ReceivedFile.close();
+					delete[] MessageBuf;
+					return false;
+				}
+
+				ReceivedMessageSize += ReceiveBytes;
+				ReceivedFile.write(MessageBuf, SendFileBufLen);
+				memset(MessageBuf, NULL, SendFileBufLen);
+			}
+
+			// End skipping while loop
+		RecvLittleFile:
+			int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+
+			if (ReceiveBytes <= 0)
+			{
+				std::cerr << "\nFailed to received file: " << FileName << std::endl;
+				ReceivedFile.close();
+				delete[] MessageBuf;
+				return false;
+			}
+
+			ReceivedFile.write(MessageBuf, FileSize % SendFileBufLen);
+
+			if (ProgressFunction != nullptr)
+				ProgressFunction(FileSize, FileSize, 0, 0);
+
+			ReceivedFile.close();
+		}
+		else
+		{
+			std::cerr << "\nFailed to send file: " << FileName << std::endl;
+			delete[] MessageBuf;
+			return false;
+		}
+
 		delete[] MessageBuf;
 		return true;
 	}
