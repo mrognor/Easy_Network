@@ -40,6 +40,18 @@ public:
 				EN::TCP_Send(ClientSockets[ClientID], "bad");
 			return;
 		}
+
+		if (message.find("continue download") != -1)
+		{
+			if (EN::IsFileExist(InterpretedMessage[2]))
+			{
+				SendToClient(ClientID, "ok");
+				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus, std::stoll(InterpretedMessage[3]));
+			}
+			else
+				EN::TCP_Send(ClientSockets[ClientID], "bad");
+			return;
+		}
 	}
 
 	void OnClientDisconnect(int ClientID)

@@ -38,6 +38,10 @@ namespace EN
 		/// \return Return true if file transmission success, false otherwise
 		bool RecvFileFromServer(void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta));
 
+		/// Function to continue receiving file from server
+		/// \return Return true if file transmission success, false otherwise
+		bool ContinueRecvFileFromServer(void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta));
+
 		/// Function to get message from server
 		void RecvMessageFromServer(std::string& msg);
 

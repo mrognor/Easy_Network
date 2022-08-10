@@ -54,21 +54,61 @@ int main()
 		if (message.find("get file") != -1)
 		{
 			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
-			std::string responce;
-			A.SendToServer(message);
-			A.RecvMessageFromServer(responce);
-			if (responce == "ok")
+			
+			if (EN::IsFileExist(IntrepretedMessage[2] + ".tmp"))
 			{
-				if (A.RecvFileFromServer(EN::DownloadStatus))
-					std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+				// Open file
+				std::ifstream SendingFile(IntrepretedMessage[2] + ".tmp", std::ios::binary);
+
+				// Find file size in bytes
+				SendingFile.seekg(0, std::ios::end);
+				uint64_t FileSize = SendingFile.tellg();
+				SendingFile.close();
+				rename((IntrepretedMessage[2] + ".tmp").c_str(), IntrepretedMessage[2].c_str());
+				message = "continue download " + IntrepretedMessage[2] + " " + std::to_string(FileSize);
+
+				A.SendToServer(message);
+
+				std::string responce;
+				A.RecvMessageFromServer(responce);
+
+				if (responce == "ok")
+				{
+					if (A.ContinueRecvFileFromServer(EN::DownloadStatus))
+						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+					else
+					{
+						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
+						rename(IntrepretedMessage[2].c_str(), (IntrepretedMessage[2] + ".tmp").c_str());
+					}
+				}
 				else
-					std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
+				{
+					std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
+				}
 			}
 			else
 			{
-				std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
-			}
+				A.SendToServer(message);
 
+				std::string responce;
+				A.RecvMessageFromServer(responce);
+
+				if (responce == "ok")
+				{
+					if (A.RecvFileFromServer(EN::DownloadStatus))
+						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+					else
+					{
+						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
+						rename(IntrepretedMessage[2].c_str(), (IntrepretedMessage[2] + ".tmp").c_str());
+					}
+				}
+				else
+				{
+					std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
+				}
+			}
 			continue;
 		}
 	}

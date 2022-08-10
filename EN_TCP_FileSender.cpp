@@ -18,6 +18,13 @@ namespace EN
 		return false;
 	}
 
+	bool EN_TCP_FileSender::ContinueRecvFileFromServer(void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	{
+		if (IsConnected())
+			return EN::ContinueRecvFile(GetSocket(), IsStop, ProgressFunction);
+		return false;
+	}
+
 	void EN_TCP_FileSender::RecvMessageFromServer(std::string& msg)
 	{
 		if (IsConnected())
