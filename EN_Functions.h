@@ -65,7 +65,11 @@ namespace EN
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
 
 	/// Return true if file exists, otherwise rerurn false
-	bool IsFileExist(std::string filePath);
+	bool IsFileExist(std::string FilePath);
+
+	/// Return file size in bytes
+	/// If couldn't open the file return 0
+	uint64_t GetFileSize(std::string FileName);
 
 	/// Crossplatform function for program suspension
 	/// Minimum time is 20

@@ -554,16 +554,32 @@ namespace EN
 			std::cout << "\nEnd file transfering" << std::endl;
 	}
 
-	bool IsFileExist(std::string filePath)
+	bool IsFileExist(std::string FilePath)
 	{
 		bool isExist = false;
-		std::ifstream fin(filePath.c_str());
+		std::ifstream fin(FilePath.c_str());
 
 		if (fin.is_open())
 			isExist = true;
 
 		fin.close();
 		return isExist;
+	}
+
+	uint64_t GetFileSize(std::string FileName)
+	{
+		std::ifstream file(FileName, std::ios::ate | std::ios::binary);
+		uint64_t FileSize = 0;
+
+		if (!file.is_open())
+		{
+			std::cerr << "Couldn't open the file" << std::endl;
+		}
+		else
+			FileSize = file.tellg();
+
+		file.close();
+		return FileSize;
 	}
 
 	void Delay(int milliseconds)

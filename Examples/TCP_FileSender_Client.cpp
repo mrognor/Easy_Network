@@ -60,13 +60,8 @@ int main()
 			// but when the download continues, the name of the file without indexes is indicated.
 			if (EN::IsFileExist(IntrepretedMessage[2] + ".tmp"))
 			{
-				// Open file
-				std::ifstream SendingFile(IntrepretedMessage[2] + ".tmp", std::ios::binary);
+				uint64_t FileSize = EN::GetFileSize(IntrepretedMessage[2] + ".tmp");
 
-				// Find file size in bytes
-				SendingFile.seekg(0, std::ios::end);
-				uint64_t FileSize = SendingFile.tellg();
-				SendingFile.close();
 				rename((IntrepretedMessage[2] + ".tmp").c_str(), IntrepretedMessage[2].c_str());
 				message = "continue download " + IntrepretedMessage[2] + " " + std::to_string(FileSize);
 
