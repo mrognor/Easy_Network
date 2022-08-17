@@ -134,7 +134,7 @@ namespace EN
 			\param[in] IsReliable if the parameter is set to true, the message is guaranteed to reach. 
 			if the parameter is set to false before the message delivery is not guaranteed
 		*/
-		void SendToClient(int ClientId, std::string message, bool IsReliable = true);
+		void SendToClient(int ClientId, std::string message, bool IsReliable = true, int MessageDelay = 10);
 
 		~EN_RAU_Server();
 	};

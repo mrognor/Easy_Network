@@ -229,9 +229,9 @@ namespace EN
 		#endif		
 	}
 
-	void EN_TCP_Server::SendToClient(int ClientId, std::string message)
+	void EN_TCP_Server::SendToClient(int ClientId, std::string message, int MessageDelay)
 	{
 		if (ClientId < ClientSockets.size() && ClientSockets[ClientId] != INVALID_SOCKET)
-			EN::TCP_Send(ClientSockets[ClientId], message);
+			EN::TCP_Send(ClientSockets[ClientId], message, MessageDelay);
 	}
 }

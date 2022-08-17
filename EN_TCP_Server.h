@@ -102,7 +102,8 @@ namespace EN
 
 			\param[in] ClientID The number of the client 
 			\param[in] message The message to be sent to the client 
+			\param[in] MessageDelay The delay after sending message
 		*/
-		void SendToClient(int ClientId, std::string message);
+		void SendToClient(int ClientId, std::string message, int MessageDelay = 10);
 	};
 }

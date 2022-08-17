@@ -168,12 +168,12 @@ namespace EN
 		}
 	}
 
-	void EN_RAU_Server::SendToClient(int ClientId, std::string message, bool IsReliable)
+	void EN_RAU_Server::SendToClient(int ClientId, std::string message, bool IsReliable, int MessageDelay)
 	{
 		if (UDPIpAddresses[ClientId] != "none")
 		{
 			if (IsReliable)
-				TCP_Server->SendToClient(ClientId, message);
+				TCP_Server->SendToClient(ClientId, message, MessageDelay);
 			else UDP_Server->SendToClient(UDPIpAddresses[ClientId], message);
 		}
 	}
