@@ -131,8 +131,8 @@ namespace EN
 
 			\param[in] ClientID The number of the client
 			\param[in] message The message to be sent to the client
-			\param[in] IsReliable if the parameter is set to true, the message is guaranteed to reach. 
-			if the parameter is set to false before the message delivery is not guaranteed
+			\param[in] IsReliable if the parameter is set to true, the message is guaranteed to reach. If the parameter is set to false the message delivery is not guaranteed
+			\param[in] MessageDelay The delay after sending message. Useless if IsReliable set to false.
 		*/
 		void SendToClient(int ClientId, std::string message, bool IsReliable = true, int MessageDelay = 10);
 
