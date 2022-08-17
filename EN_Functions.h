@@ -41,6 +41,7 @@ namespace EN
 	/// The fourth parameter is a pointer to a function to handle the remaining transfer time
 	/// The fifth parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
 	/// The sixth parameter is needed to regulate the file transfer rate. Gets amount of chunks between sending delay. 0 means no delay
+	/// The delay between sending the chunks is 20 millimeconds.
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FilePath, bool& IsStop, 
 		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, 
 		uint64_t PreviouslySendedSize = 0, int ChunksNumberBetweenDelay = 0);
