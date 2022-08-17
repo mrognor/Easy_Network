@@ -72,6 +72,5 @@ namespace EN
 	uint64_t GetFileSize(std::string FileName);
 
 	/// Crossplatform function for program suspension
-	/// Minimum time is 20
 	void Delay(int milliseconds);
 }
