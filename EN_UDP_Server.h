@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef WIN32
+#if defined WIN32 || defined _WIN64 
 
 #pragma comment(lib, "ws2_32.lib")
 #include <winsock2.h>
