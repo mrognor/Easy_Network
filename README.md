@@ -27,7 +27,7 @@ and add the path to the lib library folder there
 
 ![image](https://user-images.githubusercontent.com/47296449/165807739-68487caa-84ea-4caf-8630-63198174dea2.png)
 
-6. Open menu on Linker -> Input -> Additional Dependencies and add "EasyNetwork.lib" here. 
+6. Open menu on Linker -> Input -> Additional Dependencies and add "EasyNetwork.lib" here. Note that you must specify the correct file name for each build configuration.
 ![image](https://user-images.githubusercontent.com/47296449/165808413-9a2e783d-5a25-4829-858e-c48ed7267bac.png)
 
 7. The configuration of the project for working with the library is completed. Now you can use the code samples and try to make own programm  
