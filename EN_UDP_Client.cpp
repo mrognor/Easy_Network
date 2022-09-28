@@ -4,7 +4,7 @@ namespace EN
 {
 	EN_UDP_Client::EN_UDP_Client()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		//WSAStartup
 		WSAData wsaData;
 		// Winsock operation int result
@@ -49,7 +49,7 @@ namespace EN
 		int OperationRes;
 		while (true)
 		{
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, &sizeofaddr);
 			#else
 			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, (socklen_t*)&sizeofaddr);
@@ -75,7 +75,7 @@ namespace EN
 			std::cerr << "Error: Failed to send to server" << std::endl;
 		}
 		
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		Sleep(MessageDelay);
 		#else
 		usleep(MessageDelay);
@@ -84,7 +84,7 @@ namespace EN
 
 	void EN_UDP_Client::Close()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);
 		#else
 		close(ServerConnectionSocket);
@@ -93,7 +93,7 @@ namespace EN
 
 	EN_UDP_Client::~EN_UDP_Client()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		WSACleanup();
 		#endif
 	}

@@ -74,4 +74,17 @@ namespace EN
 
 	/// Crossplatform function for program suspension
 	void Delay(int milliseconds);
+
+	/// Function to convert int to string. 
+	/// One char takes 1 byte, and a int takes 4 bytes. 
+	/// If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
+	/// This function turns a number into a character, since a character occupies a byte, 
+	/// then you can transfer numbers up to 255 in one byte. 
+	/// This function can be considered as the translation of a number into a number system with a base of 256
+	/// This function does not work with negative numbers.
+	std::string IntToString(int n);
+
+	/// Function to convert string to int.
+	/// Works with strings from function EN::IntToString.
+	int StringToInt(std::string str);
 }

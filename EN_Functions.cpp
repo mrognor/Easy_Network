@@ -21,7 +21,7 @@ namespace EN
 		{
 			message = "";
 
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			closesocket(sock);
 			#else 
 			close(sock);
@@ -39,7 +39,7 @@ namespace EN
 		{
 			message = "";
 
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			closesocket(sock);
 			#else 
 			close(sock);
@@ -584,10 +584,32 @@ namespace EN
 
 	void Delay(int milliseconds)
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		Sleep(milliseconds);
 		#else
 		usleep(milliseconds * 1000);
 		#endif
+	}
+
+	std::string IntToString(int n)
+	{
+		std::string num = "";
+		while (abs(n / 256) > 0)
+		{
+			num += (char)(n % 256);
+			n /= 256;
+		}
+		num += (char)n;
+		return num;
+	}
+
+	int StringToInt(std::string str)
+	{
+		int num = 0;
+		for (int i = 0; i < str.size(); i++)
+		{
+			num += ((unsigned char)str[i]) * pow(256, i);
+		}
+		return num;
 	}
 }

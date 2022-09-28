@@ -4,7 +4,7 @@ namespace EN
 {
 	EN_TCP_Client::EN_TCP_Client()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		//WSAStartup
 		WSAData wsaData;
 		// Winsock operation int result
@@ -110,7 +110,7 @@ namespace EN
 	{
 		BeforeDisconnect();
 
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);
 		WSACleanup();
 		#else 

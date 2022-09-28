@@ -4,7 +4,7 @@ namespace EN
 {
 	EN_TCP_Server::EN_TCP_Server()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		//WSAStartup
 		WSAData wsaData;
 		if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
@@ -24,7 +24,7 @@ namespace EN
 		{
 			message = "";
 
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			closesocket(ClientSockets[ClientSocketID]);
 			#else 
 			close(ClientSockets[ClientSocketID]);
@@ -42,7 +42,7 @@ namespace EN
 		{
 			message = "";
 
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			closesocket(ClientSockets[ClientSocketID]);
 			#else 
 			close(ClientSockets[ClientSocketID]);
@@ -95,7 +95,7 @@ namespace EN
 		// Handle new connections
 		while (true)
 		{
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			IncomingConnection = accept(ServerListenSocket, (sockaddr*)&ServerAddress, &sizeofaddr);
 			#else
 			IncomingConnection = accept(ServerListenSocket, (sockaddr*)&ServerAddress, (socklen_t*)&sizeofaddr);
@@ -106,13 +106,13 @@ namespace EN
 			{
 				for (EN_SOCKET sock : ClientSockets)
 				{
-					#ifdef WIN32
+					#if defined WIN32 || defined _WIN64
 					closesocket(sock);
 					#else
 					close(sock);
 					#endif
 				}
-				#ifdef WIN32
+				#if defined WIN32 || defined _WIN64
 				closesocket(IncomingConnection); 
 				closesocket(ServerListenSocket);
 				WSACleanup();
@@ -175,7 +175,7 @@ namespace EN
 			ClientMessageHandler(message, ClientID);
 		}
 
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		closesocket(ClientID);
 		#else
 		close(ClientID);
@@ -189,7 +189,7 @@ namespace EN
 
 	void EN_TCP_Server::DisconnectClient(int ClientID)
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		closesocket(ClientSockets[ClientID]);
 		#else
 		shutdown(ClientSockets[ClientID], 2);
@@ -221,7 +221,7 @@ namespace EN
 		if (OperationRes != 0)
 			std::cerr << "Error: failed connect to server." << std::endl;
 		
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);
 		WSACleanup();
 		#else

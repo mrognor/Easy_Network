@@ -54,7 +54,7 @@ namespace EN
 
 	EN_UDP_Server::EN_UDP_Server()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		//WSAStartup
 		WSAData wsaData;
 		if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
@@ -120,7 +120,7 @@ namespace EN
 			//clear the buffer by filling null, it might have previously received data
 			memset(IncomingMessageBuffer, '\0', MaxMessageSize);
 
-			#ifdef WIN32
+			#if defined WIN32 || defined _WIN64
 			//try to receive some data, this is a blocking call
 			recvfrom(UDP_ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, &sizeofaddr);
 			#else
@@ -200,7 +200,7 @@ namespace EN
 		delete[] Mutexes;
 
 		delete[] IncomingMessageBuffer;
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		closesocket(UDP_ServerSocket);
 		#else
 		close(UDP_ServerSocket);
@@ -258,7 +258,7 @@ namespace EN
 
 	EN_UDP_Server::~EN_UDP_Server()
 	{
-		#ifdef WIN32
+		#if defined WIN32 || defined _WIN64
 		WSACleanup();
 		#endif
 	}
