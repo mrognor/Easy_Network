@@ -18,6 +18,7 @@ typedef int EN_SOCKET;
 
 #endif
 
+#include <math.h>
 #include <iostream>
 #include <string>
 #include <vector>

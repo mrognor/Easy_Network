@@ -50,7 +50,7 @@ bin/EN_TCP_Client.o: EN_TCP_Client.cpp
 
 bin/EN_Functions.o: EN_Functions.cpp
 	mkdir -p bin
-	g++ -c EN_Functions.cpp -o bin/EN_Functions.o
+	g++ -c EN_Functions.cpp -o bin/EN_Functions.o -lm
 
 clean:
 	rm -rf bin
