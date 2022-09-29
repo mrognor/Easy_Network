@@ -143,10 +143,9 @@ namespace EN
 		bool Connect(std::string ipAddr, int port);
 
 		/**
-			\brief Method to start server.
+			\brief Method to start server listening.
 
 			Starts a thread to process server responses
-			Important! You have to determine AfterConnect(), ServerMessageHandler() and BeforeDisconnect()
 		*/
 		void Run();
 

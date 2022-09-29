@@ -82,7 +82,7 @@ namespace EN
 		#endif
 	}
 
-	void EN_UDP_Client::Close()
+	void EN_UDP_Client::Stop()
 	{
 		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);

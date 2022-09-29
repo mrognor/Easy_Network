@@ -180,7 +180,12 @@ namespace EN
 
 		for (int i = 0; i < ThreadAmount; i++)
 		{
-			ThreadVec[i].join();
+			// try to join threads if it still works
+			try 
+			{
+				ThreadVec[i].join();
+			}
+			catch(...){}
 		}
 
 		for (int i = 0; i < ThreadAmount; i++)

@@ -39,8 +39,8 @@ int main()
 		A.SendToServer(msg);
 	}
 
-	// Close cient
-	A.Close();
+	// Stop cient
+	A.Stop();
 
 	system("pause");
 }

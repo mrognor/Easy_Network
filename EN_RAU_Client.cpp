@@ -136,7 +136,7 @@ namespace EN
 	void EN_RAU_Client::Disconnect()
 	{
 		TCP_Client->Disconnect();
-		UDP_Client->Close();
+		UDP_Client->Stop();
 		
 		Delay(300);
 		

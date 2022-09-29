@@ -80,7 +80,7 @@ namespace EN
 		void SendToServer(std::string message, int MessageDelay = 10);
 
 		/// Function to close client
-		void Close();
+		void Stop();
 
 		// Default destructor
 		~EN_UDP_Client();
