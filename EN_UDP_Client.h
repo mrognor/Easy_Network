@@ -79,7 +79,7 @@ namespace EN
 		*/
 		void SendToServer(std::string message, int MessageDelay = 10);
 
-		/// Function to close client
+		/// Function to stop client
 		void Stop();
 
 		// Default destructor
