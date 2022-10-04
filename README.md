@@ -61,6 +61,7 @@ errors will come out. We just have to wait a little
 3. The UDP server cannot send a message to the client if it has not received a 
 message from this client before. This does not apply to unreliable sending of 
 messages in rau classes
+4. Note that the maximum size of a udp packet that can be guaranteed to be sent and received is 508 bytes. You can send more, but then the message may not go away  
 
 # How to choose a class  
 This is a small overview of the library classes to simplify class selection
