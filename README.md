@@ -8,7 +8,7 @@ https://mrognor.github.io/Easy_Network_Documentation/doc/html/index.html
 Before you start, I advise you to download the code examples. For linux, you can save files to one folder, and for visual studio, you will need to add these files to different projects  
 Examples available here: https://github.com/mrognor/Easy_Network/tree/master/Examples
 
-## Windows library usage guide
+## Visual Studio library usage guide
 1. Download the latest release from github
 2. Create a new project in visual studio
 3. Click project -> properties
@@ -32,10 +32,20 @@ and add the path to the lib library folder there
 
 7. The configuration of the project for working with the library is completed. Now you can use the code samples and try to make own programm  
 
+## MinGW library usage guide
+1. Download the latest release from github
+2. You can extract library release archive to any folder. Make sure that the path to the header files in your code is up to date
+3. Now all ready to compile your project  
+You can compile server using command:  
+`g++ -pthread -lws2_32 TCPServer.cpp bin/libEasyNetwork.a -o server.sh`  
+You can compile client using command:   
+`g++ -pthread -lws2_32 TCPClient.cpp bin/libEasyNetwork.a -o client.sh`  
+4. Run your programs using command:  
+`./server.sh` and `./client.sh`
 
 ## Linux library usage
 1. Download the latest release from github
-2. You can extract library release archive to any folder. I will save everything in one folder for convenience
+2. You can extract library release archive to any folder. I will save everything in one folder for convenience. Make sure that the path to the header files in your code is up to date
 
 ![image](https://user-images.githubusercontent.com/47296449/166112771-628c328f-cef5-4c75-a440-d018841f351b.png)
 
