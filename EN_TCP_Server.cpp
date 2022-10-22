@@ -33,6 +33,12 @@ namespace EN
 			return ConnectionStatus;
 		}
 
+		if (msg_size <= 0)
+		{
+			message = "";
+			return true;
+		}
+
 		char* msg = new char[msg_size + 1];
 		msg[msg_size] = '\0';
 

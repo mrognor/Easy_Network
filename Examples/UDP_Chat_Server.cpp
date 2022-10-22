@@ -35,7 +35,7 @@ public:
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
 	bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived)
 	{
-		std::cout << "InstantHandle " << message << std::endl;
+		std::cout << "InstantHandler " << message << std::endl;
 		if (message == "false")
 			return false;
 		return true;

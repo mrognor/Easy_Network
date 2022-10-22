@@ -75,7 +75,7 @@ int main()
 			else 
 			{
 				A.SendToServer("UDP " + message, false);
-				IsTCP = false;
+				IsTCP = true;
 			}
 		}
 		// Break from while loop in case of server disconnect
