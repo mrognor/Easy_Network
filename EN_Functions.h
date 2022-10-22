@@ -83,7 +83,7 @@ namespace EN
 	/// then you can transfer numbers up to 255 in one byte. 
 	/// This function can be considered as the translation of a number into a number system with a base of 256
 	/// This function does not work with negative numbers.
-	std::string IntToString(int n);
+	std::string IntToString(unsigned int n);
 
 	/// Function to convert string to int.
 	/// Works with strings from function EN::IntToString.

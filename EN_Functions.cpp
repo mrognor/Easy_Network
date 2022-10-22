@@ -591,25 +591,25 @@ namespace EN
 		#endif
 	}
 
-	std::string IntToString(int n)
+	std::string IntToString(unsigned int n)
 	{
 		std::string num = "";
-		while (abs(n / 256) > 0)
+		while (n / 255 > 0)
 		{
-			num += (char)(n % 256);
-			n /= 256;
+			num += (char)(n % 255 + 1);
+			n /= 255;
 		}
-		num += (char)n;
+		num += (char)(n + 1);
 		return num;
 	}
 
 	int StringToInt(std::string str)
 	{
 		int num = 0;
+
 		for (int i = 0; i < str.size(); i++)
-		{
-			num += ((unsigned char)str[i]) * pow(256, i);
-		}
+			num += ((unsigned char)str[i] - 1) * pow(255, i);
+		
 		return num;
 	}
 }
