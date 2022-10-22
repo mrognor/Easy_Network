@@ -67,6 +67,7 @@ namespace EN
 		}
 		else
 		{
+			ServerConnectionSocket = INVALID_SOCKET;
 			std::cerr << "Error: failed connect to server." << std::endl;
 			return false;
 		}
@@ -109,10 +110,8 @@ namespace EN
 	void EN_TCP_Client::Disconnect()
 	{
 		BeforeDisconnect();
-
 		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);
-		WSACleanup();
 		#else 
 		close(ServerConnectionSocket);
 		#endif
@@ -121,6 +120,7 @@ namespace EN
 
 	EN_TCP_Client::~EN_TCP_Client()
 	{
+		WSACleanup();
 		if (ServerConnectionSocket != INVALID_SOCKET)
 		{
 			std::cerr << "Error: You forgot to disconnect from the server. Use method Disconnect() to do this" << std::endl;
