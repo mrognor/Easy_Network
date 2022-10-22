@@ -91,6 +91,12 @@ namespace EN
 			// Means what server was disconnected
 			if (IsServerConnected == false)
 			{
+				#if defined WIN32 || defined _WIN64
+				closesocket(ServerConnectionSocket);
+				#else 
+				close(ServerConnectionSocket);
+				#endif
+				ServerConnectionSocket = INVALID_SOCKET;
 				Disconnect();
 				return;
 			}

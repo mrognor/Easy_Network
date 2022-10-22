@@ -27,8 +27,9 @@ public:
 		if (IsConnected())
 		{
 			SendToServer("Goodbye");
-			std::cout << "Server disconnected" << std::endl;
+			std::cout << "Client disconnected" << std::endl;
 		}
+		else std::cout << "Server disconnected" << std::endl;
 	}
 };
 
@@ -79,7 +80,7 @@ int main()
 			}
 		}
 		// Break from while loop in case of server disconnect
-		else 
+		else
 			break;
 	}
 
