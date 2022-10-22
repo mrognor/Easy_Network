@@ -96,8 +96,11 @@ namespace EN
 				#else 
 				close(ServerConnectionSocket);
 				#endif
-				ServerConnectionSocket = INVALID_SOCKET;
-				Disconnect();
+				if (ServerConnectionSocket != INVALID_SOCKET)
+				{
+					ServerConnectionSocket = INVALID_SOCKET;
+					Disconnect();
+				}
 				return;
 			}
 
