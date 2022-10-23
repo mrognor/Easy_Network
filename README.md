@@ -37,9 +37,9 @@ and add the path to the lib library folder there
 2. You can extract library release archive to any folder. Make sure that the path to the header files in your code is up to date
 3. Now all ready to compile your project  
 You can compile server using command:  
-`g++ -pthread -std=c++11 -lws2_32 TCPServer.cpp bin/libEasyNetwork.a -o server.sh`  
+`g++ -pthread -std=c++11 -lws2_32 TCPServer.cpp lib/libEasyNetwork.a -o server.sh`  
 You can compile client using command:   
-`g++ -pthread -std=c++11 -lws2_32 TCPClient.cpp bin/libEasyNetwork.a -o client.sh`  
+`g++ -pthread -std=c++11 -lws2_32 TCPClient.cpp lib/libEasyNetwork.a -o client.sh`  
 4. Run your programs using command:  
 `./server.sh` and `./client.sh`
 
@@ -51,9 +51,9 @@ You can compile client using command:
 
 3. Now all ready to compile your project  
 You can compile server using command:  
-`g++ -pthread -std=c++11 TCPServer.cpp bin/libEasyNetwork.a -o server.sh`  
+`g++ -pthread -std=c++11 TCPServer.cpp lib/libEasyNetwork.a -o server.sh`  
 You can compile client using command:   
-`g++ -pthread -std=c++11 TCPClient.cpp bin/libEasyNetwork.a -o client.sh`  
+`g++ -pthread -std=c++11 TCPClient.cpp lib/libEasyNetwork.a -o client.sh`  
 4. Run your programs using command:  
 `./server.sh` and `./client.sh`
 
