@@ -32,6 +32,20 @@ namespace EN
 	void EN_RAU_TCP_Client::BeforeDisconnect()
 	{
 		RAU_Client->BeforeDisconnect();
+		RAU_Client->UDP_Client->Stop();
+
+		Delay(300);
+
+		RAU_Client->IsServerGetUDPAddress = true;
+		RAU_Client->IsShutdown = true;
+
+		RAU_Client->CondVar.notify_all();
+
+		Delay(300);
+
+		RAU_Client->IsServerGetUDPAddress = false;
+		RAU_Client->IsShutdown = false;
+		RAU_Client->ClientId = -1;
 	}
 
 	// UDP client
@@ -86,7 +100,7 @@ namespace EN
 		while (true)
 		{
 			while (!Messages.empty())
-			{
+			{				
 				ServerMessageHandler(Messages.front());
 				Mtx.lock();
 				Messages.pop();
@@ -118,7 +132,7 @@ namespace EN
 		{
 			UDP_Client->SendToServer(std::to_string(ClientId));
 			
-			Delay(1000);
+			Delay(50);
 		}
 
 		std::thread QueueHandlerThread([this]() {this->QueueMessageHandler(); });
@@ -136,14 +150,6 @@ namespace EN
 	void EN_RAU_Client::Disconnect()
 	{
 		TCP_Client->Disconnect();
-		UDP_Client->Stop();
-		
-		Delay(300);
-		
-		IsServerGetUDPAddress = true;
-		IsShutdown = true;
-
-		CondVar.notify_all();
 	}
 
 	EN_RAU_Client::~EN_RAU_Client()

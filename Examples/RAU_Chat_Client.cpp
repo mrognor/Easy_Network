@@ -29,7 +29,7 @@ public:
 			SendToServer("Goodbye");
 			std::cout << "Client disconnected" << std::endl;
 		}
-		else std::cout << "Server disconnected" << std::endl;
+		else std::cout << "Server disconnected. Press any key to try to reconnect" << std::endl;
 	}
 };
 
@@ -81,11 +81,27 @@ int main()
 		}
 		// Break from while loop in case of server disconnect
 		else
-			break;
+		{
+			bool IsSuccessConnection = false;
+			for (int i = 0; i < 25; i++)
+			{
+				std::cout << "Attempt to reconnect. Attempt: " << i << std::endl;
+				if (A.Connect())
+				{
+					IsSuccessConnection = true;
+					A.Run();
+					break;
+				}
+				EN::Delay(20);
+			}
+			if (!IsSuccessConnection)
+				break;
+		}
 	}
 
-	// Disconnect from server
-	A.Disconnect();
+	// Disconnect from server if still connected
+	if (A.IsConnected())
+		A.Disconnect();
 
 	return 0;
 }

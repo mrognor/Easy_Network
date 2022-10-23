@@ -13,7 +13,7 @@ public:
 
 	void OnClientConnected(int ClientID)
 	{
-		std::cout << "Client Connected! id: " << ClientID << std::endl;
+		std::cout << "Client connected! Id: " << ClientID << std::endl;
 		SendToClient(ClientID, "Welcome. You are connected to server.");
 		SendToClient(ClientID, "Reliable", true);
 		SendToClient(ClientID, "Unreliable", false);
