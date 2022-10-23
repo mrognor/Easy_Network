@@ -90,6 +90,9 @@ namespace EN
 	{
 		int ThreadID = std::atoi(message.substr(0, message.find(" ")).c_str());
 
+		if (ThreadID < 0)
+			return false;
+
 		if (RAU_Server->UDPIpAddresses[ThreadID] == "none")
 		{
 			RAU_Server->UDPIpAddresses[ThreadID] = ClientSocketAddr;
