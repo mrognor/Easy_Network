@@ -26,8 +26,9 @@ public:
 		if (IsConnected())
 		{
 			SendToServer("Goodbye");
-			std::cout << "Server disconnected" << std::endl;
+			std::cout << "Client disconnected" << std::endl;
 		}
+		else std::cout << "Server disconnected. Enter any key to close terminal." << std::endl;
 	}
 };
 
@@ -65,8 +66,9 @@ int main()
 		else break;
 	}
 
-	// Disconnect from server
-	A.Disconnect();
+	// Disconnect client from server if still connected
+	if (A.IsConnected())
+		A.Disconnect();
 
 	return 0;
 }
