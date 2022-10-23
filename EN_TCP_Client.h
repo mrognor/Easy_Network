@@ -45,6 +45,9 @@ namespace EN
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
 
+		// Variable for understanding the server or client is disconnected
+		bool IsClientDisconnect = false;
+
 	protected:
 
 		/**

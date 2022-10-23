@@ -96,8 +96,12 @@ namespace EN
 				#else 
 				close(ServerConnectionSocket);
 				#endif
-				ServerConnectionSocket = INVALID_SOCKET;
-				BeforeDisconnect();
+				if (!IsClientDisconnect)
+				{
+					ServerConnectionSocket = INVALID_SOCKET;
+					BeforeDisconnect();
+					IsClientDisconnect = false;
+				}
 				return;
 			}
 
@@ -116,6 +120,7 @@ namespace EN
 	void EN_TCP_Client::Disconnect()
 	{
 		BeforeDisconnect();
+		IsClientDisconnect = true;
 		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);
 		#else 
