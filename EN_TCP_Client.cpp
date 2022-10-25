@@ -131,7 +131,10 @@ namespace EN
 
 	EN_TCP_Client::~EN_TCP_Client()
 	{
+		#if defined WIN32 || defined _WIN64
 		WSACleanup();
+		#endif
+		
 		if (ServerConnectionSocket != INVALID_SOCKET)
 		{
 			std::cerr << "Error: You forgot to disconnect from the server. Use method Disconnect() to do this" << std::endl;
