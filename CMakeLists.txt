@@ -13,7 +13,7 @@ project (TCP_Chat_Server)
 
 add_executable(TCP_Chat_Server Examples/TCP_Chat_Server.cpp)
 
-target_include_directories(TCP_Chat_Server PRIVATE /)
+target_include_directories(TCP_Chat_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(TCP_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
@@ -22,7 +22,7 @@ project (TCP_Chat_Client)
 
 add_executable(TCP_Chat_Client Examples/TCP_Chat_Client.cpp)
 
-target_include_directories(TCP_Chat_Client PRIVATE /)
+target_include_directories(TCP_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(TCP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -31,7 +31,7 @@ project (UDP_Chat_Server)
 
 add_executable(UDP_Chat_Server Examples/UDP_Chat_Server.cpp)
 
-target_include_directories(UDP_Chat_Server PRIVATE /)
+target_include_directories(UDP_Chat_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(UDP_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
@@ -40,7 +40,7 @@ project (UDP_Chat_Client)
 
 add_executable(UDP_Chat_Client Examples/UDP_Chat_Client.cpp)
 
-target_include_directories(UDP_Chat_Client PRIVATE /)
+target_include_directories(UDP_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(UDP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -49,7 +49,7 @@ project (RAU_Chat_Server)
 
 add_executable(RAU_Chat_Server Examples/RAU_Chat_Server.cpp)
 
-target_include_directories(RAU_Chat_Server PRIVATE /)
+target_include_directories(RAU_Chat_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(RAU_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
@@ -58,7 +58,7 @@ project (RAU_Chat_Client)
 
 add_executable(RAU_Chat_Client Examples/RAU_Chat_Client.cpp)
 
-target_include_directories(RAU_Chat_Client PRIVATE /)
+target_include_directories(RAU_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(RAU_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -67,7 +67,7 @@ project (TCP_FileSender_Server)
 
 add_executable(TCP_FileSender_Server Examples/TCP_FileSender_Server.cpp)
 
-target_include_directories(TCP_FileSender_Server PRIVATE /)
+target_include_directories(TCP_FileSender_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(TCP_FileSender_Server EasyNetwork ${StandartIncludeLibraries})
 
@@ -76,7 +76,7 @@ project (TCP_FileSender_Client)
 
 add_executable(TCP_FileSender_Client Examples/TCP_FileSender_Client.cpp)
 
-target_include_directories(TCP_FileSender_Client PRIVATE /)
+target_include_directories(TCP_FileSender_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(TCP_FileSender_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -85,7 +85,7 @@ project (ParallelFor)
 
 add_executable(ParallelFor Examples/ParallelFor.cpp)
 
-target_include_directories(ParallelFor PRIVATE /)
+target_include_directories(ParallelFor PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(ParallelFor EasyNetwork ${StandartIncludeLibraries})
 
