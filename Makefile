@@ -6,7 +6,10 @@ ifeq ($(OS),Windows_NT)
 	FileExt = exe
 endif
 
-all: file_sender tcp_chat udp_chat rau_chat
+all: file_sender tcp_chat udp_chat rau_chat parallel_for
+
+parallel_for: lib
+	g++ -std=c++11 Examples/ParallelFor.cpp -I. -Lbin -lEasyNetwork -o bin/ParallelFor.$(FileExt) $(CPPFlags)
 
 rau_chat: lib
 	g++ -std=c++11 Examples/RAU_Chat_Server.cpp -I. -Lbin -lEasyNetwork -o bin/RAU_Chat_Server.$(FileExt) $(CPPFlags)

@@ -24,6 +24,8 @@ typedef int EN_SOCKET;
 #include <ctime>
 #include <fstream>
 
+#include "EN_ParallelFor.h"
+
 #define SendFileBufLen 1024
 
 namespace EN
