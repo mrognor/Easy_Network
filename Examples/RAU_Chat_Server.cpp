@@ -1,4 +1,4 @@
-#include "../EN_RAU_Server.h"
+#include "EN_RAU_Server.h"
 
 class RAU_Server : public EN::EN_RAU_Server
 {	

@@ -13,12 +13,16 @@ project (TCP_Chat_Server)
 
 add_executable(TCP_Chat_Server Examples/TCP_Chat_Server.cpp)
 
+target_include_directories(TCP_Chat_Server PRIVATE /)
+
 target_link_libraries(TCP_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
 # TCP chat server binary
 project (TCP_Chat_Client)
 
 add_executable(TCP_Chat_Client Examples/TCP_Chat_Client.cpp)
+
+target_include_directories(TCP_Chat_Client PRIVATE /)
 
 target_link_libraries(TCP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -27,12 +31,16 @@ project (UDP_Chat_Server)
 
 add_executable(UDP_Chat_Server Examples/UDP_Chat_Server.cpp)
 
+target_include_directories(UDP_Chat_Server PRIVATE /)
+
 target_link_libraries(UDP_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
 # UDP chat server binary
 project (UDP_Chat_Client)
 
 add_executable(UDP_Chat_Client Examples/UDP_Chat_Client.cpp)
+
+target_include_directories(UDP_Chat_Client PRIVATE /)
 
 target_link_libraries(UDP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -41,12 +49,16 @@ project (RAU_Chat_Server)
 
 add_executable(RAU_Chat_Server Examples/RAU_Chat_Server.cpp)
 
+target_include_directories(RAU_Chat_Server PRIVATE /)
+
 target_link_libraries(RAU_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
 # RAU chat server binary
 project (RAU_Chat_Client)
 
 add_executable(RAU_Chat_Client Examples/RAU_Chat_Client.cpp)
+
+target_include_directories(RAU_Chat_Client PRIVATE /)
 
 target_link_libraries(RAU_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
@@ -55,12 +67,16 @@ project (TCP_FileSender_Server)
 
 add_executable(TCP_FileSender_Server Examples/TCP_FileSender_Server.cpp)
 
+target_include_directories(TCP_FileSender_Server PRIVATE /)
+
 target_link_libraries(TCP_FileSender_Server EasyNetwork ${StandartIncludeLibraries})
 
 # TCP FileSender server binary
 project (TCP_FileSender_Client)
 
 add_executable(TCP_FileSender_Client Examples/TCP_FileSender_Client.cpp)
+
+target_include_directories(TCP_FileSender_Client PRIVATE /)
 
 target_link_libraries(TCP_FileSender_Client EasyNetwork ${StandartIncludeLibraries})
 

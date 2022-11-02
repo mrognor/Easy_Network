@@ -1,4 +1,4 @@
-#include "../EN_RAU_Client.h"
+#include "EN_RAU_Client.h"
 
 class MyClient : public EN::EN_RAU_Client
 {
