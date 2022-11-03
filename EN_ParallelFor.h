@@ -7,6 +7,7 @@
 
 namespace EN
 {
+    /// Class implementing a thread pool
     class EN_ParallelFor
     {
     private:
@@ -16,49 +17,61 @@ namespace EN
 
     private:
 
+        // A function running in a separate thread. Calls a custom function
+        // Gets template position and end. Its can be iterator or a numbers
+        // Gets lambda function to invoke it
         template<class T, class F>
-        void ThreadFunc(T& Pos, const T& End, const F& f)
+        void ThreadFunc(T& Pos, const T& End, const F& lambda_func)
         {
-            T LocalPos;
+            T LocalPos; // Local var to store thread position
             while (true)
             {
-                StepMutex.lock();
+                StepMutex.lock(); // Start working with positions
                 LocalPos = Pos;
 
-                if (Pos != End)
+                if (Pos != End) // Check if its last element
                     Pos++;
                 else
                 {
-                    ThreadFinishingMutex.lock();
-                    EndedThreads++;
-                    StepMutex.unlock();
+                    ThreadFinishingMutex.lock(); // Start working with thread killing
+                    EndedThreads++; // Increment stopped threads amount
+                    StepMutex.unlock(); // Stop working with positions
                     break;
                 }
 
-                StepMutex.unlock();
+                StepMutex.unlock(); // Stop working with positions
 
-                f(LocalPos);
+                lambda_func(LocalPos); // Invokes user function 
             }
 
-            if (EndedThreads >= ThreadAmount)
-                CondVar.notify_all();
-            ThreadFinishingMutex.unlock();
+            if (EndedThreads >= ThreadAmount) // Checks if all threads ended
+                CondVar.notify_all(); // Notify condition variable to exit from operator()
+            ThreadFinishingMutex.unlock(); // Stop working with thread killing
         }
 
     public:
+        /**
+            \brief Method that start and execute thread pool
+
+            \param[in] start The number or iterator to start
+            \param[in] end The number or iterator to end
+            \param[in] thread_amount The thread amount
+            \param[in] lambda_func The user lambda function to invokes in every iterarion
+        */
         template<class T, class F>
-        void operator() (T start, T end, int thread_amount, const F& f)
+        void operator() (T start, T end, int thread_amount, const F& lambda_func)
         {
-            EndedThreads = 0;
+            EndedThreads = 0; 
             T Pos = start; T End = end; ThreadAmount = thread_amount;
 
             std::unique_lock<std::mutex> CondVarUniqueLock(ConditionVarMutex);
 
+            // Creating threads with lambdas
             for (int i = 0; i < thread_amount; i++)
             {
-                std::thread th([this, f, &Pos, &End]()
+                std::thread th([this, lambda_func, &Pos, &End]()
                     {
-                        ThreadFunc(Pos, End, f);
+                        ThreadFunc(Pos, End, lambda_func);
                     });
                 th.detach();
             }
