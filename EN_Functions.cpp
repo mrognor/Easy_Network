@@ -16,8 +16,8 @@ namespace EN
 	{
 		int msg_size = message.length();
 
-		send(sock, (char*)&msg_size, sizeof(int), NULL);
-		send(sock, message.c_str(), message.length(), NULL);
+		send(sock, (char*)&msg_size, sizeof(int), 0);
+		send(sock, message.c_str(), message.length(), 0);
 
 		Delay(MessageDelay);
 	}
@@ -111,7 +111,7 @@ namespace EN
 
 		// Char array to keep file chunks
 		char* MessageBuf = new char[SendFileBufLen];
-		memset(MessageBuf, NULL, SendFileBufLen);
+		memset(MessageBuf, 0, SendFileBufLen);
 
 		// Find file size in bytes
 		SendingFile.seekg(0, std::ios::end);
@@ -194,7 +194,7 @@ namespace EN
 
 				// Add sending bytes
 				SendMessageSize += SendBytes;
-				memset(MessageBuf, NULL, SendFileBufLen);
+				memset(MessageBuf, 0, SendFileBufLen);
 			}
 
 			// End while loop skipping
@@ -299,7 +299,7 @@ namespace EN
 
 				ReceivedMessageSize += ReceiveBytes;
 				ReceivedFile.write(MessageBuf, SendFileBufLen);
-				memset(MessageBuf, NULL, SendFileBufLen);
+				memset(MessageBuf, 0, SendFileBufLen);
 			}
 
 			// End skipping while loop
@@ -397,7 +397,7 @@ namespace EN
 
 				ReceivedMessageSize += ReceiveBytes;
 				ReceivedFile.write(MessageBuf, SendFileBufLen);
-				memset(MessageBuf, NULL, SendFileBufLen);
+				memset(MessageBuf, 0, SendFileBufLen);
 			}
 
 			// End skipping while loop
@@ -494,7 +494,7 @@ namespace EN
 			}
 
 			ReceivedMessageSize += SendBytes;
-			memset(MessageBuf, NULL, SendFileBufLen);
+			memset(MessageBuf, 0, SendFileBufLen);
 		}
 
 	// End skipping while loop

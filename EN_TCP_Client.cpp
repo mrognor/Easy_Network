@@ -49,7 +49,7 @@ namespace EN
 		// Set ip address
 		inet_pton(AF_INET, ipAddr.c_str(), &addr.sin_addr);
 
-		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, NULL);
+		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
 		{

@@ -74,7 +74,7 @@ namespace EN
 		inet_pton(AF_INET, IpAddress.c_str(), &ServerAddress.sin_addr);
 
 		// Start socket to listen incoming connections
-		EN_SOCKET ServerListenSocket = socket(AF_INET, SOCK_STREAM, NULL);
+		EN_SOCKET ServerListenSocket = socket(AF_INET, SOCK_STREAM, 0);
 		
 		if (ServerListenSocket == INVALID_SOCKET)
 		{
@@ -215,7 +215,7 @@ namespace EN
 		// Set ip address
 		inet_pton(AF_INET, IpAddress.c_str(), &CurrentServerAddress.sin_addr);
 
-		EN_SOCKET ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, NULL);
+		EN_SOCKET ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
 		{
