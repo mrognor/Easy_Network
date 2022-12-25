@@ -29,7 +29,10 @@ typedef int EN_SOCKET;
 #define SendFileBufLen 1024
 
 namespace EN
-{ 
+{
+	/// Function for getting an ip address from a url
+	std::string GetIpByURL(std::string url);
+
 	/// Wrapper over the send function. Allows you to send std::string. 
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay = 10);
 

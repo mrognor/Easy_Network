@@ -2,6 +2,16 @@
 
 namespace EN
 {
+	std::string GetIpByURL(std::string url)
+	{
+		// First is gethostbyname. Return hostent struct
+		// Second is h_addr_list from hostent struct
+		// Fird is type conversion from h_addr_list[0] to in_addr*
+		// Fourth is get data from in_addr pointer 
+		// Fifth is convert in_addr to char* using inet_ntoa
+		return std::string(inet_ntoa(*(in_addr*)gethostbyname("4.tcp.eu.ngrok.io")->h_addr_list[0]));
+	}
+
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay)
 	{
 		int msg_size = message.length();
