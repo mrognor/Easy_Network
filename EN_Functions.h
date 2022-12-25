@@ -8,6 +8,7 @@ typedef SOCKET EN_SOCKET;
 
 #else
 
+#include <netdb.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
