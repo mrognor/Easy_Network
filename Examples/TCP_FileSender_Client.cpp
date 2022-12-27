@@ -3,13 +3,20 @@
 
 int main()
 {
-	std::cout << "Write server ip" << std::endl;
-	std::string ip;
-	getline(std::cin, ip);
-
 	EN::EN_TCP_FileSender A;
 
-	if (A.Connect(ip, 1111) == false)
+	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234. \nIf you dont write port it will be default value: 1111" << std::endl;
+	std::string ip;
+	getline(std::cin, ip);
+	auto vec = EN::Split(ip, ":");
+	
+	int port;
+	if (vec.size() == 2)
+		port = std::atoi(vec[1].c_str());
+	else port = 1111; // Default value 
+
+	// No incorrect port check
+	if (A.Connect(vec[0], port) == false)
 	{
 		std::cout << "Failed to connect" << std::endl;
 		return 0;

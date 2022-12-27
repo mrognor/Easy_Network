@@ -4,10 +4,10 @@
 class MyServer : public EN::EN_TCP_Server
 {
 public:
-	MyServer(std::string ip)
+	MyServer(std::string ip, int port)
 	{
-		IpAddress = ip; //Default set to localhost
-		// Port = <put int here> to set port. Default port is 1111
+		IpAddress = ip; // Default set to localhost
+		Port = port; // Default port is 1111
 	}
 
 	void OnClientConnected(int ClientID)
@@ -63,10 +63,18 @@ public:
 
 int main()
 {
-	std::cout << "Write server ip" << std::endl;
+	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234. \nIf you dont write port it will be default value: 1111" << std::endl;
 	std::string ip;
 	getline(std::cin, ip);
-	MyServer A(ip);
+	auto vec = EN::Split(ip, ":");
+	
+	int port;
+	if (vec.size() == 2)
+		port = std::atoi(vec[1].c_str());
+	else port = 1111; // Default value 
+
+	// No incorrect port check
+	MyServer A(vec[0], port);
 	A.Run();
 
 
