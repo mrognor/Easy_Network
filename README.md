@@ -34,30 +34,25 @@ and add the path to the lib library folder there
 
 ## MinGW library usage guide
 1. Download the latest release from github
-2. You can extract library release archive to any folder. Make sure that the path to the header files in your code is up to date
+2. You can extract library release archive to any folder
 3. Now all ready to compile your project  
 You can compile server using command:  
-`g++ -pthread -std=c++11 -lws2_32 TCPServer.cpp lib/libEasyNetwork.a -o server.sh`  
+`g++ -pthread -std=c++11 -lws2_32 PathToServer/Server.cpp -IEasyNetworkDir/ -LEasyNetworkDir/bin -lEasyNetwork -o server`  
 You can compile client using command:   
-`g++ -pthread -std=c++11 -lws2_32 TCPClient.cpp lib/libEasyNetwork.a -o client.sh`  
+`g++ -pthread -std=c++11 -lws2_32 PathToClient/Client.cpp -IEasyNetworkDir/ -LEasyNetworkDir/bin -lEasyNetwork -o client`  
 4. Run your programs using command:  
-`./server.sh` and `./client.sh`
+`server.exe` and `client.exe`
 
 ## Linux library usage
 1. Download the latest release from github
-2. You can extract library release archive to any folder. I will save everything in one folder for convenience. Make sure that the path to the header files in your code is up to date
-
-![image](https://user-images.githubusercontent.com/47296449/166112771-628c328f-cef5-4c75-a440-d018841f351b.png)
-
+2. You can extract library release archive to any folder
 3. Now all ready to compile your project  
 You can compile server using command:  
-`g++ -pthread -std=c++11 TCPServer.cpp lib/libEasyNetwork.a -o server.sh`  
+`g++ -pthread -std=c++11 PathToServer/Server.cpp -IEasyNetworkDir/ -LEasyNetworkDir/bin -lEasyNetwork -o server`
 You can compile client using command:   
-`g++ -pthread -std=c++11 TCPClient.cpp lib/libEasyNetwork.a -o client.sh`  
+`g++ -pthread -std=c++11 PathToClient/Client.cpp -IEasyNetworkDir/ -LEasyNetworkDir/bin -lEasyNetwork -o client` 
 4. Run your programs using command:  
-`./server.sh` and `./client.sh`
-
-![image](https://user-images.githubusercontent.com/47296449/166113135-c9fc8b7d-bf3a-4589-bdce-3582c5f7abd0.png)
+`./server` and `./client`
 
 # Important
 I know that no one reads further than the readme, so I want to bring some important things here  
@@ -72,6 +67,12 @@ errors will come out. We just have to wait a little
 message from this client before. This does not apply to unreliable sending of 
 messages in rau classes
 4. Note that the maximum size of a udp packet that can be guaranteed to be sent and received is 508 bytes. You can send more, but then the message may not go away  
+
+# Free white ip
+White ip allow you to use your programs outside your local network.  
+You can use free utility named [ngrok](https://ngrok.com/). This program let you free white ip.  
+You can launch ngrok using command `ngrok tcp 1111`. You can use any protocol and port you want.  
+Note that when using this program, URLs will be provided to you, but ip is used to connect. To solve this problem, use the `GetIpByURL` function
 
 # How to choose a class  
 This is a small overview of the library classes to simplify class selection
