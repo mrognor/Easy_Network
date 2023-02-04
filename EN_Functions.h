@@ -1,3 +1,6 @@
+/** @file */
+/// \cond HIDDEN_SYMBOLS
+
 #pragma once
 
 #if defined WIN32 || defined _WIN64 
@@ -28,66 +31,112 @@ typedef int EN_SOCKET;
 #include "EN_ParallelFor.h"
 
 #define SendFileBufLen 1024
+/// \endcond
 
 namespace EN
 {
-	/// Function for getting an ip address from a url
+	/// Function for getting an ip address from a url.
+	/// \param[in] url address to get ip
 	std::string GetIpByURL(std::string url);
 
-	/// Wrapper over the send function. Allows you to send std::string. 
+	/*!
+		Wrapper over the send function. Allows you to send std::string. 
+		\param[in] sock socket to send data 
+		\param[in] message message to send
+		\param[in] MessageDelay delay after message sending
+	*/
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay = 10);
 
-	/// Wrapper over the recv function. Allows you to recv std::string. 
+	/*!
+		Wrapper over the recv function. Allows you to recv std::string. 
+		\param[in] socket socket to get data
+		\param[out] message string to put received data
+		\return Returns true in case of success, false if it was disconnection 
+	*/ 
 	bool TCP_Recv(EN_SOCKET sock, std::string& message);
 
-	/// Divides the string to std::vector<std::string>. Second string is string divider. By default set to space(" ")
-	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString=" ");
+	/*!
+		Divides the string to std::vector<std::string>. 
+		\param[in] StringToSplit string to split
+		\param[in] SplitterString the string that divides the string. Default set to space(" ")
+		\return Vector of strings
+	*/ 
+	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString = " ");
 
-	/// Functions gets socket and filename and send file to socket. Third parametr its refernce to bool to stop transmission. 
-	/// The fourth parameter is a pointer to a function to handle the remaining transfer time
-	/// The fifth parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
-	/// The sixth parameter is needed to regulate the file transfer rate. Gets amount of chunks between sending delay. 0 means no delay
-	/// The delay between sending the chunks is 20 millimeconds.
+	/*! 
+		\brief The function gets socket and filename and send file to socket. 
+		\param[in] FileSendSocket the socket for sending files
+		\param[in] FilePath the full path to the file to be sent
+		\param[in] IsStop the reference to a boolean variable to stop file transfer  
+		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer. By default using EN::DownloadStatus 
+		\param[in] PreviouslySendedSize The fifth parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
+		\param[in] ChunksNumberBetweenDelay The sixth parameter is needed to regulate the file transfer rate. Gets amount of chunks between sending delay. 0 means no delay. The delay between sending the chunks is 20 millimeconds.
+		\return Returns true in case of file transmition success, false otherwise
+		
+		By default, the library progress function is used to output to the console.  
+		Timeout between sending file chunks set to 20. You adjust the number of chunks that will be sent between the this timeout
+	*/ 
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FilePath, bool& IsStop, 
 		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, 
 		uint64_t PreviouslySendedSize = 0, int ChunksNumberBetweenDelay = 0);
 
-	/// This function will wait file. Second parametr its refernce to bool to stop transmission. 
-	/// The fird parameter is a pointer to a function to handle the remaining transfer time
+	/*!
+		\brief This function will wait incoming file.
+		\param[in] FileSendSocket the socket for receiving files
+		\param[in] IsStop the reference to a boolean variable to stop file transfer
+		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
+		\return Returns true in case of file transmition success, false otherwise
+	*/
 	bool RecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
-	/// Function to continue receiving the file
-	/// This function will wait file. Second parametr its refernce to bool to stop transmission. 
-	/// The fird parameter is a pointer to a function to handle the remaining transfer time
+	/*!
+		\brief Function to continue receiving the file. This function will wait file.
+		\param[in] FileSendSocket the socket for receiving files
+		\param[in] IsStop the reference to a boolean variable to stop file transfer
+		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
+		\return Returns true in case of file transmition success, false otherwise
+	*/
 	bool ContinueRecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
-	/// This function will forward file from one socket to another. 
-	/// First parametr is source socket
-	/// Second parametr is destination socket
-	/// Third parametr its refernce to bool to stop transmission. 
-	/// The fird parameter is a pointer to a function to handle the remaining transfer time
+	/*!
+		\brief This function will forward file from one socket to another.
+		\param[in] SourceFileSocket the source socket for receiving files
+		\param[in] DestinationFileSocket the destination socket for sending files
+		\param[in] IsStop the reference to a boolean variable to stop file transfer
+		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
+		\return Returns true in case of file transmition success, false otherwise
+	*/
 	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
-	/// This function will print information about file downloading
+	/*!
+		\brief This function will print information about file downloading
+		\param[in] current the first is how many bytes were transmitted.  
+		\param[in] all the second is the total number of bytes.  
+		\param[in] speed the third parameter shows the transfer rate in bytes.  
+		\param[in] eta the fourth shows the remaining time in seconds
+	*/
 	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
 
 	/// Return true if file exists, otherwise rerurn false
 	bool IsFileExist(std::string FilePath);
 
-	/// Return file size in bytes
+	/// \brief Return file size in bytes
 	/// If couldn't open the file return 0
 	uint64_t GetFileSize(std::string FileName);
 
 	/// Crossplatform function for program suspension
 	void Delay(int milliseconds);
 
-	/// Function to convert int to string. 
-	/// One char takes 1 byte, and a int takes 4 bytes. 
-	/// If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
-	/// This function turns a number into a character, since a character occupies a byte, 
-	/// then you can transfer numbers up to 255 in one byte. 
-	/// This function can be considered as the translation of a number into a number system with a base of 256
-	/// This function does not work with negative numbers.
+	/*!
+		\brief Function to convert int to string. 
+		
+		One char takes 1 byte, and a int takes 4 bytes. 
+		If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
+		This function turns a number into a character, since a character occupies a byte, 
+		then you can transfer numbers up to 255 in one byte. 
+		This function can be considered as the translation of a number into a number system with a base of 256
+		This function does not work with negative numbers.
+	*/
 	std::string IntToString(unsigned int n);
 
 	/// Function to convert string to int.

@@ -141,3 +141,6 @@ You have to define 3 methods
 To connect to the server, you need to call the function Connect.  
 Before shutting down the program, you need to disconnect from the server using the method Disconnect  
 An example of using the class can be found here: https://github.com/mrognor/Easy_Network/blob/master/Examples/RAU_Chat_Client.cpp  
+
+# Functions
+[Info about all library functions:](namespace_e_n.html#func-members)
