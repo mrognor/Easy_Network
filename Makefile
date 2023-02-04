@@ -53,34 +53,35 @@ bin/libEasyNetwork.a: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o
 	ranlib bin/libEasyNetwork.a
 
 # Build all object files
-bin/EN_RAU_Client.o: EN_RAU_Client.cpp
+bin/EN_RAU_Client.o: EN_RAU_Client.cpp EN_RAU_Client.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_RAU_Client.cpp -o bin/EN_RAU_Client.o 
 
-bin/EN_RAU_Server.o: EN_RAU_Server.cpp
+bin/EN_RAU_Server.o: EN_RAU_Server.cpp EN_RAU_Server.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_RAU_Server.cpp -o bin/EN_RAU_Server.o 
 
-bin/EN_UDP_Client.o: EN_UDP_Client.cpp
+bin/EN_UDP_Client.o: EN_UDP_Client.cpp EN_UDP_Client.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_UDP_Client.cpp -o bin/EN_UDP_Client.o 
 
-bin/EN_UDP_Server.o: EN_UDP_Server.cpp
+bin/EN_UDP_Server.o: EN_UDP_Server.cpp EN_UDP_Server.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_UDP_Server.cpp -o bin/EN_UDP_Server.o 
 
-bin/EN_TCP_FileSender.o: EN_TCP_FileSender.cpp
+bin/EN_TCP_FileSender.o: EN_TCP_FileSender.cpp EN_TCP_FileSender.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_TCP_FileSender.cpp -o bin/EN_TCP_FileSender.o 
-bin/EN_TCP_Server.o: EN_TCP_Server.cpp
+	g++ $(CXXFLAGS) -c EN_TCP_FileSender.cpp -o bin/EN_TCP_FileSender.o
+
+bin/EN_TCP_Server.o: EN_TCP_Server.cpp EN_TCP_Server.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_TCP_Server.cpp -o bin/EN_TCP_Server.o 
 
-bin/EN_TCP_Client.o: EN_TCP_Client.cpp
+bin/EN_TCP_Client.o: EN_TCP_Client.cpp EN_TCP_Client.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_TCP_Client.cpp -o bin/EN_TCP_Client.o 
 
-bin/EN_Functions.o: EN_Functions.cpp
+bin/EN_Functions.o: EN_Functions.cpp EN_Functions.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_Functions.cpp -o bin/EN_Functions.o 
 
