@@ -53,10 +53,12 @@ namespace EN
         /**
             \brief Method that start and execute thread pool
 
-            \param[in] start The number or iterator to start
-            \param[in] end The number or iterator to end
+            \param[in] start Template variable to indicate the start of the cycle. Can be an iterator or a number
+            \param[in] end Template variable to indicate the end of the cycle. Can be an iterator or a number
             \param[in] thread_amount The thread amount
-            \param[in] lambda_func The user lambda function to invokes in every iterarion
+            \param[in] lambda_func The user lambda function to invokes in every iterarion. 
+            The lambda function accepts one parameter of the same type as the first two parameters. 
+            This function is called for all values between start and end.
         */
         template<class T, class F>
         void operator() (T start, T end, int thread_amount, const F& lambda_func)
