@@ -64,7 +64,10 @@ namespace EN
 			return false;
 		}
 
-		message = msg;
+	    message.clear();
+	    for (int i = 0; i < msg_size; ++i)
+		    message += msg[i];
+
 		delete[] msg;
 		return true;
 	}
