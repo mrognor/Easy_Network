@@ -15,53 +15,6 @@ namespace EN
 		#endif
 	}
 
-	int EN_TCP_Server::RecvFromClient(int ClientSocketID, std::string& message)
-	{
-		int msg_size;
-		int ConnectionStatus = recv(ClientSockets[ClientSocketID], (char*)&msg_size, sizeof(int), MSG_WAITALL);
-
-		if (ConnectionStatus <= 0)
-		{
-			message = "";
-
-			#if defined WIN32 || defined _WIN64
-			closesocket(ClientSockets[ClientSocketID]);
-			#else 
-			close(ClientSockets[ClientSocketID]);
-			#endif
-
-			return ConnectionStatus;
-		}
-
-		if (msg_size <= 0)
-		{
-			message = "";
-			return true;
-		}
-
-		char* msg = new char[msg_size + 1];
-		msg[msg_size] = '\0';
-
-		ConnectionStatus = recv(ClientSockets[ClientSocketID], msg, msg_size, MSG_WAITALL);
-
-		if (ConnectionStatus <= 0)
-		{
-			message = "";
-
-			#if defined WIN32 || defined _WIN64
-			closesocket(ClientSockets[ClientSocketID]);
-			#else 
-			close(ClientSockets[ClientSocketID]);
-			#endif
-			delete[] msg;
-			return ConnectionStatus;
-		}
-
-		message = msg;
-		delete[] msg;
-		return ConnectionStatus;
-	}
-
 	void EN_TCP_Server::Run()
 	{
 		// Configure ip address
@@ -166,13 +119,13 @@ namespace EN
 		OnClientConnected(ClientID);
 
 		std::string message;
-		int ConnectionStatus;
+		bool ConnectionStatus = true;
 
 		while (true)
 		{
-			ConnectionStatus = RecvFromClient(ClientID, message);
+			ConnectionStatus = EN::TCP_Recv(ClientSockets[ClientID], message);
 
-			if (ConnectionStatus <= 0)
+			if (ConnectionStatus == false)
 			{
 				OnClientDisconnect(ClientID);
 				break;
