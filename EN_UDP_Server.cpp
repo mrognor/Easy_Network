@@ -108,7 +108,6 @@ namespace EN
 			Mutexes[i] = new std::mutex;
 
 			ThreadVec[i] = std::thread([this, i]() {this->ThreadListHandler(i); });
-			ThreadVec[i].detach();
 		}
 
 		//keep listening for data
@@ -179,14 +178,7 @@ namespace EN
 		}	
 
 		for (int i = 0; i < ThreadAmount; i++)
-		{
-			// try to join threads if it still works
-			try 
-			{
-				ThreadVec[i].join();
-			}
-			catch(...){}
-		}
+			ThreadVec[i].join();
 
 		for (int i = 0; i < ThreadAmount; i++)
 		{
