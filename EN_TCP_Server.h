@@ -2,8 +2,12 @@
 
 #if defined WIN32 || defined _WIN64 
 
-#include <winsock2.h>
 #include <WS2tcpip.h>
+#include <Winsock2.h>
+#define TCP_KEEPIDLE 3
+#define TCP_KEEPCNT 16
+#define TCP_KEEPINTVL 17
+
 typedef SOCKET EN_SOCKET;
 
 #else
@@ -19,8 +23,8 @@ typedef int EN_SOCKET;
 #endif
 
 #include "EN_Functions.h"
+#include "EN_SocketOptions.h"
 #include "thread"
-
 
 namespace EN
 {
@@ -37,6 +41,12 @@ namespace EN
 
 		// The method that receives messages from the client. The first parameter is the socket index in the vector
 		int RecvFromClient(int ClientSocketID, std::string& message);
+
+        // Vector with options to be set after client connected
+        std::vector<SocketOption> CreateSocketsOption;
+
+        // Socket to accept incoming clients
+        EN_SOCKET ServerListenSocket;
 
 	protected:
 
@@ -104,5 +114,71 @@ namespace EN
 			\param[in] MessageDelay The delay after sending message
 		*/
 		void SendToClient(int ClientId, std::string message, int MessageDelay = 10);
+
+        /**
+           \brief The method sets options for accept socket.
+           Accept socket accepts incoming connections from clients
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetAcceptSocketOption(int level, int optionName, int optionValue);
+
+        /**
+            \brief The method sets options for accept socket.
+            Accept socket accepts incoming connections from clients
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetAcceptSocketOption(PredefinedSocketOptions socketOptions);
+
+        /**
+           \brief The method sets options for all sockets that will connect after its call
+
+            It makes sense to call this method before starting connecting clients, 
+            since it does not affect previously created sockets
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void AddOnSocketCreateOption(int level, int optionName, int optionValue);
+
+        /**
+           \brief The method sets options for all sockets that will connect after its call
+
+            It makes sense to call this method before starting connecting clients, 
+            since it does not affect previously created sockets
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects 
+        */
+        void AddOnSocketCreateOption(PredefinedSocketOptions socketOptions);
+
+        /**
+           \brief The method sets options for client socket
+
+            \param[in] ClientID The number of the client 
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetSocketOption(int ClientID, int level, int optionName, int optionValue);
+
+        /**
+           \brief The method sets options for client socket
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetSocketOption(int ClientID, PredefinedSocketOptions socketOptions);
 	};
 }
