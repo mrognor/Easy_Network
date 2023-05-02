@@ -16,6 +16,7 @@ typedef SOCKET EN_SOCKET;
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 typedef int EN_SOCKET; 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
