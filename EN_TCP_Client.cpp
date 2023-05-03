@@ -42,7 +42,6 @@ namespace EN
 		ServerPort = port;
 
 		sockaddr_in addr;
-		int sizeofaddr = sizeof(addr);
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(port);
 		
@@ -58,19 +57,19 @@ namespace EN
 
 		// Winsock operation int result
 		int OperationRes;
-		OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
-
-		if (OperationRes == 0)
+        OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
+            
+        if (OperationRes == 0)
 		{
 			AfterConnect();
 			return true;
 		}
-		else
-		{
+        else
+        {
 			ServerConnectionSocket = INVALID_SOCKET;
-			std::cerr << "Error: failed connect to server." << std::endl;
-			return false;
-		}
+            std::cerr << "Error: failed connect to server." << std::endl;
+            return false;
+        }
 	}
 
 	void EN_TCP_Client::Run()
