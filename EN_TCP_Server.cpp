@@ -79,7 +79,7 @@ namespace EN
 				close(IncomingConnection);
 				close(ServerListenSocket);
 				#endif
-
+                ServerListenSocket = INVALID_SOCKET;
 				break;
 			}
 
@@ -183,6 +183,15 @@ namespace EN
 		if (OperationRes != 0)
 			std::cerr << "Error: failed connect to server." << std::endl;
 		
+        label:
+
+        if (ServerListenSocket != INVALID_SOCKET)
+            goto label;
+
+        // int volatile a = 0;
+        // std::cout << ServerListenSocket << std::endl;
+        // while (ServerListenSocket != INVALID_SOCKET) { ++a; }
+
 		#if defined WIN32 || defined _WIN64
 		closesocket(ServerConnectionSocket);
 		WSACleanup();
