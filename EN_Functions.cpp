@@ -31,12 +31,7 @@ namespace EN
 		{
 			message = "";
 
-			#if defined WIN32 || defined _WIN64
-			closesocket(sock);
-			#else 
-			close(sock);
-			#endif
-
+			CloseSocket(sock);
 			return false;
 		}
 
@@ -55,11 +50,7 @@ namespace EN
 		{
 			message = "";
 
-			#if defined WIN32 || defined _WIN64
-			closesocket(sock);
-			#else 
-			close(sock);
-			#endif
+			CloseSocket(sock);
 			delete[] msg;
 			return false;
 		}
@@ -70,6 +61,15 @@ namespace EN
 
 		delete[] msg;
 		return true;
+	}
+
+	void CloseSocket(EN_SOCKET sock)
+	{
+		#if defined WIN32 || defined _WIN64
+		closesocket(sock);
+		#else 
+		close(sock);
+		#endif
 	}
 
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString)

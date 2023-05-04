@@ -46,8 +46,10 @@ namespace EN
         std::vector<SocketOption> CreateSocketsOption;
 
         // Socket to accept incoming clients
-        EN_SOCKET ServerListenSocket;
+        EN_SOCKET ServerListenSocket = INVALID_SOCKET;
 
+		// Mutex to shutdown server
+		std::mutex ShutdownMutex;
 	protected:
 
 		/// Server port. Default set to 1111

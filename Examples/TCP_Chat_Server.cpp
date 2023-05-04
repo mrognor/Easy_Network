@@ -48,29 +48,56 @@ public:
 
 int main()
 {
-	MyServer A;
-	A.Run();
+	// MyServer A;
+	// A.Run();
 
 
 	// Uncomment this code to make server standart console input.
 	// Using this you can write logic to kick clients or shutdown server
-	/*
-	MyServer A;
+	
+	// MyServer A;
 
-	std::thread th([&A]() { A.Run(); });
-	th.detach();
+	// std::thread th([&A]() { A.Run(); });
+	// th.detach();
 
-	std::string message;
+	// std::string message;
 
-	while (true)
+	// while (true)
+	// {
+	// 	getline(std::cin, message);
+	// 	std::cout << message << std::endl;
+
+	// 	if (message == "f")
+	// 	{
+	// 		A.Shutdown();
+	// 		break;
+	// 	}
+		
+	// 	A.SendToClient(0, message);
+	// }
+		
+	#if defined WIN32 || defined _WIN64
+	//WSAStartup
+	WSAData wsaData;
+	if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
 	{
-		getline(std::cin, message);
-
-		if (message == "f")
-		{
-			A.Shutdown();
-			break;
-		}
+		std::cerr << "Error: Library initialization failure." << std::endl;
+		exit(1);
 	}
-	*/
+	#endif
+	
+	MyServer A;
+	for (int i = 0; i < 10000; ++i)
+	{
+		std::thread th([&]() { A.Run(); });
+		A.Shutdown();
+		th.join();
+
+		std::cout << i << std::endl;
+	}
+
+	#if defined WIN32 || defined _WIN64
+	//WSAStartup
+	WSACleanup();
+	#endif
 }

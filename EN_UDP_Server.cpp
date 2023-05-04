@@ -197,11 +197,8 @@ namespace EN
 		delete[] Mutexes;
 
 		delete[] IncomingMessageBuffer;
-		#if defined WIN32 || defined _WIN64
-		closesocket(UDP_ServerSocket);
-		#else
-		close(UDP_ServerSocket);
-		#endif		
+
+		CloseSocket(UDP_ServerSocket);	
 	}
 
 	void EN_UDP_Server::Shutdown()

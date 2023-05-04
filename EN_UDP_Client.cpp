@@ -75,20 +75,12 @@ namespace EN
 			std::cerr << "Error: Failed to send to server" << std::endl;
 		}
 		
-		#if defined WIN32 || defined _WIN64
-		Sleep(MessageDelay);
-		#else
-		usleep(MessageDelay);
-		#endif
+		EN::Delay(MessageDelay);
 	}
 
 	void EN_UDP_Client::Stop()
 	{
-		#if defined WIN32 || defined _WIN64
-		closesocket(ServerConnectionSocket);
-		#else
-		close(ServerConnectionSocket);
-		#endif
+		CloseSocket(ServerConnectionSocket);
 	}
 
 	EN_UDP_Client::~EN_UDP_Client()

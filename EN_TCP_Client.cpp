@@ -90,11 +90,7 @@ namespace EN
 			// Means what server was disconnected
 			if (IsServerConnected == false)
 			{
-				#if defined WIN32 || defined _WIN64
-				closesocket(ServerConnectionSocket);
-				#else 
-				close(ServerConnectionSocket);
-				#endif
+				CloseSocket(ServerConnectionSocket);
 				if (!IsClientDisconnect)
 				{
 					ServerConnectionSocket = INVALID_SOCKET;
@@ -120,11 +116,7 @@ namespace EN
 	{
 		BeforeDisconnect();
 		IsClientDisconnect = true;
-		#if defined WIN32 || defined _WIN64
-		closesocket(ServerConnectionSocket);
-		#else 
-		close(ServerConnectionSocket);
-		#endif
+		CloseSocket(ServerConnectionSocket);
 		ServerConnectionSocket = INVALID_SOCKET;
 	}
 

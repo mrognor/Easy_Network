@@ -55,6 +55,9 @@ namespace EN
 	*/ 
 	bool TCP_Recv(EN_SOCKET sock, std::string& message);
 
+	/// Close socket
+	void CloseSocket(EN_SOCKET sock);
+
 	/*!
 		Divides the string to std::vector<std::string>. 
 		\param[in] StringToSplit string to split
