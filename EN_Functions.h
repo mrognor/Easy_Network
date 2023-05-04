@@ -140,9 +140,32 @@ namespace EN
 		This function can be considered as the translation of a number into a number system with a base of 256
 		This function does not work with negative numbers.
 	*/
-	std::string IntToString(unsigned int n);
+	template <class T>
+    std::string IntToString(T n)
+    {
+        std::string str;
+
+        while(n > 0)
+        {
+            str += (unsigned char)(n % T(256));
+            n /= 256;
+        }
+
+        return str;
+    }
 
 	/// Function to convert string to int.
 	/// Works with strings from function EN::IntToString.
-	int StringToInt(std::string str);
+    template <class T>
+    T StringToInt(const std::string& str)
+    {
+        T n = 0;
+        for (auto it = str.rbegin(); it != str.rend(); ++it)
+        {
+            n += (unsigned char)*it;
+            n *= 256;
+        }
+        n /= 256;
+        return n;
+    }
 }

@@ -609,26 +609,4 @@ namespace EN
 		usleep(milliseconds * 1000);
 		#endif
 	}
-
-	std::string IntToString(unsigned int n)
-	{
-		std::string num = "";
-		while (n / 255 > 0)
-		{
-			num += (char)(n % 255 + 1);
-			n /= 255;
-		}
-		num += (char)(n + 1);
-		return num;
-	}
-
-	int StringToInt(std::string str)
-	{
-		int num = 0;
-
-		for (int i = 0; i < str.size(); i++)
-			num += ((unsigned char)str[i] - 1) * pow(255, i);
-		
-		return num;
-	}
 }
