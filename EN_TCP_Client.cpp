@@ -38,7 +38,10 @@ namespace EN
 
 	bool EN_TCP_Client::Connect(std::string ipAddr, int port)
 	{
-		ServerIpAddress = ipAddr;
+		ServerIpAddress = GetIpByURL(ipAddr);
+		if (ServerIpAddress == "")
+			ServerIpAddress = ipAddr;
+
 		ServerPort = port;
 
 		sockaddr_in addr;
@@ -46,7 +49,7 @@ namespace EN
 		addr.sin_port = htons(port);
 		
 		// Set ip address
-		inet_pton(AF_INET, ipAddr.c_str(), &addr.sin_addr);
+		inet_pton(AF_INET, ServerIpAddress.c_str(), &addr.sin_addr);
 
 		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
 

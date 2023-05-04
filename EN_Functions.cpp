@@ -9,7 +9,11 @@ namespace EN
 		// Fird is type conversion from h_addr_list[0] to in_addr*
 		// Fourth is get data from in_addr pointer 
 		// Fifth is convert in_addr to char* using inet_ntoa
-		return std::string(inet_ntoa(*(in_addr*)gethostbyname(url.c_str())->h_addr_list[0]));
+		auto addr = gethostbyname(url.c_str());
+		if (addr != nullptr)
+			return std::string(inet_ntoa(*(in_addr*)addr->h_addr_list[0]));
+		else
+			return "";
 	}
 
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay)

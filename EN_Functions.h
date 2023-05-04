@@ -37,6 +37,7 @@ namespace EN
 {
 	/// Function for getting an ip address from a url.
 	/// \param[in] url address to get ip
+	/// \return Return host ip or empty string if cannot get host ip.
 	std::string GetIpByURL(std::string url);
 
 	/*!
