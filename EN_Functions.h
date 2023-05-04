@@ -132,7 +132,9 @@ namespace EN
 
 	/*!
 		\brief Function to convert int to string. 
-		
+		Works with standart data types. Use this function if your data 
+		types support next operators: >>, <<, &
+
 		One char takes 1 byte, and a int takes 4 bytes. 
 		If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
 		This function turns a number into a character, since a character occupies a byte, 
@@ -147,6 +149,33 @@ namespace EN
 
         while(n > 0)
         {
+			// Get last eight bits. Equals to % 256
+            str += (unsigned char)(n & 0b11111111);
+            n >>= 8;
+        }
+
+        return str;
+    }
+
+	/*!
+		\brief Function to convert int to string. 
+		Works with custom data types. Use this function if your data 
+		types dont support next operators: >>, <<, &
+
+		One char takes 1 byte, and a int takes 4 bytes. 
+		If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
+		This function turns a number into a character, since a character occupies a byte, 
+		then you can transfer numbers up to 255 in one byte. 
+		This function can be considered as the translation of a number into a number system with a base of 256
+		This function does not work with negative numbers.
+	*/
+	template <class T>
+    std::string WIntToString(T n)
+    {
+        std::string str;
+
+        while(n > 0)
+        {
             str += (unsigned char)(n % T(256));
             n /= 256;
         }
@@ -154,8 +183,13 @@ namespace EN
         return str;
     }
 
-	/// Function to convert string to int.
-	/// Works with strings from function EN::IntToString.
+	/** \brief Function to convert string to int.
+	
+		Works with standart data types. Use this function if your data 
+		types support next operators: >>, <<, &
+		Works with strings from function EN::IntToString.
+		\warning Dont forget to specify returning value using <type>. Example: int i = StringToInt<int>("string")
+	*/
     template <class T>
     T StringToInt(const std::string& str)
     {
@@ -166,6 +200,26 @@ namespace EN
             n *= 256;
         }
         n /= 256;
+        return n;
+    }
+
+	/** \brief Function to convert string to int.
+	
+		Works with custom data types. Use this function if your data 
+		types dont support next operators: >>, <<, &
+		Works with strings from function EN::IntToString.
+		\warning Dont forget to specify returning value using <type>. Example: int i = WStringToInt<int>("string")
+	*/
+    template <class T>
+    T WStringToInt(const std::string& str)
+    {
+        T n = 0;
+        for (auto it = str.rbegin(); it != str.rend(); ++it)
+        {
+            n += (unsigned char)*it;
+            n <<= 8;
+        }
+        n >>= 8;
         return n;
     }
 }
