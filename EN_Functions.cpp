@@ -18,10 +18,33 @@ namespace EN
 
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay)
 	{
-		int msg_size = message.length();
+		size_t messageLength = message.length();
+		char* msgBuf;
+		unsigned char messageByteLength;
 
-		send(sock, (char*)&msg_size, sizeof(int), 0);
-		send(sock, message.c_str(), message.length(), 0);
+		// If message length more than 128, then set first bit to 1, that means that message
+		// length stored in 2 bytes
+		// If message length less or equal 128, than set first bit to 0, and send only 
+		// one byte with message length
+		if (messageLength >= 128)
+		{
+			msgBuf = new char[2  + messageLength];
+			msgBuf[0] = messageLength / 128;
+			msgBuf[0] |= 0b10000000;
+			msgBuf[1] = messageLength % 128;
+			messageByteLength = 2;
+		}
+		else
+		{
+			msgBuf = new char[1  + messageLength];
+			msgBuf[0] = messageLength;
+			messageByteLength = 1;
+		}		
+
+		for (size_t i = 0; i < messageLength; ++i)
+			msgBuf[i + messageByteLength] = message[i];
+
+		send(sock, msgBuf, messageLength + messageByteLength, 0);
 
 		Delay(MessageDelay);
 	}
@@ -29,7 +52,8 @@ namespace EN
 	bool TCP_Recv(EN_SOCKET sock, std::string& message)
 	{
 		int msg_size;
-		int ConnectionStatus = recv(sock, (char*)&msg_size, sizeof(int), MSG_WAITALL);
+		unsigned char firstMessageLengthByte;
+		int ConnectionStatus = recv(sock, (char*)&firstMessageLengthByte, 1, MSG_WAITALL);
 
 		if (ConnectionStatus <= 0)
 		{
@@ -38,15 +62,34 @@ namespace EN
 			CloseSocket(sock);
 			return false;
 		}
+		
+		// If first bit equls 1, then message length store in 2 bytes and we need to read next byte
+		if (firstMessageLengthByte & 0b10000000)
+		{
+			unsigned char secondMessageLengthByte;
+			ConnectionStatus = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
 
+			if (ConnectionStatus <= 0)
+			{
+				message = "";
+
+				CloseSocket(sock);
+				return false;
+			}	
+
+			msg_size = (firstMessageLengthByte & 0b01111111) * 128;
+			msg_size += secondMessageLengthByte & 0b01111111;
+		}
+		else
+			msg_size = firstMessageLengthByte & 0b01111111;
+		
 		if (msg_size <= 0)
 		{
 			message = "";
 			return true;
 		}
 
-		char* msg = new char[msg_size + 1];
-		msg[msg_size] = '\0';
+		char* msg = new char[msg_size];
 
 		ConnectionStatus = recv(sock, msg, msg_size, MSG_WAITALL);
 
