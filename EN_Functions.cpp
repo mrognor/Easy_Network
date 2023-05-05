@@ -19,7 +19,7 @@ namespace EN
 	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay)
 	{
 		size_t messageLength = message.length();
-		char* msgBuf;
+		unsigned char* msgBuf;
 		unsigned char messageByteLength;
 
 		// If message length more than 128, then set first bit to 1, that means that message
@@ -28,7 +28,7 @@ namespace EN
 		// one byte with message length
 		if (messageLength >= 128)
 		{
-			msgBuf = new char[2  + messageLength];
+			msgBuf = new unsigned char[2  + messageLength];
 			msgBuf[0] = messageLength / 128;
 			msgBuf[0] |= 0b10000000;
 			msgBuf[1] = messageLength % 128;
@@ -36,7 +36,7 @@ namespace EN
 		}
 		else
 		{
-			msgBuf = new char[1  + messageLength];
+			msgBuf = new unsigned char[1  + messageLength];
 			msgBuf[0] = messageLength;
 			messageByteLength = 1;
 		}		
@@ -44,7 +44,7 @@ namespace EN
 		for (size_t i = 0; i < messageLength; ++i)
 			msgBuf[i + messageByteLength] = message[i];
 
-		send(sock, msgBuf, messageLength + messageByteLength, 0);
+		send(sock, (char*)msgBuf, messageLength + messageByteLength, 0);
 
 		Delay(MessageDelay);
 	}

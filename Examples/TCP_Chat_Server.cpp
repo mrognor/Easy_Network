@@ -55,27 +55,6 @@ int main()
 	// Uncomment this code to make server standart console input.
 	// Using this you can write logic to kick clients or shutdown server
 	
-	// MyServer A;
-
-	// std::thread th([&A]() { A.Run(); });
-	// th.detach();
-
-	// std::string message;
-
-	// while (true)
-	// {
-	// 	getline(std::cin, message);
-	// 	std::cout << message << std::endl;
-
-	// 	if (message == "f")
-	// 	{
-	// 		A.Shutdown();
-	// 		break;
-	// 	}
-		
-	// 	A.SendToClient(0, message);
-	// }
-		
 	#if defined WIN32 || defined _WIN64
 	//WSAStartup
 	WSAData wsaData;
@@ -85,15 +64,25 @@ int main()
 		exit(1);
 	}
 	#endif
-	
-	MyServer A;
-	for (int i = 0; i < 10000; ++i)
-	{
-		std::thread th([&]() { A.Run(); });
-		A.Shutdown();
-		th.join();
 
-		std::cout << i << std::endl;
+	MyServer A;
+
+	std::thread th([&A]() { A.Run(); });
+	th.detach();
+
+	std::string message;
+
+	while (true)
+	{
+		getline(std::cin, message);
+
+		if (message == "f")
+		{
+			A.Shutdown();
+			break;
+		}
+		
+		A.SendToClient(0, message);
 	}
 
 	#if defined WIN32 || defined _WIN64
