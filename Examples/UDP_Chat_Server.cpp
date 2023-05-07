@@ -8,7 +8,6 @@ public:
 	{
 		// IpAddress = "192.168.1.64"; Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
-		// MaxMessageSize = <put int here> to set max message size. Default set to 256.
 		// You have to set synchronizied it with client
 		// ServerBuferType = EN::Queue; Can be queue or stack
 		// ThreadAmount = 1; Shows how many threads will process incoming messages. Default set to 2
@@ -27,7 +26,7 @@ public:
 		if (message == "f")
 			Shutdown();
 		
-		std::cout << message << std::endl;
+		std::cout << "From: " << ClientIpAddress << " Message: " << message << std::endl;
 
 		SendToClient(ClientIpAddress, message);
 	}
@@ -35,7 +34,7 @@ public:
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
 	bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived)
 	{
-		std::cout << "InstantHandler " << message << std::endl;
+		std::cout << "Instant client message hadler. From: " << ClientIpAddress << " Message: " << message << std::endl;
 		if (message == "false")
 			return false;
 		return true;
@@ -49,5 +48,5 @@ int main()
 	// Start server
 	A.Run();
 
-	system("pause");
+	// system("pause");
 }

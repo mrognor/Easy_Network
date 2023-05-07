@@ -16,7 +16,7 @@ namespace EN
 			return "";
 	}
 
-	void TCP_Send(EN_SOCKET sock, std::string message, int MessageDelay)
+	void TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay)
 	{
 		size_t messageLength = message.length();
 		unsigned char* msgBuf;
@@ -107,6 +107,112 @@ namespace EN
 		    message += msg[i];
 
 		delete[] msg;
+		return true;
+	}
+
+	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message, int MessageDelay)
+	{
+		auto SplittedAddr = Split(destinationAddress, ":");
+		sockaddr_in ClientAddr;
+		//Prepare the sockaddr_in structure
+		ClientAddr.sin_family = AF_INET;
+		ClientAddr.sin_port = htons(std::atoi(SplittedAddr[1].c_str()));
+		// Set ip address
+		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
+
+		size_t messageLength = message.length();
+		unsigned char* msgBuf;
+		unsigned char messageByteLength;
+
+		// If message length more than 128, then set first bit to 1, that means that message
+		// length stored in 2 bytes
+		// If message length less or equal 128, than set first bit to 0, and send only 
+		// one byte with message length
+		if (messageLength >= 128)
+		{
+			msgBuf = new unsigned char[2  + messageLength];
+			msgBuf[0] = messageLength / 128;
+			msgBuf[0] |= 0b10000000;
+			msgBuf[1] = messageLength % 128;
+			messageByteLength = 2;
+		}
+		else
+		{
+			msgBuf = new unsigned char[1  + messageLength];
+			msgBuf[0] = messageLength;
+			messageByteLength = 1;
+		}		
+
+		for (size_t i = 0; i < messageLength; ++i)
+			msgBuf[i + messageByteLength] = message[i];
+
+		sendto(sock, (char*)msgBuf, messageLength + messageByteLength, 0, (sockaddr*)&ClientAddr, sizeof(ClientAddr));
+
+		Delay(MessageDelay);
+	}
+
+	bool UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message)
+	{
+		// Source address
+		sockaddr_in sourceSockAddr;
+		int sizeofaddr = sizeof(sourceSockAddr);
+		int ConnectionStatus;
+
+		char msg[4096];
+		#if defined WIN32 || defined _WIN64
+		//try to receive some data, this is a blocking call
+		ConnectionStatus = recvfrom(sock, (char*)&msg, 4096, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
+		#else
+		//try to receive some data, this is a blocking call
+		ConnectionStatus = recvfrom(sock, (char*)&msg, 4096, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
+		#endif
+
+		if (ConnectionStatus <= 0)
+		{
+			message = "";
+
+			CloseSocket(sock);
+			return false;
+		}
+
+		int msg_size, messageLengthInBytes = 1;
+		unsigned char firstMessageLengthByte = msg[0];
+
+		// If first bit equls 1, then message length store in 2 bytes and we need to read next byte
+		if (firstMessageLengthByte & 0b10000000)
+		{
+			unsigned char secondMessageLengthByte;
+			ConnectionStatus = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
+
+			if (ConnectionStatus <= 0)
+			{
+				message = "";
+
+				CloseSocket(sock);
+				return false;
+			}	
+
+			msg_size = (firstMessageLengthByte & 0b01111111) * 128;
+			msg_size += secondMessageLengthByte & 0b01111111;
+			messageLengthInBytes = 2;
+		}
+		else
+			msg_size = firstMessageLengthByte & 0b01111111;
+		
+		if (msg_size <= 0)
+		{
+			message = "";
+			return true;
+		}
+
+		char str[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &(sourceSockAddr.sin_addr), str, INET_ADDRSTRLEN);
+		sourceAddress = std::string(str) + ":" + std::to_string(ntohs(sourceSockAddr.sin_port));
+
+	    message.clear();
+	    for (int i = 0; i < msg_size; ++i)
+		    message += msg[i + messageLengthInBytes];
+
 		return true;
 	}
 

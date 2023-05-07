@@ -47,15 +47,12 @@ namespace EN
 		// Variable to shutdown server
 		bool IsShutdown = false;
 
-		// Server address
-		sockaddr_in ServerAddress;
-
 		// Server socket
 		EN_SOCKET UDP_ServerSocket;
 
 		// Array of pointer
 		std::list<std::string>** QueueMessageVec;
-		std::list<sockaddr_in>** QueueAddrVec;
+		std::list<std::string>** QueueAddrVec;
 		std::list<EN_TimePoint>** QueueTimeVec;
 		std::condition_variable** CondVarVec;
 		std::mutex** Mutexes;
@@ -68,9 +65,6 @@ namespace EN
 
 		/// Server port. Default set to 1111
 		int Port = 1111;
-
-		/// Maximum number of characters in a message
-		int MaxMessageSize = 256;
 
 		/// Server ip address string. Default set to localhost
 		std::string IpAddress = "127.0.0.1";
@@ -130,7 +124,7 @@ namespace EN
 			\param[in] message string to send to server
 			\param[in] ClientSocketAddr string with server address. Format: 127.0.0.1:1111
 		*/
-		void SendToClient(std::string ClientIpAddress, std::string message);
+		void SendToClient(std::string ClientIpAddress, std::string message, int messageDelay = 10);
 
 		~EN_UDP_Server();
 	};

@@ -82,10 +82,6 @@ namespace EN
 		std::string ServerIpAddress = "127.0.0.1";
 
 	protected:
-
-		/// Max size of unreliable message 
-		int MaxUnreliableMessageSize = 64;
-
 		/**
 			\brief This function is called after connecting to the server
 			

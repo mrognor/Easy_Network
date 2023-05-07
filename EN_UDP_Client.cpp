@@ -27,6 +27,9 @@ namespace EN
 			exit(1);
 		}
 
+		// Server address
+		sockaddr_in ServerSockAddr;
+
 		ServerSockAddr.sin_family = AF_INET;
 		ServerSockAddr.sin_port = htons(ServerPort);
 
@@ -34,7 +37,7 @@ namespace EN
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &ServerSockAddr.sin_addr);
 
 		// Get port from os
-		sendto(ServerConnectionSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr));
+		EN::UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), "", 0);
 
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
@@ -42,40 +45,23 @@ namespace EN
 
 	void EN_UDP_Client::ServerHandler()
 	{
-		char* Message = new char[MaxMessageSize];
-		memset(Message, '\0', MaxMessageSize);
-
-		int sizeofaddr = sizeof(ServerSockAddr);
+		std::string message, ipAddress;
 		int OperationRes;
 		while (true)
 		{
-			#if defined WIN32 || defined _WIN64
-			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, &sizeofaddr);
-			#else
-			OperationRes = recvfrom(ServerConnectionSocket, Message, MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, (socklen_t*)&sizeofaddr);
-			#endif
+			OperationRes = EN::UDP_Recv(ServerConnectionSocket, ipAddress, message);
 			
 			if (OperationRes > 0)
-			{
-				ServerMessageHandler(Message);
-			}
+				ServerMessageHandler(message);
+			
 			if (OperationRes == 0)
-			{
 				break;
-			}
 		}
-
-		delete[] Message;
 	}
 
 	void EN_UDP_Client::SendToServer(std::string message, int MessageDelay)
 	{
-		if (sendto(ServerConnectionSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ServerSockAddr, sizeof(ServerSockAddr)) == SOCKET_ERROR)
-		{
-			std::cerr << "Error: Failed to send to server" << std::endl;
-		}
-		
-		EN::Delay(MessageDelay);
+		EN::UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), message, MessageDelay);
 	}
 
 	void EN_UDP_Client::Stop()

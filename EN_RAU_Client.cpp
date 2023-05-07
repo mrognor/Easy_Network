@@ -121,7 +121,6 @@ namespace EN
 	{
 		UDP_Client->ServerIpAddress = ServerIpAddress;
 		UDP_Client->ServerPort = ServerPort + 1;
-		UDP_Client->MaxMessageSize = MaxUnreliableMessageSize + 10;
 		
 		TCP_Client->Run(); 
 		UDP_Client->Run();

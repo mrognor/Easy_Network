@@ -146,7 +146,6 @@ namespace EN
 		// Setup ip and port on udp server
 		UDP_Server->IpAddress = IpAddress;
 		UDP_Server->Port = Port + 1;
-		UDP_Server->MaxMessageSize = MaxUnreliableMessageSize + 10;
 		UDP_Server->ThreadAmount = 1;
 		UDP_Server->ServerBuferType = EN::Queue;
 

@@ -17,12 +17,7 @@ namespace EN
 				std::chrono::milliseconds elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - QueueTimeVec[ThreadID]->front());
 
 				std::string TopMessage = QueueMessageVec[ThreadID]->front();
-
-				char str[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &(QueueAddrVec[ThreadID]->front().sin_addr), str, INET_ADDRSTRLEN);
-				std::string StringServerAddress = str;
-				
-				StringServerAddress = StringServerAddress + ":" + std::to_string(ntohs(QueueAddrVec[ThreadID]->front().sin_port));
+				std::string sourceAddress = QueueAddrVec[ThreadID]->front();
 
 				switch (ServerBuferType)
 				{
@@ -34,11 +29,11 @@ namespace EN
 					QueueTimeVec[ThreadID]->pop_front();
 					Mutexes[ThreadID]->unlock();
 
-					ClientMessageHandler(TopMessage, StringServerAddress, elapsed_seconds.count());
+					ClientMessageHandler(TopMessage, sourceAddress, elapsed_seconds.count());
 					break;
 
 				case (Queue):
-					ClientMessageHandler(TopMessage, StringServerAddress, elapsed_seconds.count());
+					ClientMessageHandler(TopMessage, sourceAddress, elapsed_seconds.count());
 
 					Mutexes[ThreadID]->lock();
 					QueueMessageVec[ThreadID]->pop_front();
@@ -73,6 +68,9 @@ namespace EN
 			std::cerr << "Could not create socket" << std::endl;
 		}
 
+		// Server address
+		sockaddr_in ServerAddress;
+
 		//Prepare the sockaddr_in structure
 		ServerAddress.sin_family = AF_INET;
 		ServerAddress.sin_port = htons(Port);
@@ -86,14 +84,12 @@ namespace EN
 			std::cerr << "Bind failed" << std::endl;
 		}
 
-		char* IncomingMessageBuffer = new char[MaxMessageSize];
-
 		sockaddr_in ClientAddress;
 
 		int sizeofaddr = sizeof(ClientAddress);
 
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
-		QueueAddrVec = new std::list<sockaddr_in>*[ThreadAmount];
+		QueueAddrVec = new std::list<std::string>*[ThreadAmount];
 		QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
 		CondVarVec = new std::condition_variable*[ThreadAmount];
 		ThreadVec = new std::thread[ThreadAmount];
@@ -102,7 +98,7 @@ namespace EN
 		for (int i = 0; i < ThreadAmount; i++)
 		{
 			QueueMessageVec[i] = new std::list<std::string>;
-			QueueAddrVec[i] = new std::list<sockaddr_in>;
+			QueueAddrVec[i] = new std::list<std::string>;
 			QueueTimeVec[i] = new std::list<EN_TimePoint>;
 			CondVarVec[i] = new std::condition_variable;
 			Mutexes[i] = new std::mutex;
@@ -110,31 +106,18 @@ namespace EN
 			ThreadVec[i] = std::thread([this, i]() {this->ThreadListHandler(i); });
 		}
 
+		std::string message, clientAddress;
 		//keep listening for data
 		while (true)
 		{
 			if (IsShutdown)
 				break;
-			
-			//clear the buffer by filling null, it might have previously received data
-			memset(IncomingMessageBuffer, '\0', MaxMessageSize);
+						
+			EN::UDP_Recv(UDP_ServerSocket, clientAddress, message);
 
-			#if defined WIN32 || defined _WIN64
-			//try to receive some data, this is a blocking call
-			recvfrom(UDP_ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, &sizeofaddr);
-			#else
-			//try to receive some data, this is a blocking call
-			recvfrom(UDP_ServerSocket, IncomingMessageBuffer, MaxMessageSize, 0, (sockaddr*)&ClientAddress, (socklen_t*)&sizeofaddr);
-			#endif
-
-			if (std::string(IncomingMessageBuffer) != "")
-			{
-				char str[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &(ClientAddress.sin_addr), str, INET_ADDRSTRLEN);
-				std::string StringClientAddress = str;
-				StringClientAddress = StringClientAddress + ":" + std::to_string(ntohs(ClientAddress.sin_port));
-				
-				if (InstantClientMessageHandler(IncomingMessageBuffer, StringClientAddress, 0) == false)
+			if (std::string(message) != "")
+			{				
+				if (InstantClientMessageHandler(message, clientAddress, 0) == false)
 					continue;
 
 				int IndexMinQueue = 0;
@@ -148,8 +131,8 @@ namespace EN
 				{
 				case Queue:
 					Mutexes[IndexMinQueue]->lock();
-					QueueMessageVec[IndexMinQueue]->push_back(IncomingMessageBuffer);
-					QueueAddrVec[IndexMinQueue]->push_back(ClientAddress);
+					QueueMessageVec[IndexMinQueue]->push_back(message);
+					QueueAddrVec[IndexMinQueue]->push_back(clientAddress);
 					QueueTimeVec[IndexMinQueue]->push_back(std::chrono::system_clock::now());
 					Mutexes[IndexMinQueue]->unlock();
 
@@ -158,8 +141,8 @@ namespace EN
 
 				case Stack:
 					Mutexes[IndexMinQueue]->lock();
-					QueueMessageVec[IndexMinQueue]->push_front(IncomingMessageBuffer);
-					QueueAddrVec[IndexMinQueue]->push_front(ClientAddress);
+					QueueMessageVec[IndexMinQueue]->push_front(message);
+					QueueAddrVec[IndexMinQueue]->push_front(clientAddress);
 					QueueTimeVec[IndexMinQueue]->push_front(std::chrono::system_clock::now());
 					
 					if (QueueMessageVec[IndexMinQueue]->size() > MaxStackBuffSize)
@@ -196,8 +179,6 @@ namespace EN
 		delete[] QueueTimeVec;
 		delete[] Mutexes;
 
-		delete[] IncomingMessageBuffer;
-
 		CloseSocket(UDP_ServerSocket);	
 	}
 
@@ -205,10 +186,7 @@ namespace EN
 	{
 		IsShutdown = true;
 
-		if (sendto(UDP_ServerSocket, "", MaxMessageSize, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
-		{
-			std::cerr << "Failed to send to shutdown server" << std::endl;
-		}
+		CloseSocket(UDP_ServerSocket);	
 
 		switch (ServerBuferType)
 		{
@@ -232,22 +210,9 @@ namespace EN
 		}
 	}
 
-	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message)
+	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message, int messageDelay)
 	{
-		auto SplittedAddr = Split(ClientIpAddress, ":");
-		sockaddr_in ClientAddr;
-		//Prepare the sockaddr_in structure
-		ClientAddr.sin_family = AF_INET;
-		ClientAddr.sin_port = htons(std::atoi(SplittedAddr[1].c_str()));
-
-		// Set ip address
-		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
-
-		//now reply the client with the same data
-		if (sendto(UDP_ServerSocket, message.c_str(), MaxMessageSize, 0, (sockaddr*)&ClientAddr, sizeof(ClientIpAddress)) == SOCKET_ERROR)
-		{
-			std::cerr << "Failed to send" << std::endl;
-		}
+		EN::UDP_Send(UDP_ServerSocket, ClientIpAddress, message, messageDelay);
 	}
 
 	EN_UDP_Server::~EN_UDP_Server()

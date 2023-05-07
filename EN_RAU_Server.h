@@ -77,9 +77,6 @@ namespace EN
 		/// Server ip address. By default set to localhost
 		std::string IpAddress = "127.0.0.1";
 
-		/// Max size of unreliable message 
-		int MaxUnreliableMessageSize = 64;
-
 		/**
 			\brief The method that is executed when the client connects to the server
 

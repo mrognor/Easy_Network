@@ -29,9 +29,6 @@ namespace EN
 	class EN_UDP_Client
 	{
 	private:
-		// Server address
-		sockaddr_in ServerSockAddr;
-
 		/// Socket to connect to server
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 		
@@ -43,9 +40,6 @@ namespace EN
 
 		/// Default port. Default set to 1111
 		int ServerPort = 1111;
-
-		/// Maximum number of characters in a message
-		int MaxMessageSize = 256;
 
 		/// Server ip address string. Default set to localhost
 		std::string ServerIpAddress = "127.0.0.1";
