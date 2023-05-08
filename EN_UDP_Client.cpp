@@ -37,7 +37,7 @@ namespace EN
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &ServerSockAddr.sin_addr);
 
 		// Get port from os
-		EN::UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), "", 0);
+		EN::UDP_Send(ServerConnectionSocket, "0.0.0.0:0", "", 0);
 
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();

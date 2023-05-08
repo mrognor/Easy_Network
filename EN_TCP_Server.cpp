@@ -136,6 +136,7 @@ namespace EN
 	{
 		IsShutdown = true;
 
+		// Check what server successfully started
 		while (true)
 		{
 			ShutdownMutex.lock();

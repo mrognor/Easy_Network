@@ -67,7 +67,7 @@ namespace EN
 
 		// Incoming messages buffer
 		std::queue<std::string> Messages;
-		// Condition variable to wake up server messahe handle thread
+		// Condition variable to wake up server message handler thread
 		std::condition_variable CondVar;
 		// Mutex to make code thread-safety
 		std::mutex Mtx;

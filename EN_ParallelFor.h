@@ -7,7 +7,7 @@
 
 namespace EN
 {
-    /// Class implementing a thread pool
+    /// Class implementing a parallel for
     class EN_ParallelFor
     {
     private:

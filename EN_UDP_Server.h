@@ -19,6 +19,7 @@ typedef int EN_SOCKET;
 #endif
 
 #include "EN_Functions.h"
+#include "EN_ThreadGate.h"
 #include <thread>
 #include <mutex>
 #include <queue>
@@ -48,15 +49,18 @@ namespace EN
 		bool IsShutdown = false;
 
 		// Server socket
-		EN_SOCKET UDP_ServerSocket;
+		EN_SOCKET UDP_ServerSocket = INVALID_SOCKET;
 
-		// Array of pointer
+		// Array of pointers
 		std::list<std::string>** QueueMessageVec;
 		std::list<std::string>** QueueAddrVec;
 		std::list<EN_TimePoint>** QueueTimeVec;
-		std::condition_variable** CondVarVec;
+		EN::EN_Gate** GateVec;
 		std::mutex** Mutexes;
 		std::thread* ThreadVec;
+
+		// Mutex to prevent errors while shutdown before run
+		std::mutex ShutdownMutex;
 
 		// Functions to handle incoming message buffer
 		void ThreadListHandler(int ThreadID);

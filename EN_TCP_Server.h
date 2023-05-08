@@ -45,7 +45,7 @@ namespace EN
         // Socket to accept incoming clients
         EN_SOCKET ServerListenSocket = INVALID_SOCKET;
 
-		// Mutex to shutdown server
+		// Mutex to prevent errors while shutdown before run
 		std::mutex ShutdownMutex;
 	protected:
 

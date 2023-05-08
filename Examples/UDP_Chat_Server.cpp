@@ -47,6 +47,4 @@ int main()
 	MyServer A;
 	// Start server
 	A.Run();
-
-	// system("pause");
 }
