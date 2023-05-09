@@ -29,7 +29,10 @@ public:
 
 		// Shutdown server
 		if (message == "F")
+		{
+			std::cout << "Server was shutdown by client. Enter any key to end programm" << std::endl;
 			Shutdown(); 
+		}
 
 		// Send incoming message to all different clients 
 		for (int j = 0; j < GetConnectionsCount(); j++)
@@ -75,6 +78,9 @@ int main()
 	while (true)
 	{
 		getline(std::cin, message);
+
+		if (A.GetIsShutdown())
+			break;
 
 		if (message == "f")
 		{

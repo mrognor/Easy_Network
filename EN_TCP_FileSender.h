@@ -11,9 +11,6 @@ namespace EN
 		void AfterConnect() {};
 
 		/// This method does nothing but we have to redefine it to work correctly
-		void Run() {};
-
-		/// This method does nothing but we have to redefine it to work correctly
 		void ServerMessageHandler(std::string message) {};
 
 		/// This method does nothing but we have to redefine it to work correctly

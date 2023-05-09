@@ -92,6 +92,9 @@ namespace EN
 		/// The function returns the number of connected devices
 		int GetConnectionsCount() { return ClientSockets.size(); }
 
+		/// The function returns whether the server is running
+		bool GetIsShutdown() { return IsShutdown; }
+
 		/// Method to start server.
 		void Run();
 

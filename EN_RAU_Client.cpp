@@ -76,20 +76,36 @@ namespace EN
 
 	bool EN_RAU_Client::Connect()
 	{
-		return TCP_Client->Connect();
+		return Connect("127.0.0.1", 1111);
 	}
 
 	bool EN_RAU_Client::Connect(int port)
 	{
-		ServerPort = port;
-		return TCP_Client->Connect(port);
+		return Connect("127.0.0.1", port);
 	}
 
 	bool EN_RAU_Client::Connect(std::string ipAddr, int port)
 	{
 		ServerIpAddress = ipAddr;
 		ServerPort = port;
-		return TCP_Client->Connect(ipAddr, port);
+
+		UDP_Client->ServerIpAddress = ServerIpAddress;
+		UDP_Client->ServerPort = ServerPort + 1;
+		UDP_Client->Run();
+		
+		std::thread QueueHandlerThread([this]() {this->QueueMessageHandler(); });
+		QueueHandlerThread.detach();
+
+		if (!TCP_Client->Connect(ipAddr, port)) 
+		{
+			std::cerr << "Failed to connect to server" << std::endl;
+			return false;
+		}
+
+		while (IsServerGetUDPAddress != true)
+			UDP_Client->SendToServer(std::to_string(ClientId));
+
+		return true;
 	}
 
 	void EN_RAU_Client::QueueMessageHandler()
@@ -115,27 +131,6 @@ namespace EN
 			if (IsShutdown)
 				break;
 		}
-	}
-
-	void EN_RAU_Client::Run()
-	{
-		UDP_Client->ServerIpAddress = ServerIpAddress;
-		UDP_Client->ServerPort = ServerPort + 1;
-		
-		TCP_Client->Run(); 
-		UDP_Client->Run();
-
-		Delay(300);
-
-		while (IsServerGetUDPAddress != true)
-		{
-			UDP_Client->SendToServer(std::to_string(ClientId));
-			
-			Delay(50);
-		}
-
-		std::thread QueueHandlerThread([this]() {this->QueueMessageHandler(); });
-		QueueHandlerThread.detach();
 	}
 
 	void EN_RAU_Client::SendToServer(std::string message, bool IsReliable, int MessageDelay)

@@ -5,7 +5,7 @@ class RAU_Server : public EN::EN_RAU_Server
 public:
 	RAU_Server()
 	{
-		//IpAddress = "192.168.1.71"; Default set to localhost
+		// IpAddress = "192.168.1.73"; Default set to localhost
 		// Port = <put int here> to set port. Default port is 1111
 		// MaxUnreliableMessageSize = 512; Default set to 64
 		// You have to set synchronizied it with client

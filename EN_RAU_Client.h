@@ -59,7 +59,7 @@ namespace EN
 
 		// Boolean variable for tracking the connection status. 
 		// When the server receives the client's IP address, 
-		// it will send a message via tsp and this variable will become true
+		// It will send a message via tcp and this variable will become true
 		bool IsServerGetUDPAddress = false;
 
 		// Variable to shutdown server
@@ -137,13 +137,6 @@ namespace EN
 			\return Returns true in case of success, false otherwise
 		*/
 		bool Connect(std::string ipAddr, int port);
-
-		/**
-			\brief Method to start server listening.
-
-			Starts a thread to process server responses
-		*/
-		void Run();
 
 		/**
 			\brief Function for sending a message to a connected server.

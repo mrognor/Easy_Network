@@ -54,31 +54,24 @@ namespace EN
 		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
-		{
 			std::cerr << "Error at socket" << std::endl;
-		}
 
 		// Winsock operation int result
 		int OperationRes;
         OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
             
         if (OperationRes == 0)
-		{
 			AfterConnect();
-			return true;
-		}
         else
         {
 			ServerConnectionSocket = INVALID_SOCKET;
             std::cerr << "Error: failed connect to server." << std::endl;
             return false;
         }
-	}
 
-	void EN_TCP_Client::Run()
-	{
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
+		return true;
 	}
 
 	void EN_TCP_Client::ServerHandler()
@@ -94,6 +87,7 @@ namespace EN
 			if (IsServerConnected == false)
 			{
 				CloseSocket(ServerConnectionSocket);
+				// Check if disconnect was from client side and BeforeDisconnect() was alredy invoked
 				if (!IsClientDisconnect)
 				{
 					ServerConnectionSocket = INVALID_SOCKET;

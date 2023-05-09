@@ -46,9 +46,6 @@ int main()
 		return 0;
 	}
 
-	// Start client
-	A.Run();
-
 	std::string message;
 
 	// Bool variable to change message type 
@@ -89,7 +86,6 @@ int main()
 				if (A.Connect())
 				{
 					IsSuccessConnection = true;
-					A.Run();
 					break;
 				}
 				EN::Delay(20);

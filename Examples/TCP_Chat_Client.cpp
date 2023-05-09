@@ -45,9 +45,6 @@ int main()
 		return 0;
 	}
 
-	// Start client
-	A.Run();
-
 	std::string message;
 
 	while (true)

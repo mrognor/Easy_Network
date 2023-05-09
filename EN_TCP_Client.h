@@ -110,14 +110,6 @@ namespace EN
 		bool Connect(std::string ipAddr, int port);
 
 		/**
-			\brief Method to start server.
-
-			Starts a thread to process server responses
-			Important! You have to determine AfterConnect(), ServerMessageHandler() and BeforeDisconnect()
-		*/
-		void Run();
-
-		/**
 			\brief Function for sending a message to a connected server.
 			\param[in] message the message string to send to the server
 			\param[in] MessageDelay Optional parameter. the time that will pass after sending the message to the server
