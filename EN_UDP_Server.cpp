@@ -82,7 +82,7 @@ namespace EN
 
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
 		QueueAddrVec = new std::list<std::string>*[ThreadAmount];
-		QueueTimeVec = new std::list<EN_TimePoint>*[ThreadAmount];
+		QueueTimeVec = new std::list<std::chrono::system_clock::time_point>*[ThreadAmount];
 		GateVec = new EN::EN_Gate*[ThreadAmount];
 		ThreadVec = new std::thread[ThreadAmount];
 		Mutexes = new std::mutex*[ThreadAmount];
@@ -91,7 +91,7 @@ namespace EN
 		{
 			QueueMessageVec[i] = new std::list<std::string>;
 			QueueAddrVec[i] = new std::list<std::string>;
-			QueueTimeVec[i] = new std::list<EN_TimePoint>;
+			QueueTimeVec[i] = new std::list<std::chrono::system_clock::time_point>;
 			GateVec[i] = new EN::EN_Gate;
 			Mutexes[i] = new std::mutex;
 

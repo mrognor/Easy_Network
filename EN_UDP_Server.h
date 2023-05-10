@@ -30,8 +30,6 @@ typedef int EN_SOCKET;
 #include <stack>
 #include <list>
 
-typedef std::chrono::system_clock::time_point EN_TimePoint;
-
 namespace EN
 {
 	/// UDP server buffer types
@@ -54,7 +52,7 @@ namespace EN
 		// Array of pointers
 		std::list<std::string>** QueueMessageVec;
 		std::list<std::string>** QueueAddrVec;
-		std::list<EN_TimePoint>** QueueTimeVec;
+		std::list<std::chrono::system_clock::time_point>** QueueTimeVec;
 		EN::EN_Gate** GateVec;
 		std::mutex** Mutexes;
 		std::thread* ThreadVec;
