@@ -165,9 +165,7 @@ namespace EN
     void EN_TCP_Server::SetAcceptSocketOption(PredefinedSocketOptions socketOptions)
     {
         for (int i = 0; i < socketOptions.Levels.size(); ++i)
-        {
             setsockopt(ServerListenSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], (const char*)&socketOptions.OptionValues[i], sizeof(socketOptions.OptionValues[i]));
-        }
     }
 
     void EN_TCP_Server::AddOnSocketCreateOption(int level, int optionName, int optionValue)

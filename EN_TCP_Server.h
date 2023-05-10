@@ -175,8 +175,9 @@ namespace EN
         void SetSocketOption(int ClientID, int level, int optionName, int optionValue);
 
         /**
-           \brief The method sets options for client socket
+            \brief The method sets options for client socket
 
+            \param[in] ClientID The number of the client 
             \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects

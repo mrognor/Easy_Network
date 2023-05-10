@@ -117,6 +117,17 @@ namespace EN
 		ServerConnectionSocket = INVALID_SOCKET;
 	}
 
+    void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)
+    {
+        setsockopt(ServerConnectionSocket, level, optionName, (const char*)&optionValue, sizeof(optionValue));
+    }
+
+    void EN_TCP_Client::SetSocketOption(PredefinedSocketOptions socketOptions)
+    {        
+        for (int i = 0; i < socketOptions.Levels.size(); ++i)
+            setsockopt(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], (const char*)&socketOptions.OptionValues[i], sizeof(socketOptions.OptionValues[i]));
+    }
+
 	EN_TCP_Client::~EN_TCP_Client()
 	{
 		#if defined WIN32 || defined _WIN64
