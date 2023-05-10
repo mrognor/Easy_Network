@@ -301,6 +301,7 @@ namespace EN
 
 				if (IsStop == true)
 				{
+                    SendingFile.close();
 					IsStop = false;
 					delete[] MessageBuf;
 					return false;
