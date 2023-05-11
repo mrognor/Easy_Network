@@ -151,6 +151,9 @@ namespace EN
 	/// Crossplatform function for program suspension
 	void Delay(int milliseconds);
 
+	/// \brief Returns the number of processor cores
+	int GetCPUCores() { return std::thread::hardware_concurrency(); }
+
 	/*!
 		\brief Function to convert int to string. 
 		Works with standart data types. Use this function if your data 
