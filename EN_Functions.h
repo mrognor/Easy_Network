@@ -8,6 +8,7 @@
 #include <winsock2.h>
 #include <WS2tcpip.h>
 typedef SOCKET EN_SOCKET;
+#define GETSOCKETERRNO() (WSAGetLastError())
 
 #else
 
@@ -18,6 +19,7 @@ typedef SOCKET EN_SOCKET;
 #include <netinet/in.h>
 #include <arpa/inet.h>
 typedef int EN_SOCKET;
+#define GETSOCKETERRNO() (errno)
 
 #endif
 
@@ -29,6 +31,7 @@ typedef int EN_SOCKET;
 #include <fstream>
 
 #include "EN_ParallelFor.h"
+#include "EN_Logger.h"
 
 #define SendFileBufLen 1024
 /// \endcond

@@ -13,7 +13,7 @@ namespace EN
 
 		if (OperationRes != 0)
 		{
-			std::cerr << "WSAStartup failed: " << OperationRes << std::endl;
+            LOG(Error, "WSAStartup failed: " + OperationRes);
 			exit(1);
 		}
 		#endif
@@ -23,7 +23,7 @@ namespace EN
 	{
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 		{
-			std::cerr << "Failed to create socket" << std::endl;
+            LOG(Error, "Failed to create socket");
 			exit(1);
 		}
 

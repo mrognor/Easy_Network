@@ -51,9 +51,12 @@ namespace EN
 		#if defined WIN32 || defined _WIN64
 		//WSAStartup
 		WSAData wsaData;
-		if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
+        // Winsock operation int result
+		int OperationRes;
+		OperationRes = WSAStartup(MAKEWORD(2, 1), &wsaData);
+		if (OperationRes != 0)
 		{
-			std::cerr << "Error: Library initialization failure." << std::endl;
+			LOG(Error, "WSAStartup failed: " + OperationRes);
 			exit(1);
 		}
 		#endif
@@ -64,8 +67,10 @@ namespace EN
 		ShutdownMutex.lock();
 		//Create a socket
 		if ((UDP_ServerSocket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
-			std::cerr << "Could not create socket" << std::endl;
-		
+        {
+            LOG(Error, "Could not create socket");
+        }
+
 		// Server address
 		sockaddr_in ServerAddress;
 
@@ -78,7 +83,9 @@ namespace EN
 
 		// Bind
 		if (bind(UDP_ServerSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
-			std::cerr << "Bind failed" << std::endl;
+        {
+            LOG(Error, "Bind failed");
+        }
 
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
 		QueueAddrVec = new std::list<std::string>*[ThreadAmount];

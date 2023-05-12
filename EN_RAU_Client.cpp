@@ -98,7 +98,7 @@ namespace EN
 
 		if (!TCP_Client->Connect(ipAddr, port)) 
 		{
-			std::cerr << "Failed to connect to server" << std::endl;
+            LOG(Warning, "Failed to connect to server");
 			return false;
 		}
 

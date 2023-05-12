@@ -13,7 +13,7 @@ namespace EN
 
 		if (OperationRes != 0)
 		{
-			std::cerr << "WSAStartup failed: " << OperationRes << std::endl;
+            LOG(Error, "WSAStartup failed: " + OperationRes);
 			exit(1);
 		}
 		#endif
@@ -54,8 +54,9 @@ namespace EN
 		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
-			std::cerr << "Error at socket" << std::endl;
-
+        {
+            LOG(Error, "Error at socket: " + std::to_string(GETSOCKETERRNO()));
+        }
 		// Winsock operation int result
 		int OperationRes;
         OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
@@ -65,7 +66,7 @@ namespace EN
         else
         {
 			ServerConnectionSocket = INVALID_SOCKET;
-            std::cerr << "Error: failed connect to server." << std::endl;
+            LOG(Warning, "Error: failed connect to server");
             return false;
         }
 
@@ -106,7 +107,7 @@ namespace EN
 	{
 		if (ServerConnectionSocket != INVALID_SOCKET)
 			TCP_Send(ServerConnectionSocket, message);
-		else std::cerr << "Error: the server is not connected" << std::endl;
+		else LOG(Error, "Error: the server is not connected");
 	}
 
 	void EN_TCP_Client::Disconnect()
@@ -136,7 +137,7 @@ namespace EN
 		
 		if (ServerConnectionSocket != INVALID_SOCKET)
 		{
-			std::cerr << "Error: You forgot to disconnect from the server. Use method Disconnect() to do this" << std::endl;
+            LOG(Error, "Error: You forgot to disconnect from the server. Use method Disconnect() to do this");
 			exit(1);
 		}
 	}

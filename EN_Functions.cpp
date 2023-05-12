@@ -333,7 +333,7 @@ namespace EN
 
 				if (SendBytes <= 0)
 				{
-					std::cerr << "\nFailed to send file: " << FileName << std::endl;
+                    LOG(Error, "Failed to send file: " + FileName);
 					SendingFile.close();
 					delete[] MessageBuf;
 					return false;
@@ -352,7 +352,7 @@ namespace EN
 
 			if (SendBytes <= 0)
 			{
-				std::cerr << "\nFailed to send file: " << FileName << std::endl;
+                LOG(Error, "Failed to send file: " + FileName);
 				SendingFile.close();
 				delete[] MessageBuf;
 				return false;
@@ -363,10 +363,9 @@ namespace EN
 
 			SendingFile.close();
 		}
-
 		else
 		{
-			std::cerr << "\nFailed to open file: " << FileName << std::endl;
+            LOG(Error, "Failed to open file: " + FileName);
 			delete[] MessageBuf;
 			return false;
 		}
@@ -381,7 +380,7 @@ namespace EN
 		std::string FileInfo;
 		if (EN::TCP_Recv(FileSendSocket, FileInfo) == false)
 		{
-			std::cerr << "\nFailed to received file name" << std::endl;
+            LOG(Error, "Failed to received file name");
 			return false;
 		}
 		
@@ -438,7 +437,7 @@ namespace EN
 
 				if (ReceiveBytes <= 0)
 				{
-					std::cerr << "\nFailed to received file: " << FileName << std::endl;
+                    LOG(Error, "Failed to received file: " + FileName);
 					ReceivedFile.close();
 					delete[] MessageBuf;
 					return false;
@@ -455,7 +454,7 @@ namespace EN
 
 			if (ReceiveBytes <= 0)
 			{
-				std::cerr << "\nFailed to received file: " << FileName << std::endl;
+                LOG(Error, "Failed to received file: " + FileName);
 				ReceivedFile.close();
 				delete[] MessageBuf;
 				return false;
@@ -470,7 +469,7 @@ namespace EN
 		}
 		else
 		{
-			std::cerr << "\nFailed to send file: " << FileName << std::endl;
+            LOG(Error, "Failed to send file: " + FileName);
 			delete[] MessageBuf;
 			return false;
 		}
@@ -485,7 +484,7 @@ namespace EN
 		std::string FileInfo;
 		if (EN::TCP_Recv(FileSendSocket, FileInfo) == false)
 		{
-			std::cerr << "\nFailed to received file name" << std::endl;
+            LOG(Error, "Failed to received file name");
 			return false;
 		}
 
@@ -494,7 +493,7 @@ namespace EN
 
 		if (!IsFileExist(FileName))
 		{
-			std::cerr << "No file to re-receive!" << std::endl;
+            LOG(Error, "No file to re-receive!");
 			return false;
 		}
 
@@ -536,7 +535,7 @@ namespace EN
 
 				if (ReceiveBytes <= 0)
 				{
-					std::cerr << "\nFailed to received file: " << FileName << std::endl;
+                    LOG(Error, "Failed to received file: " + FileName);
 					ReceivedFile.close();
 					delete[] MessageBuf;
 					return false;
@@ -553,7 +552,7 @@ namespace EN
 
 			if (ReceiveBytes <= 0)
 			{
-				std::cerr << "\nFailed to received file: " << FileName << std::endl;
+                LOG(Error, "Failed to received file: " + FileName);
 				ReceivedFile.close();
 				delete[] MessageBuf;
 				return false;
@@ -568,7 +567,7 @@ namespace EN
 		}
 		else
 		{
-			std::cerr << "\nFailed to send file: " << FileName << std::endl;
+            LOG(Error, "Failed to send file: " + FileName);
 			delete[] MessageBuf;
 			return false;
 		}
@@ -583,7 +582,7 @@ namespace EN
 		std::string FileInfo;
 		if (EN::TCP_Recv(SourceFileSocket, FileInfo) == false)
 		{
-			std::cerr << "\nFailed to received file name" << std::endl;
+            LOG(Error, "Failed to received file name");
 			return false;
 		}
 		
@@ -624,8 +623,7 @@ namespace EN
 
 			if (ReceiveBytes <= 0)
 			{
-				std::cerr << "\nFailed to forward file" << std::endl;
-
+                LOG(Error, "Failed to forward file");
 				delete[] MessageBuf;
 				return false;
 			}
@@ -635,7 +633,7 @@ namespace EN
 
 			if (SendBytes <= 0)
 			{
-				std::cerr << "\nFailed to forward file" << std::endl;
+				LOG(Error, "Failed to forward file");
 				delete[] MessageBuf;
 				return false;
 			}
@@ -651,7 +649,7 @@ namespace EN
 
 		if (ReceiveBytes <= 0)
 		{
-			std::cerr << "\nFailed to forward file" << std::endl;
+			LOG(Error, "Failed to forward file");
 			delete[] MessageBuf;
 			return false;
 		}
@@ -661,7 +659,7 @@ namespace EN
 
 		if (SendBytes <= 0)
 		{
-			std::cerr << "\nFailed to forward file" << std::endl;
+			LOG(Error, "Failed to forward file");
 			delete[] MessageBuf;
 			return false;
 		}
@@ -736,7 +734,8 @@ namespace EN
 
 		if (!file.is_open())
 		{
-			std::cerr << "Couldn't open the file" << std::endl;
+            LOG(Error, "Couldn't open the file");
+            return 0;
 		}
 		else
 			FileSize = file.tellg();

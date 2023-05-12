@@ -6,8 +6,8 @@ namespace EN
 	{
 		if (IsConnected())
 			return EN::SendFile(GetSocket(), FileName, IsStop, ProgressFunction, DelayInMilliseconds);
-		else std::cerr << "Error: the server is not connected" << std::endl;
-		std::cout << "File transfer ended" << std::endl;
+		else LOG(Warning, "Error: the server is not connected");
+        LOG(Message, "File transfer ended");
 		return false;
 	}
 

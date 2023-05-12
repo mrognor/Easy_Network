@@ -178,7 +178,7 @@ namespace EN
 				TCP_Server->SendToClient(ClientId, message, MessageDelay);
 			else UDP_Server->SendToClient(UDPIpAddresses[ClientId], message);
 		}
-		else std::cerr << "The client is not connected" << std::endl;
+		else LOG(Warning, "The client is not connected");
 	}
 
 	EN_RAU_Server::~EN_RAU_Server()

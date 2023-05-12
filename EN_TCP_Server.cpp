@@ -24,7 +24,7 @@ namespace EN
 
 		if (ServerListenSocket == INVALID_SOCKET)
 		{
-			std::cerr << "Error: cannot create socket" << std::endl;
+            LOG(Error, "Error: cannot create socket: " + std::to_string(GETSOCKETERRNO()));
 		}
 
 		int OperationRes;
@@ -32,14 +32,14 @@ namespace EN
 
 		if (OperationRes == SOCKET_ERROR)
 		{
-			std::cerr << "Error: cannot bind socket" << std::endl;
+            LOG(Error, "Error: cannot bind socket: " + std::to_string(GETSOCKETERRNO()));
 		}
 
 		OperationRes = listen(ServerListenSocket, SOMAXCONN);
 
 		if (OperationRes == SOCKET_ERROR)
 		{
-			std::cerr << "Error: cannot listen socket" << std::endl;
+            LOG(Error, "Error: cannot listen socket: " + std::to_string(GETSOCKETERRNO()));
 		}
 
 		EN_SOCKET IncomingConnection;
@@ -68,8 +68,8 @@ namespace EN
 
 			if (IncomingConnection == INVALID_SOCKET)
 			{
-				std::cerr << "Error: Client connection failure." << std::endl;
-				std::cerr << "Tip: check server ip" << std::endl;
+                LOG(Error, "Error: Client connection failure: " + std::to_string(GETSOCKETERRNO()));
+                LOG(Warning, "Accept on server listen socket return invalid socket. It may occur by invalid server ip address");
 				break;
 			}
 			else
