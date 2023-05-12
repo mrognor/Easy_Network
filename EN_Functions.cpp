@@ -753,4 +753,141 @@ namespace EN
 		usleep(milliseconds * 1000);
 		#endif
 	}
+
+    int GetCPUCores() { return std::thread::hardware_concurrency(); }
+
+    int GetCurrentSecond()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return ltm->tm_sec;
+    }
+
+    int GetCurrentMinute()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return ltm->tm_min;
+    }
+
+    int GetCurrentHour()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return ltm->tm_hour;
+    }
+
+    int GetCurrentMonthDay()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return ltm->tm_mday;
+    }
+
+    int GetCurrentYearDay()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return (ltm->tm_yday + 1);
+    }
+
+    int GetCurrentMonth()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return (ltm->tm_mon + 1);
+    }
+
+    int GetCurrentYear()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        return (ltm->tm_year + 1900);
+    }
+
+    std::string GetCurrentDate(bool IsAmericanFormat)
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        std::string currentDate;
+
+        switch(ltm->tm_wday)
+        {
+        case 0:
+            currentDate += "Mon"; break;
+        case 1:
+            currentDate += "Tue"; break;
+        case 2:
+            currentDate += "Wed"; break;
+        case 3:
+            currentDate += "Thu"; break;
+        case 4:
+            currentDate += "Fri"; break;
+        case 5:
+            currentDate += "Sat"; break;
+        case 6:
+            currentDate += "Sun"; break;
+        }
+
+        currentDate += " ";
+
+        if (!IsAmericanFormat)
+        {
+            if (ltm->tm_mon < 9) currentDate += "0";
+            currentDate += std::to_string(ltm->tm_mon + 1);
+            currentDate += ".";
+
+            if (ltm->tm_mday < 10) currentDate += "0";
+            currentDate += std::to_string(ltm->tm_mday);
+            currentDate += ".";
+        }
+        else
+        {
+            if (ltm->tm_mday < 10) currentDate += "0";
+            currentDate += std::to_string(ltm->tm_mday);
+            currentDate += ".";
+
+            if (ltm->tm_mon < 9) currentDate += "0";
+            currentDate += std::to_string(ltm->tm_mon + 1);
+            currentDate += ".";
+        }
+
+        currentDate += std::to_string(1900 + ltm->tm_year);
+
+        return currentDate;
+    }
+
+    std::string GetCurrentDayTime()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        std::string currentTime;
+
+        if (ltm->tm_hour < 10) currentTime += "0";
+        currentTime += std::to_string(ltm->tm_hour);
+        currentTime += ".";
+        if (ltm->tm_min < 10) currentTime += "0";
+        currentTime += std::to_string(ltm->tm_min);
+        currentTime += ".";
+        if (ltm->tm_sec < 10) currentTime += "0";
+        currentTime += std::to_string(ltm->tm_sec);
+        
+        return currentTime;
+    }
+
+    std::string GetLocalTime()
+    {
+        time_t now = time(0);
+        std::string res(ctime(&now));
+        res.pop_back();
+        return res;
+    }
+
+    std::string GetUTCTime()
+    {
+        time_t now = time(0);
+        tm *gmtm = gmtime(&now);
+        char *dt = asctime(gmtm);
+        return std::string(dt);
+    }
 }
