@@ -55,7 +55,7 @@ namespace EN
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
         {
-            LOG(Error, "Error at socket: " + std::to_string(GETSOCKETERRNO()));
+            LOG(Error, "Error at socket: " + std::to_string(GETSOCKETERRNO()) + " " + EN::GetSocketError());
         }
 		// Winsock operation int result
 		int OperationRes;

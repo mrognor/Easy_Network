@@ -755,6 +755,36 @@ namespace EN
 
     int GetCPUCores() { return std::thread::hardware_concurrency(); }
 
+	std::string GetSocketError(int socketErrorCode)
+    {
+        #if defined WIN32 || defined _WIN64 
+
+        if (socketErrorCode  == -1)
+            socketErrorCode = WSAGetLastError();
+
+        char msgBuf [256];
+        msgBuf [0] = '\0';
+        FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL,
+                    socketErrorCode,
+                    MAKELANGID (LANG_ENGLISH, SUBLANG_DEFAULT),
+                    msgBuf,
+                    sizeof (msgBuf),
+                    NULL);
+
+        char *nl = strrchr(msgBuf, '\n');
+        if (nl) *nl = 0;
+        return std::string(msgBuf);
+
+        #else
+
+        if (socketErrorCode  == -1)
+            socketErrorCode = errno;
+        return strerror(errno);
+
+        #endif
+    }
+
     int GetCurrentSecond()
     {
         time_t now = time(0);

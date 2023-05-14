@@ -4,9 +4,18 @@
 
 #include <WS2tcpip.h>
 #include <Winsock2.h>
+
+#ifndef TCP_KEEPIDLE
 #define TCP_KEEPIDLE 3
+#endif
+
+#ifndef TCP_KEEPCNT
 #define TCP_KEEPCNT 16
+#endif
+
+#ifndef TCP_KEEPINTVL
 #define TCP_KEEPINTVL 17
+#endif
 
 typedef SOCKET EN_SOCKET;
 

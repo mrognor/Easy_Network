@@ -157,6 +157,13 @@ namespace EN
 	/// \brief Returns the number of processor cores
 	int GetCPUCores();
 
+    /** 
+        Return string description to socket error
+        \param [in] socketErrorCode Socket error code. Optional parameter.
+        If you do not specify it, the function itself will take the last socket error from the operating system
+    */ 
+    std::string GetSocketError(int socketErrorCode = -1);
+    
     /// Return current second
     int GetCurrentSecond();
 

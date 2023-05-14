@@ -15,19 +15,25 @@ namespace EN
         case Message:
             if (MaxLogLevel > 0)
                 break;
-            std::cerr << "[message] " << logMessage << std::endl;
+            std::cerr << GetCurrentDayTime() << " [message] " << logMessage << std::endl;
+            break;
+
+        case Hint:
+            if (MaxLogLevel > 0)
+                break;
+            std::cerr << "\x1B[94m" << GetCurrentDayTime() << " [hint] " << logMessage << "\033[0m" << std::endl;
             break;
 
         case Warning:
             if (MaxLogLevel > 1)
                 break;
-            std::cerr << "\x1B[33m[warning] " << logMessage << "\033[0m" << std::endl;
+            std::cerr << "\x1B[33m" << GetCurrentDayTime() << " [warning] " << logMessage << "\033[0m" << std::endl;
             break;
 
         case Error:
             if (MaxLogLevel > 2)
                 break;
-            std::cerr << "\x1B[31m[error] " << logMessage << "\033[0m" << std::endl;
+            std::cerr << "\x1B[31m" << GetCurrentDayTime() << " [error] " << logMessage << "\033[0m" << std::endl;
             break;
         }
     }
