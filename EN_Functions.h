@@ -299,6 +299,8 @@ namespace EN
 		Works with standart data types. Use this function if your data 
 		types support next operators: >>, <<, &
 
+        \warning This function does not work with negative numbers.
+
 		One char takes 1 byte, and a int takes 4 bytes. 
 		If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
 		This function turns a number into a character, since a character occupies a byte, 
@@ -311,6 +313,8 @@ namespace EN
     {
         std::string str;
 
+        if (n == 0) str += '\0';
+        
         while(n > 0)
         {
 			// Get last eight bits. Equals to % 256
@@ -326,18 +330,21 @@ namespace EN
 		Works with custom data types. Use this function if your data 
 		types dont support next operators: >>, <<, &
 
+        \warning This function does not work with negative numbers.
+
 		One char takes 1 byte, and a int takes 4 bytes. 
 		If you try to translate the number 120 into a string, then you will have 3 characters or 3 bytes.
 		This function turns a number into a character, since a character occupies a byte, 
 		then you can transfer numbers up to 255 in one byte. 
 		This function can be considered as the translation of a number into a number system with a base of 256
-		This function does not work with negative numbers.
 	*/
 	template <class T>
     std::string WIntToString(T n)
     {
         std::string str;
 
+        if (n == 0) str += '\0';
+        
         while(n > 0)
         {
             str += (unsigned char)(n % T(256));
@@ -353,6 +360,7 @@ namespace EN
 		types support next operators: >>, <<, &
 		Works with strings from function EN::IntToString.
 		\warning Dont forget to specify returning value using <type>. Example: int i = StringToInt<int>("string")
+        \warning Don't forget that the IntToString function doesn't work with negative numbers
 	*/
     template <class T>
     T StringToInt(const std::string& str)
@@ -373,6 +381,7 @@ namespace EN
 		types dont support next operators: >>, <<, &
 		Works with strings from function EN::IntToString.
 		\warning Dont forget to specify returning value using <type>. Example: int i = WStringToInt<int>("string")
+        \warning Don't forget that the IntToString function doesn't work with negative numbers
 	*/
     template <class T>
     T WStringToInt(const std::string& str)
