@@ -8,7 +8,6 @@
 #include <winsock2.h>
 #include <WS2tcpip.h>
 typedef SOCKET EN_SOCKET;
-#define GETSOCKETERRNO() (WSAGetLastError())
 
 #else
 
@@ -19,7 +18,6 @@ typedef SOCKET EN_SOCKET;
 #include <netinet/in.h>
 #include <arpa/inet.h>
 typedef int EN_SOCKET;
-#define GETSOCKETERRNO() (errno)
 
 #endif
 
@@ -154,15 +152,19 @@ namespace EN
 	/// Crossplatform function for program suspension
 	void Delay(int milliseconds);
 
-	/// \brief Returns the number of processor cores
+	/// Returns the number of processor cores
 	int GetCPUCores();
+
+    
+    /// Return last socket error code 
+    int GetSocketErrorCode();
 
     /** 
         Return string description to socket error
         \param [in] socketErrorCode Socket error code. Optional parameter.
         If you do not specify it, the function itself will take the last socket error from the operating system
     */ 
-    std::string GetSocketError(int socketErrorCode = -1);
+    std::string GetSocketErrorString(int socketErrorCode = -1);
     
     /// Return current second
     int GetCurrentSecond();
@@ -185,7 +187,8 @@ namespace EN
     /// Return current year
     int GetCurrentYear();
 
-    /** \brief Function for getting the current date
+    /** 
+        \brief Function for getting the current date
         \param [in] IsAmericanFormat A variable for specifying the format of the returned date. By default, the parameter is false
         If the parameter is empty or false, the function returns the date in normal format: dd.mm.yyyy.
         Otherwise it will return in the american format: mm.dd.yyyy.

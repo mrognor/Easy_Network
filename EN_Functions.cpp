@@ -755,7 +755,16 @@ namespace EN
 
     int GetCPUCores() { return std::thread::hardware_concurrency(); }
 
-	std::string GetSocketError(int socketErrorCode)
+    int GetSocketErrorCode()
+    {
+        #if defined WIN32 || defined _WIN64 
+            return WSAGetLastError();
+        #else
+            return (errno);
+        #endif
+    }
+
+	std::string GetSocketErrorString(int socketErrorCode)
     {
         #if defined WIN32 || defined _WIN64 
 
