@@ -117,6 +117,18 @@ namespace EN
 		*/
 		void SendToServer(std::string message, int MessageDelay = 10);
 
+        /**
+			\brief Method that wait new incoming message from client
+
+            \warning Since the ServerMessageHandler runs in a separate thread, the call to the WaitMessage method must be in the same thread.  
+            This is necessary so that there is no waiting for a new message in different threads, which leads to undefined behavior.
+            Note that you still can use this function on client connection because ServerMessageHandler invokes after AfterConnect.
+
+			\param[in] message The string to store incoming message
+            \return Returns true in case of success, false if it was disconnection  
+		*/
+        bool WaitMessage(std::string& message);
+        
 		/// This function disconnect client from server
 		void Disconnect();
 

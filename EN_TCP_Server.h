@@ -118,6 +118,19 @@ namespace EN
 		void SendToClient(int ClientId, std::string message, int MessageDelay = 10);
 
         /**
+			\brief Method that wait new incoming message from client
+
+            \warning Since the ClientMessageHandler runs in a separate thread, the call to the WaitMessage method must be in the same thread.  
+            This is necessary so that there is no waiting for a new message in different threads, which leads to undefined behavior.
+            Note that you still can use this function on client connection because ClientMessageHandler invokes after OnClientConnected.
+            
+            \param[in] ClientID The number of the client 
+			\param[in] message The string to store incoming message
+            \return Returns true in case of success, false if it was disconnection 
+		*/
+        bool WaitMessage(int ClientId, std::string& message);
+
+        /**
            \brief The method sets options for accept socket.
            Accept socket accepts incoming connections from clients
 

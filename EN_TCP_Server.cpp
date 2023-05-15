@@ -24,7 +24,7 @@ namespace EN
 
 		if (ServerListenSocket == INVALID_SOCKET)
 		{
-            LOG(Error, "Error: cannot create socket: " + std::to_string(GETSOCKETERRNO()) + " " + EN::GetSocketError());
+            LOG(Error, "Error: cannot create socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
 		}
 
 		int OperationRes;
@@ -32,14 +32,14 @@ namespace EN
 
 		if (OperationRes == SOCKET_ERROR)
 		{
-            LOG(Error, "Error: cannot bind socket: " + std::to_string(GETSOCKETERRNO()) + " " + EN::GetSocketError());
+            LOG(Error, "Error: cannot bind socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
 		}
 
 		OperationRes = listen(ServerListenSocket, SOMAXCONN);
 
 		if (OperationRes == SOCKET_ERROR)
 		{
-            LOG(Error, "Error: cannot listen socket: " + std::to_string(GETSOCKETERRNO()) + " " + EN::GetSocketError());
+            LOG(Error, "Error: cannot listen socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
 		}
 
 		EN_SOCKET IncomingConnection;
@@ -68,7 +68,7 @@ namespace EN
 
 			if (IncomingConnection == INVALID_SOCKET)
 			{
-                LOG(Error, "Error: Client connection failure: " + std::to_string(GETSOCKETERRNO()) + " " + EN::GetSocketError());
+                LOG(Error, "Error: Client connection failure: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
                 LOG(Hint, "Accept on server listen socket return invalid socket. It may occur by invalid server ip address");
 				break;
 			}
@@ -156,6 +156,11 @@ namespace EN
 		if (ClientId < ClientSockets.size() && ClientSockets[ClientId] != INVALID_SOCKET)
 			EN::TCP_Send(ClientSockets[ClientId], message, MessageDelay);
 	}
+
+    bool EN_TCP_Server::WaitMessage(int ClientId, std::string& message)
+    {
+        return EN::TCP_Recv(ClientSockets[ClientId], message);
+    }
 
     void EN_TCP_Server::SetAcceptSocketOption(int level, int optionName, int optionValue)
     {

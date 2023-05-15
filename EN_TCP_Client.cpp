@@ -55,7 +55,7 @@ namespace EN
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
         {
-            LOG(Error, "Error at socket: " + std::to_string(GETSOCKETERRNO()) + " " + EN::GetSocketError());
+            LOG(Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
         }
 		// Winsock operation int result
 		int OperationRes;
@@ -109,6 +109,11 @@ namespace EN
 			TCP_Send(ServerConnectionSocket, message);
 		else LOG(Error, "Error: the server is not connected");
 	}
+
+    bool EN_TCP_Client::WaitMessage(std::string& message)
+    {
+        return EN::TCP_Recv(ServerConnectionSocket, message);
+    }
 
 	void EN_TCP_Client::Disconnect()
 	{
