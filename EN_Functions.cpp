@@ -843,31 +843,29 @@ namespace EN
         return (ltm->tm_year + 1900);
     }
 
+    std::string GetCurrentDayWeek()
+    {
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+
+        switch(ltm->tm_wday)
+        {
+        case 0: return "Monday";
+        case 1: return "Tuesday";
+        case 2: return "Wednesday"; 
+        case 3: return "Thursday";
+        case 4: return "Friday";
+        case 5: return "Saturday";
+        case 6: return "Sunday";
+        }
+        return "";
+    }
+
     std::string GetCurrentDate(bool IsAmericanFormat)
     {
         time_t now = time(0);
         tm* ltm = localtime(&now);
         std::string currentDate;
-
-        switch(ltm->tm_wday)
-        {
-        case 0:
-            currentDate += "Mon"; break;
-        case 1:
-            currentDate += "Tue"; break;
-        case 2:
-            currentDate += "Wed"; break;
-        case 3:
-            currentDate += "Thu"; break;
-        case 4:
-            currentDate += "Fri"; break;
-        case 5:
-            currentDate += "Sat"; break;
-        case 6:
-            currentDate += "Sun"; break;
-        }
-
-        currentDate += " ";
 
         if (!IsAmericanFormat)
         {

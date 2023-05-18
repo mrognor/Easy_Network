@@ -18,28 +18,28 @@ namespace EN
             if (MaxLogLevel > 0)
                 break;
             mtx.lock();
-            std::cerr << GetCurrentDayTime() << " [message] " << logMessage << std::endl;
+            std::cerr << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [message] " << logMessage << std::endl;
             break;
 
         case Hint:
             if (MaxLogLevel > 0)
                 break;
             mtx.lock();
-            std::cerr << "\x1B[94m" << GetCurrentDayTime() << " [hint] " << logMessage << "\033[0m" << std::endl;
+            std::cerr << "\x1B[94m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [hint] " << logMessage << "\033[0m" << std::endl;
             break;
 
         case Warning:
             if (MaxLogLevel > 1)
                 break;
             mtx.lock();
-            std::cerr << "\x1B[33m" << GetCurrentDayTime() << " [warning] " << logMessage << "\033[0m" << std::endl;
+            std::cerr << "\x1B[33m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [warning] " << logMessage << "\033[0m" << std::endl;
             break;
 
         case Error:
             if (MaxLogLevel > 2)
                 break;
             mtx.lock();
-            std::cerr << "\x1B[31m" << GetCurrentDayTime() << " [error] " << logMessage << "\033[0m" << std::endl;
+            std::cerr << "\x1B[31m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [error] " << logMessage << "\033[0m" << std::endl;
             break;
         }
         mtx.unlock();

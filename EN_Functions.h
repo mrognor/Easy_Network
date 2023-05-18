@@ -187,13 +187,15 @@ namespace EN
     /// Return current year
     int GetCurrentYear();
 
+    /// Returns the name of today's day of the week
+    std::string GetCurrentDayWeek();
+
     /** 
         \brief Function for getting the current date
         \param [in] IsAmericanFormat A variable for specifying the format of the returned date. By default, the parameter is false
         If the parameter is empty or false, the function returns the date in normal format: dd.mm.yyyy.
         Otherwise it will return in the american format: mm.dd.yyyy.
-        \return Return current date in string with format: "day_week_name date" where day_week_name only 3 first char, first char is Capital like Mon or Sun,
-        date is date in format dd.mm.yyyy or mm.dd.yyyy depends on input param
+        \return Return current date in string with format: dd.mm.yyyy or mm.dd.yyyy depends on input param
     */  
     std::string GetCurrentDate(bool IsAmericanFormat = false);
 
