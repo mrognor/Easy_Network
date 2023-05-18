@@ -78,13 +78,14 @@ namespace EN
                     setsockopt(IncomingConnection, it.Level, it.OptionName, (const char *)&it.OptionValue, sizeof(it.OptionValue));
 
 				bool WasReusedSocket = false;
+
 				for (int i = 0; i < ClientSockets.size(); i++)
 				{
 					if (ClientSockets[i] == INVALID_SOCKET)
 					{
+						ClientSockets[i] = IncomingConnection;
 						std::thread ClientHandlerThread([this, i]() { this->ClientHandler(i); });
 						ClientHandlerThread.detach();
-						ClientSockets[i] = IncomingConnection;
 						WasReusedSocket = true;
 						break;
 					}
@@ -93,7 +94,8 @@ namespace EN
 				{
 					ClientSockets.push_back(IncomingConnection);
 
-					std::thread ClientHandlerThread([this]() { this->ClientHandler(ClientSockets.size() - 1); });
+					int i = ClientSockets.size() - 1;
+					std::thread ClientHandlerThread([this, i]() { this->ClientHandler(i); });
 					ClientHandlerThread.detach();
 				}
 			}
