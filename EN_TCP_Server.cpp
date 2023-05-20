@@ -12,7 +12,6 @@ namespace EN
 
 		// Configure ip address
 		sockaddr_in ServerAddress;
-		int sizeofaddr = sizeof(ServerAddress);
 		ServerAddress.sin_family = AF_INET;
 		ServerAddress.sin_port = htons(Port);
 		
@@ -48,6 +47,7 @@ namespace EN
 		// Handle new connections
 		while (true)
 		{
+            int sizeofaddr = sizeof(ServerAddress);
 			#if defined WIN32 || defined _WIN64
 			IncomingConnection = accept(ServerListenSocket, (sockaddr*)&ServerAddress, &sizeofaddr);
 			#else
@@ -122,7 +122,7 @@ namespace EN
 			ClientMessageHandler(message, ClientID);
 		}
 
-		CloseSocket(ClientID);
+        CloseSocket(ClientSockets[ClientID]);
 		ClientSockets[ClientID] = INVALID_SOCKET;
 		if (ClientID == ClientSockets.size() - 1)
 			ClientSockets.pop_back();
