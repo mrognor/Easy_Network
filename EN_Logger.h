@@ -10,11 +10,7 @@
 #include <string>
 
 #ifndef DISABLE_LOGGER
-    #define LOG(logLevel, messageString)             \
-        if (EN::LogFunc == nullptr)                      \
-            DefaultLogFunc(logLevel, messageString); \
-        else                                         \
-            EN::LogFunc(logLevel, messageString);
+    #define LOG(logLevel, messageString) EN::LogFunc(logLevel, messageString);
 #else
     #define LOG(logLevel, messageString)
 #endif

@@ -3,7 +3,7 @@
 namespace EN
 {
     int MaxLogLevel = -1;
-    void (*LogFunc)(logLevels, std::string) = nullptr;
+    void (*LogFunc)(logLevels, std::string) = DefaultLogFunc;
 
     void DefaultLogFunc(logLevels logLevel, std::string logMessage)
     {
