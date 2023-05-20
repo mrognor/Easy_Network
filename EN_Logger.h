@@ -26,8 +26,8 @@ namespace EN
     /// Logging levels
     enum logLevels
     {
-        Message, ///< Message. A simple message with some debugging information
-        Hint, ///< Hint. A hint for correcting errors. All hints are created manually
+        Info, ///< Info. A simple message with some debugging information
+        Hint, ///< Hint. A message with hint for correcting errors. All hints are created manually
         Warning, ///< Warning. Warning message about possible errors
         Error ///< Error. Critical error messages
     };
@@ -60,9 +60,9 @@ namespace EN
         The message level will be passed to the logLevels type parameter. 
         The message itself is passed to the std::string type parameter
         \param [in] maxLogLevel Optional parametr to set maximal logging level. 
-        By default set to Message what means which means that all messages will be processing
+        By default set to Info what means which means that all messages will be processing
     */
-    void SetLogFunc(void (*logFunc)(logLevels, std::string), logLevels maxLogLevel = Message);
+    void SetLogFunc(void (*logFunc)(logLevels, std::string), logLevels maxLogLevel = Info);
 
     /// Set maximal log level
     void SetMaxLogLevel(logLevels maxLogLevel);

@@ -10,11 +10,11 @@ namespace EN
         static std::mutex mtx;
 
         if (MaxLogLevel == -1)
-            MaxLogLevel = Message;
+            MaxLogLevel = Info;
 
         switch (logLevel)
         {
-        case Message:
+        case Info:
             if (MaxLogLevel > 0)
                 break;
             mtx.lock();
