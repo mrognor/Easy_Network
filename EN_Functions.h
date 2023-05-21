@@ -36,6 +36,33 @@ typedef int EN_SOCKET;
 
 namespace EN
 {
+    #if defined WIN32 || defined _WIN64
+    /// This class is necessary for initialization and cleaning of the windows wsa network subsystem. 
+    /// It will be created before calling main and destroyed after exiting main. Works only on windows
+    class WSA_Init_Cleanup
+    {
+    public:
+        WSA_Init_Cleanup()
+        { 
+            // WSAStartup
+            WSAData wsaData;
+            if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
+            {
+                std::cerr << "Error: Library initialization failure." << std::endl;
+                exit(1);
+            }
+        }
+
+        ~WSA_Init_Cleanup()
+        {
+	        // Clean after wsa
+	        WSACleanup();
+        }
+    };
+
+    extern WSA_Init_Cleanup WSA_IC;
+    #endif
+
 	/// Function for getting an ip address from a url.
 	/// \param[in] url address to get ip
 	/// \return Return host ip or empty string if cannot get host ip.

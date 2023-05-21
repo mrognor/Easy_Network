@@ -74,9 +74,6 @@ namespace EN
 		virtual void BeforeDisconnect() = 0;
 
 	public:
-		/// Default constructor. On Windows initiate winsock api
-		EN_TCP_Client();
-
 		/// Server port getter
 		int GetServerPort() { return ServerPort; }
 

@@ -46,22 +46,6 @@ namespace EN
 		}
 	}
 
-	EN_UDP_Server::EN_UDP_Server()
-	{
-		#if defined WIN32 || defined _WIN64
-		//WSAStartup
-		WSAData wsaData;
-        // Winsock operation int result
-		int OperationRes;
-		OperationRes = WSAStartup(MAKEWORD(2, 1), &wsaData);
-		if (OperationRes != 0)
-		{
-			LOG(Error, "WSAStartup failed: " + OperationRes);
-			exit(1);
-		}
-		#endif
-	}
-
 	void EN_UDP_Server::Run()
 	{
 		ShutdownMutex.lock();
@@ -202,12 +186,5 @@ namespace EN
 	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message, int messageDelay)
 	{
 		EN::UDP_Send(UDP_ServerSocket, ClientIpAddress, message, messageDelay);
-	}
-
-	EN_UDP_Server::~EN_UDP_Server()
-	{
-		#if defined WIN32 || defined _WIN64
-		WSACleanup();
-		#endif
 	}
 }

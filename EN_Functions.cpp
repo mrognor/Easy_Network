@@ -2,6 +2,10 @@
 
 namespace EN
 {
+	#if defined WIN32 || defined _WIN64
+	WSA_Init_Cleanup WSA_IC = WSA_Init_Cleanup();
+	#endif
+	
 	std::string GetIpByURL(std::string url)
 	{
 		// First is gethostbyname. Return hostent struct

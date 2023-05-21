@@ -104,10 +104,6 @@ namespace EN
 		virtual bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) = 0;
 
 	public:
-
-		// Default constructor. Port: 1111. Ip address: 127.0.0.1(localhost)
-		EN_UDP_Server();
-
 		/// Port getter
 		int GetPort() { return Port; }
 
@@ -127,7 +123,5 @@ namespace EN
 			\param[in] ClientSocketAddr string with server address. Format: 127.0.0.1:1111
 		*/
 		void SendToClient(std::string ClientIpAddress, std::string message, int messageDelay = 10);
-
-		~EN_UDP_Server();
 	};
 }

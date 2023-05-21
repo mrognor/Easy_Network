@@ -2,23 +2,6 @@
 
 namespace EN
 {
-	EN_TCP_Client::EN_TCP_Client()
-	{
-		#if defined WIN32 || defined _WIN64
-		//WSAStartup
-		WSAData wsaData;
-		// Winsock operation int result
-		int OperationRes;
-		OperationRes = WSAStartup(MAKEWORD(2, 1), &wsaData);
-
-		if (OperationRes != 0)
-		{
-            LOG(Error, "WSAStartup failed: " + OperationRes);
-			exit(1);
-		}
-		#endif
-	}
-
 	bool EN_TCP_Client::IsConnected()
 	{
 		if (ServerConnectionSocket != INVALID_SOCKET)
@@ -135,11 +118,7 @@ namespace EN
     }
 
 	EN_TCP_Client::~EN_TCP_Client()
-	{
-		#if defined WIN32 || defined _WIN64
-		WSACleanup();
-		#endif
-		
+	{	
 		if (ServerConnectionSocket != INVALID_SOCKET)
 		{
             LOG(Error, "Error: You forgot to disconnect from the server. Use method Disconnect() to do this");

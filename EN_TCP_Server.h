@@ -80,9 +80,6 @@ namespace EN
 		virtual void OnClientDisconnect(int ClientID) = 0;
 
 	public:
-
-		EN_TCP_Server();
-
 		/// Port getter
 		int GetPort() { return Port; }
 

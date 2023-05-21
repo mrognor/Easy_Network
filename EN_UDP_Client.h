@@ -49,9 +49,6 @@ namespace EN
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 	public:
-		// Default constructor. Initiate winsock api
-		EN_UDP_Client();
-
 		/// Server port getter
 		int GetPort() { return ServerPort; }
 
@@ -74,9 +71,6 @@ namespace EN
 
 		/// Function to stop client
 		void Stop();
-
-		// Default destructor
-		~EN_UDP_Client();
 	};
 }
 

@@ -2,10 +2,6 @@
 
 namespace EN
 {
-	EN_TCP_Server::EN_TCP_Server()
-	{
-	}
-
 	void EN_TCP_Server::Run()
 	{
 		ShutdownMutex.lock();

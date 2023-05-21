@@ -2,23 +2,6 @@
 
 namespace EN
 {
-	EN_UDP_Client::EN_UDP_Client()
-	{
-		#if defined WIN32 || defined _WIN64
-		//WSAStartup
-		WSAData wsaData;
-		// Winsock operation int result
-		int OperationRes;
-		OperationRes = WSAStartup(MAKEWORD(2, 1), &wsaData);
-
-		if (OperationRes != 0)
-		{
-            LOG(Error, "WSAStartup failed: " + OperationRes);
-			exit(1);
-		}
-		#endif
-	}
-
 	void EN_UDP_Client::Run()
 	{
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
@@ -67,12 +50,5 @@ namespace EN
 	void EN_UDP_Client::Stop()
 	{
 		CloseSocket(ServerConnectionSocket);
-	}
-
-	EN_UDP_Client::~EN_UDP_Client()
-	{
-		#if defined WIN32 || defined _WIN64
-		WSACleanup();
-		#endif
 	}
 }

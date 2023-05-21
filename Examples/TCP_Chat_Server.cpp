@@ -58,16 +58,6 @@ int main()
 	// Uncomment this code to make server standart console input.
 	// Using this you can write logic to kick clients or shutdown server
 	
-	#if defined WIN32 || defined _WIN64
-	//WSAStartup
-	WSAData wsaData;
-	if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
-	{
-		std::cerr << "Error: Library initialization failure." << std::endl;
-		exit(1);
-	}
-	#endif
-
 	MyServer A;
 
 	std::thread th([&A]() { A.Run(); });
@@ -90,9 +80,4 @@ int main()
 		
 		A.SendToClient(0, message);
 	}
-
-	#if defined WIN32 || defined _WIN64
-	//WSAStartup
-	WSACleanup();
-	#endif
 }
