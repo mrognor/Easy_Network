@@ -61,8 +61,7 @@ int main()
 	MyServer A;
 
 	std::thread th([&A]() { A.Run(); });
-	th.detach();
-
+	
 	std::string message;
 
 	while (true)
@@ -80,4 +79,6 @@ int main()
 		
 		A.SendToClient(0, message);
 	}
+
+	th.join();
 }

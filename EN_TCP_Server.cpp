@@ -75,7 +75,7 @@ namespace EN
 
 				bool WasReusedSocket = false;
 
-				for (int i = 0; i < ClientSockets.size(); i++)
+				for (int i = 0; i < ClientSockets.size(); ++i)
 				{
 					if (ClientSockets[i] == INVALID_SOCKET)
 					{
@@ -133,7 +133,7 @@ namespace EN
 	void EN_TCP_Server::Shutdown()
 	{
 		IsShutdown = true;
-
+		
 		// Check what server successfully started
 		while (true)
 		{

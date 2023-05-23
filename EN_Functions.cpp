@@ -214,7 +214,8 @@ namespace EN
 	{
 		#if defined WIN32 || defined _WIN64
 		closesocket(sock);
-		#else 
+		#else
+		shutdown(sock, SHUT_RDWR);
 		close(sock);
 		#endif
 	}
@@ -871,7 +872,7 @@ namespace EN
         tm* ltm = localtime(&now);
         std::string currentDate;
 
-        if (!IsAmericanFormat)
+        if (IsAmericanFormat)
         {
             if (ltm->tm_mon < 9) currentDate += "0";
             currentDate += std::to_string(ltm->tm_mon + 1);
