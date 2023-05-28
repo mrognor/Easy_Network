@@ -285,7 +285,7 @@ namespace EN
     template <class T>
     std::string GetCurrentDayTimeWithSecondFraction()
     {
-        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::high_resolution_clock::now();
+        const auto now = std::chrono::system_clock::now();
         time_t cnow = std::chrono::system_clock::to_time_t(now);
         tm* ltm = localtime(&cnow);
         std::string currentTime;
