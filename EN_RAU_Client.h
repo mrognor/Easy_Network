@@ -22,13 +22,13 @@ namespace EN
 		EN_RAU_TCP_Client(EN_RAU_Client* rau_Client);
 
 		// A function to be defined by the user. It is used for logic after connection
-		void AfterConnect() {};
+		void OnConnect() {};
 
 		// A function to be defined by the user. It is used to process incoming messages from the server
 		void ServerMessageHandler(std::string message);
 
-		// A function to be defined by the user. Performed before disconnected from the server
-		void BeforeDisconnect();
+		// A function to be defined by the user. Performed after disconnected from the server
+		void OnDisconnect();
 	};
 
 	class EN_RAU_UDP_Client : public EN_UDP_Client
@@ -87,7 +87,7 @@ namespace EN
 			
 			\warning Must be defined by the user
 		*/
-		virtual void AfterConnect() = 0; 
+		virtual void OnConnect() = 0; 
 
 		/**
 			\brief The function processes all incoming messages
@@ -98,12 +98,12 @@ namespace EN
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 		/**
-			\brief The function is called before disconnecting from the server.
+			\brief The function is called after disconnecting from the server.
 
 			Important! If disconnection occurs from the server side or connection lost, the IsConnected() function returns false
 			\warning Must be defined by the user
 		*/
-		virtual void BeforeDisconnect() = 0;
+		virtual void OnDisconnect() = 0;
 
 	public:
 		EN_RAU_Client();

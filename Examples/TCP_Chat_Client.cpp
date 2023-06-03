@@ -8,7 +8,7 @@ public:
 	MyClient(){}
 
 	// A function to be defined by the user. It is used for logic after connection
-	void AfterConnect() {}
+	void OnConnect() {}
 
 	// A function to be defined by the user. It is used to process incoming messages from the server
 	void ServerMessageHandler(std::string message)
@@ -16,19 +16,10 @@ public:
 		std::cout << message << std::endl;
 	}
 
-	// A function to be defined by the user. Performed before disconnected from the server
-	void BeforeDisconnect()
+	// A function to be defined by the user. Performed after disconnected from the server
+	void OnDisconnect()
 	{
-		// Check if server still connected
-		// The connection can be terminated both from the client side and from the server side. 
-		// If the client is disconnected, then we can send the final message to the server. 
-		// If the server then we will not be able to send the message
-		if (IsConnected())
-		{
-			SendToServer("Goodbye");
-			std::cout << "Client disconnected" << std::endl;
-		}
-		else std::cout << "Server disconnected. Enter any key to close terminal." << std::endl;
+		std::cout << "Server disconnected." << std::endl;
 	}
 };
 
@@ -62,10 +53,12 @@ int main()
 
 		else break;
 	}
-
+	
 	// Disconnect client from server if still connected
 	if (A.IsConnected())
 		A.Disconnect();
+
+	EN::Delay(100);
 
 	return 0;
 }

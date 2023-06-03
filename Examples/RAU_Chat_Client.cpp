@@ -10,7 +10,7 @@ public:
 	}
 
 	// A function to be defined by the user. It is used for logic after connection
-	void AfterConnect() 
+	void OnConnect() 
 	{ 
 		SendToServer("Hello"); 
 	}
@@ -21,15 +21,10 @@ public:
 		std::cout << message << std::endl;
 	}
 
-	// A function to be defined by the user. Performed before disconnected from the server
-	void BeforeDisconnect()
+	// A function to be defined by the user. Performed after disconnected from the server
+	void OnDisconnect()
 	{
-		if (IsConnected())
-		{
-			SendToServer("Goodbye");
-			std::cout << "Client disconnected" << std::endl;
-		}
-		else std::cout << "Server disconnected. Press any key to try to reconnect" << std::endl;
+		std::cout << "Server disconnected." << std::endl;
 	}
 };
 

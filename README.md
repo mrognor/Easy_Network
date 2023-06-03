@@ -91,9 +91,9 @@ An example of using the class can be found here: https://github.com/mrognor/Easy
 
 ### EN_TCP_Client  
 You have to define 3 methods  
-1. void AfterConnect()  
+1. void OnConnect()  
 2. void ServerMessageHandler(std::string message)  
-3. void BeforeDisconnect()  
+3. void OnDisconnect()  
 
 To connect to the server, you need to call the function Connect.  
 Before shutting down the program, you need to disconnect from the server using the method Disconnect  
@@ -134,9 +134,9 @@ An example of using the class can be found here: https://github.com/mrognor/Easy
 
 ### EN_RAU_Client  
 You have to define 3 methods  
-1. void AfterConnect()  
+1. void OnConnect()  
 2. void ServerMessageHandler(std::string message)  
-3. void BeforeDisconnect()  
+3. void OnDisconnect()  
 
 To connect to the server, you need to call the function Connect.  
 Before shutting down the program, you need to disconnect from the server using the method Disconnect  

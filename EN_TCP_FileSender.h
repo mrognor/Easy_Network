@@ -8,13 +8,13 @@ namespace EN
 	private:
 
 		/// A function to be defined by the user. It is used for logic after connection
-		void AfterConnect() {};
+		void OnConnect() {};
 
 		/// This method does nothing but we have to redefine it to work correctly
 		void ServerMessageHandler(std::string message) {};
 
 		/// This method does nothing but we have to redefine it to work correctly
-		void BeforeDisconnect() {};
+		void OnDisconnect() {};
 
 		/// Variable to stop file transmission
 		bool IsStop = false;

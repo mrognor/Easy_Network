@@ -45,7 +45,7 @@ namespace EN
         OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
             
         if (OperationRes == 0)
-			AfterConnect();
+			OnConnect();
         else
         {
 			ServerConnectionSocket = INVALID_SOCKET;
@@ -71,19 +71,13 @@ namespace EN
 			if (IsServerConnected == false)
 			{
 				CloseSocket(ServerConnectionSocket);
-				// Check if disconnect was from client side and BeforeDisconnect() was alredy invoked
-				if (!IsClientDisconnect)
-				{
-					ServerConnectionSocket = INVALID_SOCKET;
-					BeforeDisconnect();
-					IsClientDisconnect = false;
-				}
+				ServerConnectionSocket = INVALID_SOCKET;
+				OnDisconnect();
 				return;
 			}
 
 			ServerMessageHandler(message);
 		}
-
 	}
 
 	void EN_TCP_Client::SendToServer(std::string message, int MessageDelay)
@@ -100,10 +94,7 @@ namespace EN
 
 	void EN_TCP_Client::Disconnect()
 	{
-		BeforeDisconnect();
-		IsClientDisconnect = true;
 		CloseSocket(ServerConnectionSocket);
-		ServerConnectionSocket = INVALID_SOCKET;
 	}
 
     void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)

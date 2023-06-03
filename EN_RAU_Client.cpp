@@ -15,7 +15,7 @@ namespace EN
 			if (RAU_Client->IsServerGetUDPAddress == false)
 			{
 				RAU_Client->IsServerGetUDPAddress = true;
-				RAU_Client->AfterConnect();
+				RAU_Client->OnConnect();
 			}
 			else
 			{
@@ -29,9 +29,9 @@ namespace EN
 			RAU_Client->ClientId = std::atoi(message.c_str());
 	}
 
-	void EN_RAU_TCP_Client::BeforeDisconnect()
+	void EN_RAU_TCP_Client::OnDisconnect()
 	{
-		RAU_Client->BeforeDisconnect();
+		RAU_Client->OnDisconnect();
 		RAU_Client->UDP_Client->Stop();
 
 		Delay(300);

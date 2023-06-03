@@ -44,10 +44,6 @@ namespace EN
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
-
-		// Variable for understanding the server or client is disconnected
-		bool IsClientDisconnect = false;
-
 	protected:
 
 		/**
@@ -55,7 +51,7 @@ namespace EN
 			
 			\warning Must be defined by the user
 		*/
-		virtual void AfterConnect() = 0;
+		virtual void OnConnect() = 0;
 
 		/**
 			\brief The function processes all incoming messages
@@ -66,12 +62,11 @@ namespace EN
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 		/**
-			\brief The function is called before disconnecting from the server.
+			\brief The function is called after disconnecting from the server.
 
-			Important! If disconnection occurs from the server side or connection lost, the IsConnected() function returns false
 			\warning Must be defined by the user
 		*/
-		virtual void BeforeDisconnect() = 0;
+		virtual void OnDisconnect() = 0;
 
 	public:
 		/// Server port getter
@@ -119,7 +114,7 @@ namespace EN
 
             \warning Since the ServerMessageHandler runs in a separate thread, the call to the WaitMessage method must be in the same thread.  
             This is necessary so that there is no waiting for a new message in different threads, which leads to undefined behavior.
-            Note that you still can use this function on client connection because ServerMessageHandler invokes after AfterConnect.
+            Note that you still can use this function on client connection because ServerMessageHandler invokes after OnConnect.
 
 			\param[in] message The string to store incoming message
             \return Returns true in case of success, false if it was disconnection  
@@ -149,7 +144,7 @@ namespace EN
         void SetSocketOption(PredefinedSocketOptions socketOptions);
 
 		// Default destructor
-		~EN_TCP_Client();
+		virtual ~EN_TCP_Client();
 	};
 }
 
