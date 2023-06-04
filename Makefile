@@ -48,46 +48,54 @@ bin/ParallelFor$(FILEEXT): bin/libEasyNetwork.a Examples/ParallelFor.cpp
 	g++ $(CXXFLAGS) Examples/ParallelFor.cpp -I. -Lbin -lEasyNetwork -o bin/ParallelFor$(FILEEXT) $(LDFLAGS)
 	
 # Library binary
-bin/libEasyNetwork.a: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o
-	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o
+bin/libEasyNetwork.a: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o
+	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o
 	ranlib bin/libEasyNetwork.a
 
 # Build all object files
-bin/EN_RAU_Client.o: EN_RAU_Client.cpp EN_RAU_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_RAU_Client.o: EN_RAU_Client.cpp EN_RAU_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_RAU_Client.cpp -o bin/EN_RAU_Client.o 
+	g++ $(CXXFLAGS) -c EN_RAU_Client.cpp -o bin/EN_RAU_Client.o
 
-bin/EN_RAU_Server.o: EN_RAU_Server.cpp EN_RAU_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_RAU_Server.o: EN_RAU_Server.cpp EN_RAU_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_RAU_Server.cpp -o bin/EN_RAU_Server.o 
+	g++ $(CXXFLAGS) -c EN_RAU_Server.cpp -o bin/EN_RAU_Server.o
 
-bin/EN_UDP_Client.o: EN_UDP_Client.cpp EN_UDP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_UDP_Client.o: EN_UDP_Client.cpp EN_UDP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_UDP_Client.cpp -o bin/EN_UDP_Client.o 
+	g++ $(CXXFLAGS) -c EN_UDP_Client.cpp -o bin/EN_UDP_Client.o
 
-bin/EN_UDP_Server.o: EN_UDP_Server.cpp EN_UDP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_UDP_Server.o: EN_UDP_Server.cpp EN_UDP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_UDP_Server.cpp -o bin/EN_UDP_Server.o 
+	g++ $(CXXFLAGS) -c EN_UDP_Server.cpp -o bin/EN_UDP_Server.o
 
-bin/EN_TCP_FileSender.o: EN_TCP_FileSender.cpp EN_TCP_FileSender.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_TCP_FileSender.o: EN_TCP_FileSender.cpp EN_TCP_FileSender.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_TCP_FileSender.cpp -o bin/EN_TCP_FileSender.o
 
-bin/EN_TCP_Server.o: EN_TCP_Server.cpp EN_TCP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_TCP_Server.o: EN_TCP_Server.cpp EN_TCP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_TCP_Server.cpp -o bin/EN_TCP_Server.o 
+	g++ $(CXXFLAGS) -c EN_TCP_Server.cpp -o bin/EN_TCP_Server.o
 
-bin/EN_TCP_Client.o: EN_TCP_Client.cpp EN_TCP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_TCP_Client.o: EN_TCP_Client.cpp EN_TCP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_TCP_Client.cpp -o bin/EN_TCP_Client.o 
+	g++ $(CXXFLAGS) -c EN_TCP_Client.cpp -o bin/EN_TCP_Client.o
 
-bin/EN_Functions.o: EN_Functions.cpp EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h
+bin/EN_Functions.o: EN_Functions.cpp EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_Functions.cpp -o bin/EN_Functions.o 
+	g++ $(CXXFLAGS) -c EN_Functions.cpp -o bin/EN_Functions.o
 
-bin/EN_Logger.o: EN_Logger.cpp EN_Logger.h
+bin/EN_Logger.o: EN_Logger.cpp EN_Logger.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
-	g++ $(CXXFLAGS) -c EN_Logger.cpp -o bin/EN_Logger.o 
+	g++ $(CXXFLAGS) -c EN_Logger.cpp -o bin/EN_Logger.o
+
+bin/EN_ThreadGate.o: EN_ThreadGate.cpp EN_ThreadGate.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_ThreadGate.cpp -o bin/EN_ThreadGate.o
+
+bin/EN_ThreadCrossWalk.o: EN_ThreadCrossWalk.cpp EN_ThreadCrossWalk.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_ThreadCrossWalk.cpp -o bin/EN_ThreadCrossWalk.o
 
 # Clean all
 clean:

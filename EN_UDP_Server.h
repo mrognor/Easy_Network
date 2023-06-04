@@ -53,7 +53,7 @@ namespace EN
 		std::list<std::string>** QueueMessageVec;
 		std::list<std::string>** QueueAddrVec;
 		std::list<std::chrono::system_clock::time_point>** QueueTimeVec;
-		EN::EN_Gate** GateVec;
+		EN::EN_ThreadGate** GateVec;
 		std::mutex** Mutexes;
 		std::thread* ThreadVec;
 
