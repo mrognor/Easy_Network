@@ -20,6 +20,7 @@ typedef int EN_SOCKET;
 
 #include "EN_Functions.h"
 #include "EN_SocketOptions.h"
+#include "EN_ThreadCrossWalk.h"
 #include "thread"
 
 namespace EN
@@ -43,6 +44,9 @@ namespace EN
 
 		// Mutex to prevent errors while shutdown before run
 		std::mutex ShutdownMutex;
+
+		// Thread cross walk to synchronize access to ClientSockets between different threads
+		ThreadCrossWalk CrossWalk;
 	protected:
 
 		/// Server port. Default set to 1111

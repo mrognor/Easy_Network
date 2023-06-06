@@ -145,7 +145,8 @@ namespace EN
 			msgBuf[i + messageByteLength] = message[i];
 
 		sendto(sock, (char*)msgBuf, messageLength + messageByteLength, 0, (sockaddr*)&ClientAddr, sizeof(ClientAddr));
-
+		
+		delete[] msgBuf;
 		Delay(MessageDelay);
 	}
 
