@@ -2,57 +2,58 @@
 
 namespace EN
 {
-    int MaxLogLevel = -1;
-    void (*LogFunc)(logLevels, std::string) = DefaultLogFunc;
+    int EnabledLogLevels = ENABLE_LOG_LEVEL_INFO | ENABLE_LOG_LEVEL_HINT | ENABLE_LOG_LEVEL_WARNING | ENABLE_LOG_LEVEL_ERROR;
+    void (*LogFunc)(LogLevels, std::string) = DefaultLogFunc;
 
-    void DefaultLogFunc(logLevels logLevel, std::string logMessage)
+    void DefaultLogFunc(LogLevels logLevel, std::string logMessage)
     {
         static std::mutex mtx;
-
-        if (MaxLogLevel == -1)
-            MaxLogLevel = Info;
 
         switch (logLevel)
         {
         case Info:
-            if (MaxLogLevel > 0)
-                break;
-            mtx.lock();
-            std::cerr << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [message] " << logMessage << std::endl;
+            if (EnabledLogLevels & ENABLE_LOG_LEVEL_INFO)
+            {
+                mtx.lock();
+                std::cerr << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [message] " << logMessage << std::endl;
+            }
             break;
 
         case Hint:
-            if (MaxLogLevel > 0)
-                break;
-            mtx.lock();
-            std::cerr << "\x1B[94m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [hint] " << logMessage << "\033[0m" << std::endl;
+            if (EnabledLogLevels & ENABLE_LOG_LEVEL_HINT)
+            {
+                mtx.lock();
+                std::cerr << "\x1B[94m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [hint] " << logMessage << "\033[0m" << std::endl;
+            }
             break;
 
         case Warning:
-            if (MaxLogLevel > 1)
-                break;
-            mtx.lock();
-            std::cerr << "\x1B[33m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [warning] " << logMessage << "\033[0m" << std::endl;
+            if (EnabledLogLevels & ENABLE_LOG_LEVEL_WARNING)
+            {
+                mtx.lock();
+                std::cerr << "\x1B[33m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [warning] " << logMessage << "\033[0m" << std::endl;
+            }
             break;
 
         case Error:
-            if (MaxLogLevel > 2)
-                break;
-            mtx.lock();
-            std::cerr << "\x1B[31m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [error] " << logMessage << "\033[0m" << std::endl;
+            if (EnabledLogLevels & ENABLE_LOG_LEVEL_ERROR)
+            {
+                mtx.lock();
+                std::cerr << "\x1B[31m" << GetCurrentDate() << " " << GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() << " [error] " << logMessage << "\033[0m" << std::endl;
+            }
             break;
         }
         mtx.unlock();
     }
 
-    void SetLogFunc(void (*logFunc)(logLevels, std::string), logLevels maxLogLevel)
+    void SetLogFunc(void (*logFunc)(LogLevels, std::string), int logLevelsToEnable)
     {
         LogFunc = logFunc;
-        MaxLogLevel = maxLogLevel;
+        EnabledLogLevels = logLevelsToEnable;
     }
 
-    void SetMaxLogLevel(logLevels maxLogLevel)
+    void EnableLogLevels(int logLevelsToEnable)
     {
-        MaxLogLevel = maxLogLevel;
+        EnabledLogLevels = logLevelsToEnable;
     }
 }
