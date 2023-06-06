@@ -80,11 +80,9 @@ namespace EN
 		}
 	}
 
-	void EN_TCP_Client::SendToServer(std::string message, int MessageDelay)
+	bool EN_TCP_Client::SendToServer(std::string message, int MessageDelay)
 	{
-		if (ServerConnectionSocket != INVALID_SOCKET)
-			TCP_Send(ServerConnectionSocket, message);
-		else LOG(Error, "Error: the server is not connected");
+		return TCP_Send(ServerConnectionSocket, message);
 	}
 
     bool EN_TCP_Client::WaitMessage(std::string& message)

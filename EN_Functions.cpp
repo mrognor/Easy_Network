@@ -20,10 +20,10 @@ namespace EN
 			return "";
 	}
 
-	void TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay)
+	bool TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay)
 	{
 		size_t messageLength = message.length();
-
+		int sendedBytes;
 		// If message length more than 128, then set first bit to 1, that means that message
 		// length stored in 2 bytes
 		// If message length less or equal 128, than set first bit to 0, and send only 
@@ -31,16 +31,20 @@ namespace EN
 		if (messageLength >= 128)
 		{
             unsigned char msgBuf[2] = {(unsigned char)((messageLength / 128) | 0b10000000), (unsigned char)(messageLength % 128)};
-            send(sock, (char*)msgBuf, 2, 0);
+            sendedBytes = send(sock, (char*)msgBuf, 2, 0);
+			if (sendedBytes != 2) return false;	
 		}
 		else
 		{
             unsigned char msgBuf[1] = {(unsigned char)messageLength};
-			send(sock, (char*)msgBuf, 1, 0);
+			sendedBytes = send(sock, (char*)msgBuf, 1, 0);
+			if (sendedBytes != 1) return false;	
 		}		
 
-		send(sock, message.c_str(), messageLength, 0);
+		sendedBytes = send(sock, message.c_str(), messageLength, 0);
+		if (sendedBytes != messageLength) return false;
 		Delay(MessageDelay);
+		return true;
 	}
 
 	bool TCP_Recv(EN_SOCKET sock, std::string& message)
@@ -269,7 +273,8 @@ namespace EN
 		uint64_t FileSize = SendingFile.tellg();
 
 		// Send file name and file size
-		EN::TCP_Send(FileSendSocket, FileName + " " + std::to_string(FileSize - PreviouslySendedSize));
+		if (!EN::TCP_Send(FileSendSocket, FileName + " " + std::to_string(FileSize - PreviouslySendedSize)))
+			return false;
 
 		// See file start
 		SendingFile.seekg(0, std::ios::beg);
@@ -591,7 +596,8 @@ namespace EN
 			return false;
 		}
 		
-		EN::TCP_Send(DestinationFileSocket, FileInfo);
+		if (!EN::TCP_Send(DestinationFileSocket, FileInfo))
+			return false;
 
 		uint64_t FileSize = std::stoll(Split(FileInfo)[1]);
 

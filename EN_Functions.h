@@ -73,8 +73,10 @@ namespace EN
 		\param[in] sock socket to send data 
 		\param[in] message message to send
 		\param[in] MessageDelay delay after message sending
+        
+        \return Returns true in case of success, false if it was disconnection 
 	*/
-	void TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay = 10);
+	bool TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay = 10);
 
 	/*!
 		Wrapper over the recv function. Allows you to recv std::string. 

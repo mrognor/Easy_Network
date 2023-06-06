@@ -149,10 +149,10 @@ namespace EN
 		CloseSocket(ServerListenSocket);
 	}
 
-	void EN_TCP_Server::SendToClient(int ClientId, std::string message, int MessageDelay)
+	bool EN_TCP_Server::SendToClient(int ClientId, std::string message, int MessageDelay)
 	{
-		if (ClientId < ClientSockets.size() && ClientSockets[ClientId] != INVALID_SOCKET)
-			EN::TCP_Send(ClientSockets[ClientId], message, MessageDelay);
+		// if (ClientId < ClientSockets.size() && ClientSockets[ClientId] != INVALID_SOCKET)
+		return EN::TCP_Send(ClientSockets[ClientId], message, MessageDelay);
 	}
 
     bool EN_TCP_Server::WaitMessage(int ClientId, std::string& message)
