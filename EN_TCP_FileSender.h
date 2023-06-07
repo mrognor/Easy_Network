@@ -1,3 +1,5 @@
+#pragma once
+
 #include "EN_TCP_Client.h"
 
 namespace EN

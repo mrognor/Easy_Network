@@ -46,7 +46,7 @@ namespace EN
 		std::mutex ShutdownMutex;
 
 		// Thread cross walk to synchronize access to ClientSockets between different threads
-		ThreadCrossWalk CrossWalk;
+		EN_ThreadCrossWalk CrossWalk;
 	protected:
 
 		/// Server port. Default set to 1111
