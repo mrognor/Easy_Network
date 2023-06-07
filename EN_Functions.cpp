@@ -41,7 +41,7 @@ namespace EN
 			if (sendedBytes != 1) return false;	
 		}		
 
-		sendedBytes = send(sock, message.c_str(), messageLength, 0);
+		sendedBytes = send(sock, message.c_str(), (int)messageLength, 0);
 		if (sendedBytes != messageLength) return false;
 		Delay(MessageDelay);
 		return true;
@@ -129,22 +129,22 @@ namespace EN
 		if (messageLength >= 128)
 		{
 			msgBuf = new unsigned char[2  + messageLength];
-			msgBuf[0] = messageLength / 128;
+			msgBuf[0] = (int)(messageLength / 128);
 			msgBuf[0] |= 0b10000000;
-			msgBuf[1] = messageLength % 128;
+			msgBuf[1] = (int)(messageLength % 128);
 			messageByteLength = 2;
 		}
 		else
 		{
 			msgBuf = new unsigned char[1  + messageLength];
-			msgBuf[0] = messageLength;
+			msgBuf[0] = (int)messageLength;
 			messageByteLength = 1;
 		}		
 
 		for (size_t i = 0; i < messageLength; ++i)
 			msgBuf[i + messageByteLength] = message[i];
 
-		sendto(sock, (char*)msgBuf, messageLength + messageByteLength, 0, (sockaddr*)&ClientAddr, sizeof(ClientAddr));
+		sendto(sock, (char*)msgBuf, messageLength + messageByteLength, 0, (sockaddr*)&ClientAddr, (int)sizeof(ClientAddr));
 		
 		delete[] msgBuf;
 		Delay(MessageDelay);
@@ -228,7 +228,7 @@ namespace EN
 	std::vector<std::string> Split(std::string StringToSplit, std::string SplitterString)
 	{
 		std::vector<std::string> ReturnVector;
-		int i = 0;
+		size_t i = 0;
 		std::string SplittedString = "";
 		while (i < StringToSplit.size())
 		{
@@ -689,7 +689,7 @@ namespace EN
 			return;
 
 		std::string AllMeasureName, SpeedName, Eta;
-		int AllMeasureSize, SpeedSize, EtaSize;
+		int AllMeasureSize, SpeedSize, EtaSize = 0;
 
 		AllMeasureName = "KB";
 		AllMeasureSize = 1024;

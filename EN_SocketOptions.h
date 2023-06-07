@@ -60,7 +60,7 @@ namespace EN
         }
     };
 
-    #define TCP_KEEPALIVE PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
+    #define TCP_KEEP_A_LIVE PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
     #define TCP_NO_DELAY PredefinedSocketOptions({IPPROTO_TCP}, {TCP_NODELAY}, {1})
 }
 
