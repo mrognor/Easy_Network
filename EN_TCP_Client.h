@@ -105,9 +105,8 @@ namespace EN
 		/**
 			\brief Function for sending a message to a connected server.
 			\param[in] message the message string to send to the server
-			\param[in] MessageDelay Optional parameter. the time that will pass after sending the message to the server
 		*/
-		bool SendToServer(std::string message, int MessageDelay = 10);
+		bool SendToServer(std::string message);
 
         /**
 			\brief Method that wait new incoming message from client

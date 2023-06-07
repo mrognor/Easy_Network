@@ -170,12 +170,12 @@ namespace EN
 		}
 	}
 
-	void EN_RAU_Server::SendToClient(int ClientId, std::string message, bool IsReliable, int MessageDelay)
+	void EN_RAU_Server::SendToClient(int ClientId, std::string message, bool IsReliable)
 	{
 		if (UDPIpAddresses.size() > ClientId && UDPIpAddresses[ClientId] != "none")
 		{
 			if (IsReliable)
-				TCP_Server->SendToClient(ClientId, message, MessageDelay);
+				TCP_Server->SendToClient(ClientId, message);
 			else UDP_Server->SendToClient(UDPIpAddresses[ClientId], message);
 		}
 		else LOG(Warning, "The client is not connected");

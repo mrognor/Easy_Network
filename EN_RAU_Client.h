@@ -141,9 +141,8 @@ namespace EN
 		/**
 			\brief Function for sending a message to a connected server.
 			\param[in] message the message string to send to the server
-			\param[in] MessageDelay Optional parameter. the time that will pass after sending the message to the server
 		*/
-		void SendToServer(std::string message, bool IsReliable = true, int MessageDelay = 10);
+		void SendToServer(std::string message, bool IsReliable = true);
 
 		/// This function disconnect client from server
 		void Disconnect();

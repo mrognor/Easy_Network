@@ -133,12 +133,12 @@ namespace EN
 		}
 	}
 
-	void EN_RAU_Client::SendToServer(std::string message, bool IsReliable, int MessageDelay)
+	void EN_RAU_Client::SendToServer(std::string message, bool IsReliable)
 	{
 		if (IsReliable)
-			TCP_Client->SendToServer(message, MessageDelay);
+			TCP_Client->SendToServer(message);
 		else
-			UDP_Client->SendToServer(std::to_string(ClientId) + " " + message, MessageDelay);
+			UDP_Client->SendToServer(std::to_string(ClientId) + " " + message);
 	}
 
 	void EN_RAU_Client::Disconnect()

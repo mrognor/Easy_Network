@@ -20,7 +20,7 @@ namespace EN
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &ServerSockAddr.sin_addr);
 
 		// Get port from os
-		EN::UDP_Send(ServerConnectionSocket, "0.0.0.0:0", "", 0);
+		EN::UDP_Send(ServerConnectionSocket, "0.0.0.0:0", "");
 
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
@@ -42,9 +42,9 @@ namespace EN
 		}
 	}
 
-	void EN_UDP_Client::SendToServer(std::string message, int MessageDelay)
+	void EN_UDP_Client::SendToServer(std::string message)
 	{
-		EN::UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), message, MessageDelay);
+		EN::UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), message);
 	}
 
 	void EN_UDP_Client::Stop()

@@ -183,8 +183,8 @@ namespace EN
 			GateVec[i]->Open();
 	}
 
-	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message, int messageDelay)
+	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message)
 	{
-		EN::UDP_Send(UDP_ServerSocket, ClientIpAddress, message, messageDelay);
+		EN::UDP_Send(UDP_ServerSocket, ClientIpAddress, message);
 	}
 }

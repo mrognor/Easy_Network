@@ -72,11 +72,10 @@ namespace EN
 		Wrapper over the send function. Allows you to send std::string. 
 		\param[in] sock socket to send data 
 		\param[in] message message to send
-		\param[in] MessageDelay delay after message sending
         
         \return Returns true in case of success, false if it was disconnection 
 	*/
-	bool TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay = 10);
+	bool TCP_Send(EN_SOCKET sock, const std::string& message);
 
 	/*!
 		Wrapper over the recv function. Allows you to recv std::string. 
@@ -91,17 +90,17 @@ namespace EN
 		\param[in] sock socket to send data
 		\param[in] ipAddress destination ip address and port
 		\param[in] message string to put received data
-		\param[in] MessageDelay delay after message sending
+
 		\return Returns true in case of success, false if it was disconnection 
 	*/ 
-	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message, int MessageDelay);
+	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message);
 
 	/*!
 		Wrapper over the recv function. Allows you to recv std::string. 
 		\param[in] sock socket to get data
 		\param[in] ipAddress source ip address and port
 		\param[out] message string to put received data
-		\param[in] MessageDelay delay after message sending
+
 		\return Returns true in case of success, false if it was disconnection 
 	*/ 
 	bool UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message);

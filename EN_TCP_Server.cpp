@@ -178,12 +178,12 @@ namespace EN
 		CloseSocket(ServerListenSocket);
 	}
 
-	bool EN_TCP_Server::SendToClient(int ClientId, std::string message, int MessageDelay)
+	bool EN_TCP_Server::SendToClient(int ClientId, std::string message)
 	{
 		bool res = false;
 		CrossWalk.CarStartCrossRoad();
 		if (ClientSockets.size() > ClientId)
-			res = EN::TCP_Send(ClientSockets[ClientId], message, MessageDelay);
+			res = EN::TCP_Send(ClientSockets[ClientId], message);
 		CrossWalk.CarStopCrossRoad();
 		return res;
 	}

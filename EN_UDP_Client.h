@@ -65,9 +65,8 @@ namespace EN
 			\brief Function for sending a message to a connected server
 
 			\param[in] message string to send to server
-			\param[in] MessageDelay Additional parameter, it takes the delay in executing the code to send the message
 		*/
-		void SendToServer(std::string message, int MessageDelay = 10);
+		void SendToServer(std::string message);
 
 		/// Function to stop client
 		void Stop();

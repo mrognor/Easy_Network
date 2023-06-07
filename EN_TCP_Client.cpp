@@ -80,7 +80,7 @@ namespace EN
 		}
 	}
 
-	bool EN_TCP_Client::SendToServer(std::string message, int MessageDelay)
+	bool EN_TCP_Client::SendToServer(std::string message)
 	{
 		return TCP_Send(ServerConnectionSocket, message);
 	}

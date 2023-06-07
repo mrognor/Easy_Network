@@ -20,7 +20,7 @@ namespace EN
 			return "";
 	}
 
-	bool TCP_Send(EN_SOCKET sock, const std::string& message, int MessageDelay)
+	bool TCP_Send(EN_SOCKET sock, const std::string& message)
 	{
 		size_t messageLength = message.length();
 		int sendedBytes;
@@ -43,7 +43,7 @@ namespace EN
 
 		sendedBytes = send(sock, message.c_str(), messageLength, 0);
 		if (sendedBytes != messageLength) return false;
-		Delay(MessageDelay);
+
 		return true;
 	}
 
@@ -108,7 +108,7 @@ namespace EN
 		return true;
 	}
 
-	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message, int MessageDelay)
+	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message)
 	{
 		auto SplittedAddr = Split(destinationAddress, ":");
 		sockaddr_in ClientAddr;
@@ -147,7 +147,6 @@ namespace EN
 		sendto(sock, (char*)msgBuf, messageLength + messageByteLength, 0, (sockaddr*)&ClientAddr, sizeof(ClientAddr));
 		
 		delete[] msgBuf;
-		Delay(MessageDelay);
 	}
 
 	bool UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message)

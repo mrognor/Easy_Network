@@ -23,7 +23,7 @@ public:
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
-		std::cout << message << std::endl;
+		std::cout << "msg: " << message << std::endl;
 
 		// Disconnect client
 		if (message == "TCP d" || message == "UDP d")

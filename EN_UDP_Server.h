@@ -122,6 +122,6 @@ namespace EN
 			\param[in] message string to send to server
 			\param[in] ClientSocketAddr string with server address. Format: 127.0.0.1:1111
 		*/
-		void SendToClient(std::string ClientIpAddress, std::string message, int messageDelay = 10);
+		void SendToClient(std::string ClientIpAddress, std::string message);
 	};
 }

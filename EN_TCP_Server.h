@@ -110,11 +110,10 @@ namespace EN
 
 			\param[in] ClientID The number of the client 
 			\param[in] message The message to be sent to the client 
-			\param[in] MessageDelay The delay after sending message
 
 			\return Returns true in case of success, false if it was disconnection  
 		*/
-		bool SendToClient(int ClientId, std::string message, int MessageDelay = 10);
+		bool SendToClient(int ClientId, std::string message);
 
         /**
 			\brief Method that wait new incoming message from client
