@@ -87,7 +87,7 @@ namespace EN
 		std::string GetIpAddr() { return IpAddress; }
 
 		/// The function returns the number of connected devices
-		int GetConnectionsCount() { return ClientSockets.size(); }
+		size_t GetConnectionsCount();
 
 		/// The function returns whether the server is running
 		bool GetIsShutdown() { return IsShutdown; }

@@ -108,7 +108,7 @@ namespace EN
 		std::string GetIpAddr() { return IpAddress; }
 
 		/// The function returns the number of connected devices
-		int GetConnectionsCount() { return TCP_Server->GetConnectionsCount(); }
+		size_t GetConnectionsCount() { return TCP_Server->GetConnectionsCount(); }
 
 		/// Method to start server.
 		void Run();

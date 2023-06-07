@@ -2,6 +2,14 @@
 
 namespace EN
 {
+	size_t EN_TCP_Server::GetConnectionsCount()
+	{ 
+		CrossWalk.CarStartCrossRoad();
+		size_t res = ClientSockets.size();
+		CrossWalk.CarStopCrossRoad();
+		return res;
+	}
+
 	void EN_TCP_Server::Run()
 	{
 		ShutdownMutex.lock();
@@ -56,7 +64,6 @@ namespace EN
 				CrossWalk.PedestrianStartCrossRoad();
 				for (EN_SOCKET sock : ClientSockets)
 					CloseSocket(sock);
-				ClientSockets.clear();
 				CrossWalk.PedestrianStopCrossRoad();
 
 				CloseSocket(IncomingConnection);
@@ -94,13 +101,23 @@ namespace EN
 				{
 					ClientSockets.push_back(IncomingConnection);
 
-					int i = ClientSockets.size() - 1;
+					int i = (int)ClientSockets.size() - 1;
 					std::thread ClientHandlerThread([this, i]() { this->ClientHandler(i); });
 					ClientHandlerThread.detach();
 				}
 				CrossWalk.PedestrianStopCrossRoad();
 			}
 		}
+
+		// Wait while all clients disconnect
+		while (true)
+		{
+			CrossWalk.PedestrianStartCrossRoad();
+			if (ClientSockets.size() == 0)
+				break;
+			CrossWalk.PedestrianStopCrossRoad();
+		}
+		CrossWalk.PedestrianStopCrossRoad();
 	}
 
 	void EN_TCP_Server::ClientHandler(int ClientID)
@@ -133,21 +150,18 @@ namespace EN
 
 		CrossWalk.PedestrianStartCrossRoad();
 
-		if (ClientSockets.size() > ClientID)
+		ClientSockets[ClientID] = INVALID_SOCKET;
+		if (ClientID == ClientSockets.size() - 1)
 		{
-			ClientSockets[ClientID] = INVALID_SOCKET;
-			if (ClientID == ClientSockets.size() - 1)
+			for (int i = (int)ClientSockets.size() - 1; i >= 0; --i)
 			{
-				for (int i = ClientSockets.size() - 1; i >= 0; --i)
-				{
-					if (ClientSockets[i] == INVALID_SOCKET)
-						ClientSockets.pop_back();
-					else
-						break;
-				}
+				if (ClientSockets[i] == INVALID_SOCKET)
+					ClientSockets.pop_back();
+				else
+					break;
 			}
 		}
-			
+
 		CrossWalk.PedestrianStopCrossRoad();
 	}
 
@@ -190,7 +204,7 @@ namespace EN
 
     bool EN_TCP_Server::WaitMessage(int ClientId, std::string& message)
     {
-		EN_SOCKET clientSocket;
+		EN_SOCKET clientSocket = INVALID_SOCKET;
 		CrossWalk.CarStartCrossRoad();
 		if (ClientSockets.size() > ClientId)
 			clientSocket = ClientSockets[ClientId];
