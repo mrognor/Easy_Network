@@ -1,13 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <fstream>
 
 #if defined WIN32 || defined _WIN64
 #include <winsock2.h>
 #include <Windows.h>
 #endif
-
-#include <string>
 
 #ifndef DISABLE_LOGGER
     #define LOG(logLevel, messageString) EN::LogFunc(logLevel, messageString);
@@ -39,18 +39,14 @@ namespace EN
         \brief Maximum logging level
 
         Using this variable, you can disable the output of unnecessary messages.
-        0 level does not disable anything.
-        1 level disables messages and prompts.
-        2 level disables the same as the first level plus warnings.
-        3 level disables the same as the second level plus errors.
-        If you have not added your own levels, then this level is equivalent to completely disabling all logging.
+        Use EnableLogLevels functions to turn on only required log levels.
     */
     extern int EnabledLogLevels;
 
     /// Pointer to logging function
     extern void (*LogFunc)(LogLevels, std::string);
 
-    /// \brief Default logging function
+    /// \brief Default logging function. Write all to cerr
     /// \param [in] logLevel The type of this message
     /// \param [in] logMessage The message itself
     void DefaultLogFunc(LogLevels logLevel, std::string logMessage);
@@ -71,9 +67,20 @@ namespace EN
     /**
         \brief Enable log levels.
 
-        \param [in] logLevelsToEnable Optional parametr for fine-tuning the required logging levels.
+        \param [in] logLevelsToEnable Parametr for fine-tuning the required logging levels.
         Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
         Using the logical operator |, you can combine the necessary logging levels.
     */
     void EnableLogLevels(int logLevelsToEnable);
+
+    /**
+        \brief Enable file log levels.
+
+        \param [in] logLevelsToEnable Parametr for fine-tuning the required logging levels.
+        Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
+        Using the logical operator |, you can combine the necessary logging levels.
+        \param [in] fileName The name of the file to record this logging level
+        \param [in] openMode Optional parametr to open log files. Works like standart fstream open. 
+    */
+    void SetLogLevelsFile(int logLevelsToEnable, std::string fileName, std::ios_base::openmode openMode = (std::ios_base::openmode)16);
 }
