@@ -11,15 +11,16 @@
 
 #ifndef DISABLE_LOGGER
     #define LOG(logLevel, messageString) EN::LogFunc(logLevel, messageString);
-    // Dont use this. Diable logger using -DDISABLE_LOGGER key when compile project
-    #define ENABLE_LOG_LEVEL_NONE    0b00000000
-    #define ENABLE_LOG_LEVEL_INFO    0b00000001
-    #define ENABLE_LOG_LEVEL_HINT    0b00000010
-    #define ENABLE_LOG_LEVEL_WARNING 0b00000100
-    #define ENABLE_LOG_LEVEL_ERROR   0b00001000
 #else
     #define LOG(logLevel, messageString)
 #endif
+
+// Dont use this. Diable logger using -DDISABLE_LOGGER key when compile project
+#define ENABLE_LOG_LEVEL_NONE    0b00000000
+#define ENABLE_LOG_LEVEL_INFO    0b00000001
+#define ENABLE_LOG_LEVEL_HINT    0b00000010
+#define ENABLE_LOG_LEVEL_WARNING 0b00000100
+#define ENABLE_LOG_LEVEL_ERROR   0b00001000
 
 #include "EN_Functions.h"
 

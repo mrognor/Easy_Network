@@ -7,6 +7,8 @@ ifeq ($(OS), Windows_NT)
 	FILEEXT = .exe
 endif
 
+#use -D DISABLE_LOGGER to disable logger
+
 debug: CXXFLAGS += -g
 debug: all
 
