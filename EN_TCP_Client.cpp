@@ -53,8 +53,12 @@ namespace EN
             return false;
         }
 
-		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
-		ServerHandlerThread.detach();
+		ServerHandlerMtx.lock();
+		if (ServerHandlerThread.joinable())
+			ServerHandlerThread.join();
+		ServerHandlerMtx.unlock();
+
+		ServerHandlerThread = std::thread([this]() { this->ServerHandler(); });
 		return true;
 	}
 
@@ -93,6 +97,10 @@ namespace EN
 	void EN_TCP_Client::Disconnect()
 	{
 		CloseSocket(ServerConnectionSocket);
+		ServerHandlerMtx.lock();
+		if (ServerHandlerThread.get_id() != std::this_thread::get_id() && ServerHandlerThread.joinable())
+			ServerHandlerThread.join();
+		ServerHandlerMtx.unlock();
 	}
 
     void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)
@@ -109,9 +117,11 @@ namespace EN
 	EN_TCP_Client::~EN_TCP_Client()
 	{	
 		if (ServerConnectionSocket != INVALID_SOCKET)
-		{
             LOG(Error, "Error: You forgot to disconnect from the server. Use method Disconnect() to do this");
-			exit(1);
-		}
+
+		ServerHandlerMtx.lock();
+		if (ServerHandlerThread.joinable())
+			ServerHandlerThread.join();
+		ServerHandlerMtx.unlock();
 	}
 }

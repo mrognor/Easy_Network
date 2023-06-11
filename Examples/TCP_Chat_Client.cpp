@@ -58,7 +58,5 @@ int main()
 	if (A.IsConnected())
 		A.Disconnect();
 
-	EN::Delay(100);
-
 	return 0;
 }

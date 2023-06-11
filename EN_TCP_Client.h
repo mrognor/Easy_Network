@@ -41,6 +41,12 @@ namespace EN
 		// Socket to connect to server. Library wrapper for your operating system socket
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 
+		// Thread to handle incoming from server messages
+		std::thread ServerHandlerThread;
+		
+		// Mutex to synchronize server handler logic
+		std::mutex ServerHandlerMtx;
+
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
