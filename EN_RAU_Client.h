@@ -22,7 +22,7 @@ namespace EN
 		EN_RAU_TCP_Client(EN_RAU_Client* rau_Client);
 
 		// A function to be defined by the user. It is used for logic after connection
-		void OnConnect() {};
+		void OnConnect();
 
 		// A function to be defined by the user. It is used to process incoming messages from the server
 		void ServerMessageHandler(std::string message);
@@ -109,10 +109,10 @@ namespace EN
 		EN_RAU_Client();
 
 		/// Server port getter
-		int GetServerPort() { return ServerPort; }
+		int GetServerPort();
 
 		/// Server ip getter
-		std::string GetServerIpAddress() { return ServerIpAddress; }
+		std::string GetServerIpAddress();
 
 		/// Function return true if client connected to server
 		bool IsConnected();

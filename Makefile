@@ -50,8 +50,8 @@ bin/ParallelFor$(FILEEXT): bin/libEasyNetwork.a Examples/ParallelFor.cpp
 	g++ $(CXXFLAGS) Examples/ParallelFor.cpp -I. -Lbin -lEasyNetwork -o bin/ParallelFor$(FILEEXT) $(LDFLAGS)
 	
 # Library binary
-bin/libEasyNetwork.a: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o
-	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o
+bin/libEasyNetwork.a: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o bin/EN_SocketOptions.o
+	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_TCP_FileSender.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_RAU_Server.o bin/EN_RAU_Client.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o bin/EN_SocketOptions.o
 	ranlib bin/libEasyNetwork.a
 
 # Build all object files
@@ -90,6 +90,10 @@ bin/EN_Functions.o: EN_Functions.cpp EN_Functions.h EN_SocketOptions.h EN_Thread
 bin/EN_Logger.o: EN_Logger.cpp EN_Logger.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_Logger.cpp -o bin/EN_Logger.o
+
+bin/EN_SocketOptions.o: EN_SocketOptions.h EN_SocketOptions.cpp EN_Functions.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_SocketOptions.cpp -o bin/EN_SocketOptions.o
 
 bin/EN_ThreadGate.o: EN_ThreadGate.cpp EN_ThreadGate.h
 	mkdir -p bin

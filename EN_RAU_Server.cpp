@@ -86,6 +86,8 @@ namespace EN
 		RAU_Server = rau_Server;
 	}
 
+	void EN_RAU_UDP_Server::ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived) {};
+
 	bool EN_RAU_UDP_Server::InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
 	{
 		int ThreadID = std::atoi(message.substr(0, message.find(" ")).c_str());
@@ -113,6 +115,12 @@ namespace EN
 		TCP_Server = new EN_RAU_TCP_Server(this);
 		UDP_Server = new EN_RAU_UDP_Server(this);
 	}
+
+	int EN_RAU_Server::GetPort() { return Port; }
+
+	std::string EN_RAU_Server::GetIpAddr() { return IpAddress; }
+
+	size_t EN_RAU_Server::GetConnectionsCount() { return TCP_Server->GetConnectionsCount(); }
 
 	void EN_RAU_Server::ThreadQueueHandler(int ClientID)
 	{

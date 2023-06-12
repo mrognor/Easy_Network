@@ -3,6 +3,10 @@
 
 namespace EN
 {
+	int EN_UDP_Server::GetPort() { return Port; }
+
+	std::string EN_UDP_Server::GetIpAddr() { return IpAddress; }
+	
 	void EN_UDP_Server::ThreadListHandler(int ThreadID)
 	{
 		while (true)

@@ -9,6 +9,8 @@
 #include <Windows.h>
 #endif
 
+#include "EN_Functions.h"
+
 #ifndef DISABLE_LOGGER
     #define LOG(logLevel, messageString) EN::LogFunc(logLevel, messageString);
 #else
@@ -22,7 +24,6 @@
 #define ENABLE_LOG_LEVEL_WARNING 0b00000100
 #define ENABLE_LOG_LEVEL_ERROR   0b00001000
 
-#include "EN_Functions.h"
 
 namespace EN
 {

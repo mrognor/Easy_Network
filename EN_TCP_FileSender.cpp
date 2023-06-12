@@ -2,6 +2,14 @@
 
 namespace EN
 {
+	void EN_TCP_FileSender::OnConnect() {};
+
+	void EN_TCP_FileSender::ServerMessageHandler(std::string message) {};
+
+	void EN_TCP_FileSender::OnDisconnect() {};
+
+	EN_TCP_FileSender::EN_TCP_FileSender() : EN_TCP_Client() {};
+
 	bool EN_TCP_FileSender::SendFileToServer(std::string FileName, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int DelayInMilliseconds)
 	{
 		if (IsConnected())
@@ -30,4 +38,6 @@ namespace EN
 		if (IsConnected())
 			bool IsServerConnected = EN::TCP_Recv(GetSocket(), msg);
 	}
+
+	void EN_TCP_FileSender::StopDownloading() { IsStop = true; }
 }

@@ -2,6 +2,12 @@
 
 namespace EN
 {
+	int EN_TCP_Client::GetServerPort() { return ServerPort; }
+
+	std::string EN_TCP_Client::GetServerIpAddress() { return ServerIpAddress; }
+
+	EN_SOCKET EN_TCP_Client::GetSocket() { return ServerConnectionSocket; }
+
 	bool EN_TCP_Client::IsConnected()
 	{
 		if (ServerConnectionSocket != INVALID_SOCKET)

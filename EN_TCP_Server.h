@@ -81,16 +81,16 @@ namespace EN
 
 	public:
 		/// Port getter
-		int GetPort() { return Port; }
+		int GetPort();
 
 		/// Ip getter
-		std::string GetIpAddr() { return IpAddress; }
+		std::string GetIpAddr();
 
 		/// The function returns the number of connected devices
 		size_t GetConnectionsCount();
 
 		/// The function returns whether the server is running
-		bool GetIsShutdown() { return IsShutdown; }
+		bool GetIsShutdown();
 
 		/// Method to start server.
 		void Run();

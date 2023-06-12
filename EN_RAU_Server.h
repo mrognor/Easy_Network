@@ -37,7 +37,7 @@ namespace EN
 		EN_RAU_UDP_Server(EN_RAU_Server* rau_Server);
 
 		// Third parametr in milliseconds
-		void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived) {}
+		void ClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeSincePackageArrived);
 
 		// Function work between putting message in buffer. Return true if you want to put message in buffer
 		bool InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived);
@@ -102,13 +102,13 @@ namespace EN
 		EN_RAU_Server();
 
 		/// Port getter
-		int GetPort() { return Port; }
+		int GetPort();
 
 		/// Ip getter
-		std::string GetIpAddr() { return IpAddress; }
+		std::string GetIpAddr();
 
 		/// The function returns the number of connected devices
-		size_t GetConnectionsCount() { return TCP_Server->GetConnectionsCount(); }
+		size_t GetConnectionsCount();
 
 		/// Method to start server.
 		void Run();

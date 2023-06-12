@@ -105,10 +105,10 @@ namespace EN
 
 	public:
 		/// Port getter
-		int GetPort() { return Port; }
+		int GetPort();
 
 		/// Ip getter
-		std::string GetIpAddr() { return IpAddress; }
+		std::string GetIpAddr();
 
 		/// Method to start server.
 		void Run();

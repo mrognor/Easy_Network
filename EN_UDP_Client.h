@@ -50,13 +50,13 @@ namespace EN
 
 	public:
 		/// Server port getter
-		int GetPort() { return ServerPort; }
+		int GetPort();
 
 		/// Ip getter
-		std::string GetIpAddr() { return ServerIpAddress; }
+		std::string GetIpAddr();
 
 		/// Socket getter
-		EN_SOCKET GetSocket() { return ServerConnectionSocket; }
+		EN_SOCKET GetSocket();
 
 		/// Method to start server. Starts a thread to process server responses
 		void Run();

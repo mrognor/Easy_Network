@@ -8,6 +8,8 @@ namespace EN
 		RAU_Client = rau_Client;
 	}
 
+	void EN_RAU_TCP_Client::OnConnect() {};
+
 	void EN_RAU_TCP_Client::ServerMessageHandler(std::string message)
 	{
 		if (RAU_Client->ClientId != -1)
@@ -68,6 +70,10 @@ namespace EN
 		TCP_Client = new EN_RAU_TCP_Client(this);
 		UDP_Client = new EN_RAU_UDP_Client(this);
 	}
+
+	int EN_RAU_Client::GetServerPort() { return ServerPort; }
+
+	std::string EN_RAU_Client::GetServerIpAddress() { return ServerIpAddress; }
 
 	bool EN_RAU_Client::IsConnected()
 	{

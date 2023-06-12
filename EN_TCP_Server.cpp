@@ -2,6 +2,10 @@
 
 namespace EN
 {
+	int EN_TCP_Server::GetPort() { return Port; }
+
+	std::string EN_TCP_Server::GetIpAddr() { return IpAddress; }
+
 	size_t EN_TCP_Server::GetConnectionsCount()
 	{ 
 		CrossWalk.CarStartCrossRoad();
@@ -9,6 +13,8 @@ namespace EN
 		CrossWalk.CarStopCrossRoad();
 		return res;
 	}
+
+	bool EN_TCP_Server::GetIsShutdown() { return IsShutdown; }
 
 	void EN_TCP_Server::Run()
 	{

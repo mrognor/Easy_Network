@@ -76,13 +76,13 @@ namespace EN
 
 	public:
 		/// Server port getter
-		int GetServerPort() { return ServerPort; }
+		int GetServerPort();
 
 		/// Server ip getter
-		std::string GetServerIpAddress() { return ServerIpAddress; }
+		std::string GetServerIpAddress();
 
 		/// Socket getter
-		EN_SOCKET GetSocket() { return ServerConnectionSocket; }
+		EN_SOCKET GetSocket();
 
 		/// Function return true if client connected to server
 		bool IsConnected();

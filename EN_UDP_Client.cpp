@@ -2,6 +2,12 @@
 
 namespace EN
 {
+	int EN_UDP_Client::GetPort() { return ServerPort; }
+
+	std::string EN_UDP_Client::GetIpAddr() { return ServerIpAddress; }
+
+	EN_SOCKET EN_UDP_Client::GetSocket() { return ServerConnectionSocket; }
+
 	void EN_UDP_Client::Run()
 	{
 		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)

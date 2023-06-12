@@ -98,6 +98,6 @@ EN_TCP_Server.h EN_UDP_Client.h EN_UDP_Server.h EN_ParallelFor.h EN_SocketOption
 
 set(LibSources EN_Functions.cpp EN_RAU_Client.cpp
 EN_RAU_Server.cpp EN_TCP_Client.cpp  EN_TCP_FileSender.cpp
-EN_TCP_Server.cpp EN_UDP_Client.cpp EN_UDP_Server.cpp EN_ThreadGate.cpp EN_Logger.cpp EN_ThreadCrossWalk.cpp)
+EN_TCP_Server.cpp EN_UDP_Client.cpp EN_UDP_Server.cpp EN_SocketOptions.cpp EN_ThreadGate.cpp EN_Logger.cpp EN_ThreadCrossWalk.cpp)
 
 add_library(EasyNetwork STATIC ${LibSources} ${LibHeaders})

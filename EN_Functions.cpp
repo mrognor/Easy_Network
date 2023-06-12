@@ -3,7 +3,26 @@
 namespace EN
 {
 	#if defined WIN32 || defined _WIN64
+
+    WSA_Init_Cleanup::WSA_Init_Cleanup()
+	{ 
+		// WSAStartup
+		WSAData wsaData;
+		if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
+		{
+			std::cerr << "Error: Library initialization failure." << std::endl;
+			exit(1);
+		}
+	}
+
+	WSA_Init_Cleanup::~WSA_Init_Cleanup()
+	{
+		// Clean after wsa
+		WSACleanup();
+	}
+
 	WSA_Init_Cleanup WSA_IC = WSA_Init_Cleanup();
+
 	#endif
 	
 	std::string GetIpByURL(std::string url)

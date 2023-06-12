@@ -52,16 +52,11 @@ namespace EN
         std::vector<int> OptionNames;
         std::vector<int> OptionValues;
 
-        PredefinedSocketOptions(std::vector<int> levels, std::vector<int> optionNames, std::vector<int> optionValues)
-        {
-            Levels = levels;
-            OptionNames = optionNames;
-            OptionValues = optionValues;
-        }
+        PredefinedSocketOptions(std::vector<int> levels, std::vector<int> optionNames, std::vector<int> optionValues);
     };
 
-    #define TCP_KEEP_A_LIVE PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
-    #define TCP_NO_DELAY PredefinedSocketOptions({IPPROTO_TCP}, {TCP_NODELAY}, {1})
+    #define EN_TCP_KEEPALIVE PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
+    #define EN_TCP_NODELAY PredefinedSocketOptions({IPPROTO_TCP}, {TCP_NODELAY}, {1})
 }
 
 
