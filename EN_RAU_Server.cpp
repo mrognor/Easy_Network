@@ -189,6 +189,46 @@ namespace EN
 		else LOG(Warning, "The client is not connected");
 	}
 
+	void EN_RAU_Server::SetTCPAcceptSocketOption(int level, int optionName, int optionValue)
+	{
+		TCP_Server->SetAcceptSocketOption(level, optionName, optionValue);
+	}
+
+	void EN_RAU_Server::SetTCPAcceptSocketOption(PredefinedSocketOptions socketOptions)
+	{
+		TCP_Server->SetAcceptSocketOption(socketOptions);
+	}
+
+	void EN_RAU_Server::AddOnTCPSocketCreateOption(int level, int optionName, int optionValue)
+	{
+		TCP_Server->AddOnSocketCreateOption(level, optionName, optionValue);
+	}
+
+	void EN_RAU_Server::AddOnTCPSocketCreateOption(PredefinedSocketOptions socketOptions)
+	{
+		TCP_Server->AddOnSocketCreateOption(socketOptions);
+	}
+
+	void EN_RAU_Server::SetTCPSocketOption(int ClientID, int level, int optionName, int optionValue)
+	{
+		TCP_Server->SetSocketOption(ClientID, level, optionName, optionValue);
+	}
+
+	void EN_RAU_Server::SetTCPSocketOption(int ClientID, PredefinedSocketOptions socketOptions)
+	{
+		TCP_Server->SetSocketOption(ClientID, socketOptions);
+	}
+
+    void EN_RAU_Server::SetUDPSocketOption(int level, int optionName, int optionValue)
+	{
+		UDP_Server->SetSocketOption(level, optionName, optionValue);
+	}
+
+    void EN_RAU_Server::SetUDPSocketOption(PredefinedSocketOptions socketOptions)
+	{
+		UDP_Server->SetSocketOption(socketOptions);
+	}
+
 	EN_RAU_Server::~EN_RAU_Server()
 	{
 		for (int i = 0; i < VectorQueuesMessages.size(); i++)

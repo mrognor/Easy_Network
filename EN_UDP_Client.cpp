@@ -2,6 +2,15 @@
 
 namespace EN
 {
+	EN_UDP_Client::EN_UDP_Client()
+	{
+		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
+		{
+            LOG(Error, "Failed to create socket");
+			exit(1);
+		}
+	}
+
 	int EN_UDP_Client::GetPort() { return ServerPort; }
 
 	std::string EN_UDP_Client::GetIpAddr() { return ServerIpAddress; }
@@ -10,12 +19,6 @@ namespace EN
 
 	void EN_UDP_Client::Run()
 	{
-		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
-		{
-            LOG(Error, "Failed to create socket");
-			exit(1);
-		}
-
 		// Server address
 		sockaddr_in ServerSockAddr;
 
@@ -57,4 +60,15 @@ namespace EN
 	{
 		CloseSocket(ServerConnectionSocket);
 	}
+
+	void EN_UDP_Client::SetSocketOption(int level, int optionName, int optionValue)
+    {
+        EN::SetSocketOption(ServerConnectionSocket, level, optionName, optionValue);
+    }
+
+    void EN_UDP_Client::SetSocketOption(PredefinedSocketOptions socketOptions)
+    {        
+        for (int i = 0; i < socketOptions.Levels.size(); ++i)
+            EN::SetSocketOption(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
+    }
 }

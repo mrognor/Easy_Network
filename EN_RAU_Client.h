@@ -147,6 +147,44 @@ namespace EN
 		/// This function disconnect client from server
 		void Disconnect();
 
+		/**
+           \brief The method sets options for tcp(reliable) client socket
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetTCPSocketOption(int level, int optionName, int optionValue);
+
+        /**
+           \brief The method sets options for tcp(reliable) client socket
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetTCPSocketOption(PredefinedSocketOptions socketOptions);
+
+		/**
+           \brief The method sets options for udp(unreliable) client socket
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetUDPSocketOption(int level, int optionName, int optionValue);
+
+        /**
+           \brief The method sets options for udp(unreliable) client socket
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetUDPSocketOption(PredefinedSocketOptions socketOptions);
+
 		~EN_RAU_Client();
 	};
 }

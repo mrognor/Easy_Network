@@ -235,6 +235,16 @@ namespace EN
     */
     std::string GetUTCTime();
 
+    /** 
+        \brief Set operating system socket options
+        Wrapper over setsockopt operating system function.
+        \param [in] socket Socket to set options
+        \param [in] level Socket option level
+        \param [in] optionName Socket option name
+        \param [in] optionValue Socket option value
+    */
+    void SetSocketOption(EN_SOCKET socket, int level, int optionName, int optionValue);
+
     /**
         This function returns a fraction of a current second. 
         Accepts the time data type from the chrono library as a template.

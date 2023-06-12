@@ -191,4 +191,15 @@ namespace EN
 	{
 		EN::UDP_Send(UDP_ServerSocket, ClientIpAddress, message);
 	}
+
+	void EN_UDP_Server::SetSocketOption(int level, int optionName, int optionValue)
+    {
+        EN::SetSocketOption(UDP_ServerSocket, level, optionName, optionValue);
+    }
+
+    void EN_UDP_Server::SetSocketOption(PredefinedSocketOptions socketOptions)
+    {        
+        for (int i = 0; i < socketOptions.Levels.size(); ++i)
+            EN::SetSocketOption(UDP_ServerSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
+    }
 }

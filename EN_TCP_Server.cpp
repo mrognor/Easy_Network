@@ -87,7 +87,7 @@ namespace EN
 			else
 			{
                 for (const auto& it : CreateSocketsOption)
-                    setsockopt(IncomingConnection, it.Level, it.OptionName, (const char *)&it.OptionValue, sizeof(it.OptionValue));
+                    EN::SetSocketOption(IncomingConnection, it.Level, it.OptionName, it.OptionValue);
 
 				bool WasReusedSocket = false;
 
@@ -221,13 +221,13 @@ namespace EN
 
     void EN_TCP_Server::SetAcceptSocketOption(int level, int optionName, int optionValue)
     {
-        setsockopt(ServerListenSocket, level, optionName, (const char*)&optionValue, sizeof(optionValue));
+        EN::SetSocketOption(ServerListenSocket, level, optionName, optionValue);
     }
 
     void EN_TCP_Server::SetAcceptSocketOption(PredefinedSocketOptions socketOptions)
     {
         for (int i = 0; i < socketOptions.Levels.size(); ++i)
-            setsockopt(ServerListenSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], (const char*)&socketOptions.OptionValues[i], sizeof(socketOptions.OptionValues[i]));
+            EN::SetSocketOption(ServerListenSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
     }
 
     void EN_TCP_Server::AddOnSocketCreateOption(int level, int optionName, int optionValue)
@@ -255,7 +255,7 @@ namespace EN
     {
 		CrossWalk.CarStartCrossRoad();
 		if (ClientSockets.size() > ClientID)
-        	setsockopt(ClientSockets[ClientID], level, optionName, (const char*)&optionValue, sizeof(optionValue));
+        	EN::SetSocketOption(ClientSockets[ClientID], level, optionName, optionValue);
 		CrossWalk.CarStopCrossRoad();
     }
 
@@ -264,7 +264,7 @@ namespace EN
 		CrossWalk.CarStartCrossRoad();
         for (int i = 0; i < socketOptions.Levels.size(); ++i)
 			if (ClientSockets.size() > ClientID)
-            	setsockopt(ClientSockets[ClientID], socketOptions.Levels[i], socketOptions.OptionNames[i], (const char*)&socketOptions.OptionValues[i], sizeof(socketOptions.OptionValues[i]));
+            	EN::SetSocketOption(ClientSockets[ClientID], socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
 		CrossWalk.CarStopCrossRoad();
     }
 }

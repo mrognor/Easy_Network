@@ -2,6 +2,16 @@
 
 namespace EN
 {
+	EN_TCP_Client::EN_TCP_Client()
+	{
+		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+		if (ServerConnectionSocket == INVALID_SOCKET)
+        {
+            LOG(Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+        }
+	}
+
 	int EN_TCP_Client::GetServerPort() { return ServerPort; }
 
 	std::string EN_TCP_Client::GetServerIpAddress() { return ServerIpAddress; }
@@ -40,12 +50,6 @@ namespace EN
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &addr.sin_addr);
 
-		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
-
-		if (ServerConnectionSocket == INVALID_SOCKET)
-        {
-            LOG(Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
-        }
 		// Winsock operation int result
 		int OperationRes;
         OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
@@ -111,13 +115,13 @@ namespace EN
 
     void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)
     {
-        setsockopt(ServerConnectionSocket, level, optionName, (const char*)&optionValue, sizeof(optionValue));
+		EN::SetSocketOption(ServerConnectionSocket, level, optionName, optionValue);
     }
 
     void EN_TCP_Client::SetSocketOption(PredefinedSocketOptions socketOptions)
     {        
         for (int i = 0; i < socketOptions.Levels.size(); ++i)
-            setsockopt(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], (const char*)&socketOptions.OptionValues[i], sizeof(socketOptions.OptionValues[i]));
+			EN::SetSocketOption(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
     }
 
 	EN_TCP_Client::~EN_TCP_Client()

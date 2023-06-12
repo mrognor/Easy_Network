@@ -75,6 +75,8 @@ namespace EN
 		virtual void OnDisconnect() = 0;
 
 	public:
+		EN_TCP_Client();
+		
 		/// Server port getter
 		int GetServerPort();
 

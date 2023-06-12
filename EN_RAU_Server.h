@@ -132,6 +132,92 @@ namespace EN
 		*/
 		void SendToClient(int ClientId, std::string message, bool IsReliable = true);
 
+		/**
+           \brief The method sets options for accept socket. Works with tcp(reliable)
+           Accept socket accepts incoming connections from clients.
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetTCPAcceptSocketOption(int level, int optionName, int optionValue);
+
+        /**
+            \brief The method sets options for accept socket. Works with tcp(reliable)
+            Accept socket accepts incoming connections from clients.
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetTCPAcceptSocketOption(PredefinedSocketOptions socketOptions);
+
+        /**
+           \brief The method sets options for all sockets that will connect after its call. Works with tcp(reliable)
+
+            It makes sense to call this method before starting connecting clients, 
+            since it does not affect previously created sockets.
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void AddOnTCPSocketCreateOption(int level, int optionName, int optionValue);
+
+        /**
+           \brief The method sets options for all sockets that will connect after its call. Works with tcp(reliable)
+
+            It makes sense to call this method before starting connecting clients, 
+            since it does not affect previously created sockets
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects 
+        */
+        void AddOnTCPSocketCreateOption(PredefinedSocketOptions socketOptions);
+
+        /**
+           \brief The method sets options for client socket. Works with tcp(reliable)
+
+            \param[in] ClientID The number of the client 
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetTCPSocketOption(int ClientID, int level, int optionName, int optionValue);
+
+        /**
+            \brief The method sets options for client socket. Works with tcp(reliable)
+
+            \param[in] ClientID The number of the client 
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetTCPSocketOption(int ClientID, PredefinedSocketOptions socketOptions);
+
+		/**
+           \brief The method sets options for client socket. Works with udp(unreliable)
+
+            \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
+			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
+            The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
+			\param[in] optionValue The value for the requested option is specified.
+        */
+        void SetUDPSocketOption(int level, int optionName, int optionValue);
+
+        /**
+           \brief The method sets options for client socket. Works with udp(unreliable)
+
+            \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
+            The list of all predefined structures is in EN_SocketOptions.h. 
+            You can create your own sets of options using define or by creating structure objects
+        */
+        void SetUDPSocketOption(PredefinedSocketOptions socketOptions);
+		
 		~EN_RAU_Server();
 	};
 }

@@ -152,6 +152,26 @@ namespace EN
 		TCP_Client->Disconnect();
 	}
 
+	void EN_RAU_Client::SetTCPSocketOption(int level, int optionName, int optionValue)
+	{
+		TCP_Client->SetSocketOption(level, optionName, optionValue);
+	}
+
+	void EN_RAU_Client::SetTCPSocketOption(PredefinedSocketOptions socketOptions)
+	{
+		TCP_Client->SetSocketOption(socketOptions);
+	}
+
+	void EN_RAU_Client::SetUDPSocketOption(int level, int optionName, int optionValue)
+	{
+		UDP_Client->SetSocketOption(level, optionName, optionValue);
+	}
+
+    void EN_RAU_Client::SetUDPSocketOption(PredefinedSocketOptions socketOptions)
+	{
+		UDP_Client->SetSocketOption(socketOptions);
+	}
+
 	EN_RAU_Client::~EN_RAU_Client()
 	{
 		delete TCP_Client;

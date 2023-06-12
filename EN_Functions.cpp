@@ -956,4 +956,14 @@ namespace EN
         char *dt = asctime(gmtm);
         return std::string(dt);
     }
+
+	void SetSocketOption(EN_SOCKET socket, int level, int optionName, int optionValue)
+	{
+		if (setsockopt(socket, level, optionName, (const char*)&optionValue, sizeof(optionValue)) != 0)
+			LOG(EN::LogLevels::Warning, "Invalid socket option! Socket option name: "
+				+ std::to_string(optionName)
+				+ " Socket option value: "
+				+ std::to_string(optionValue)
+				+ " Error code: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+	}
 }
