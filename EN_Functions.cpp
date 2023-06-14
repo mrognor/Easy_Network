@@ -42,28 +42,36 @@ namespace EN
 	bool TCP_Send(EN_SOCKET sock, const std::string& message)
 	{
 		size_t messageLength = message.length();
-		int sendedBytes;
+
 		// If message length more than 128, then set first bit to 1, that means that message
 		// length stored in 2 bytes
 		// If message length less or equal 128, than set first bit to 0, and send only 
-		// one byte with message length
+		// one byte with message length	
+
+		unsigned char* msgBuf;
+		int startIndex;
 		if (messageLength >= 128)
 		{
-            unsigned char msgBuf[2] = {(unsigned char)((messageLength / 128) | 0b10000000), (unsigned char)(messageLength % 128)};
-            sendedBytes = send(sock, (char*)msgBuf, 2, 0);
-			if (sendedBytes != 2) return false;	
+			msgBuf = new unsigned char[2 + (int)messageLength];
+			msgBuf[0] = (unsigned char)((messageLength / 128) | 0b10000000);
+			msgBuf[1] = (unsigned char)(messageLength % 128);
+			startIndex = 2;
 		}
 		else
 		{
-            unsigned char msgBuf[1] = {(unsigned char)messageLength};
-			sendedBytes = send(sock, (char*)msgBuf, 1, 0);
-			if (sendedBytes != 1) return false;	
-		}		
+			msgBuf = new unsigned char[1 + (int)messageLength];
+			msgBuf[0] = (unsigned char)messageLength;
+			startIndex = 1;
+		}	
 
-		sendedBytes = send(sock, message.c_str(), (int)messageLength, 0);
-		if (sendedBytes != messageLength) return false;
+		for (int i = startIndex; i < (int)messageLength + startIndex; ++i)
+			msgBuf[i] = message[i - startIndex];
+		
+		int sendedBytes = send(sock, msgBuf, (int)messageLength + startIndex, 0);
+		delete[] msgBuf;
 
-		return true;
+		// Return true if sended butes equals message length, otherwise return false
+		return (sendedBytes == messageLength);
 	}
 
 	bool TCP_Recv(EN_SOCKET sock, std::string& message)
