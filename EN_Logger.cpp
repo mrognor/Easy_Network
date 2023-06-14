@@ -32,7 +32,7 @@ FileLogger FL;
 
 namespace EN
 {
-    int EnabledLogLevels = ENABLE_LOG_LEVEL_INFO | ENABLE_LOG_LEVEL_HINT | ENABLE_LOG_LEVEL_WARNING | ENABLE_LOG_LEVEL_ERROR;
+    int EnabledLogLevels = EN_LOG_LEVEL_INFO | EN_LOG_LEVEL_HINT | EN_LOG_LEVEL_WARNING | EN_LOG_LEVEL_ERROR;
     void (*LogFunc)(LogLevels, std::string) = DefaultLogFunc;
 
     void DefaultLogFunc(LogLevels logLevel, std::string logMessage)
@@ -40,7 +40,7 @@ namespace EN
         switch (logLevel)
         {
         case Info:
-            if (EnabledLogLevels & ENABLE_LOG_LEVEL_INFO)
+            if (EnabledLogLevels & EN_LOG_LEVEL_INFO)
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [info] " + logMessage;
@@ -51,7 +51,7 @@ namespace EN
             break;
 
         case Hint:
-            if (EnabledLogLevels & ENABLE_LOG_LEVEL_HINT)
+            if (EnabledLogLevels & EN_LOG_LEVEL_HINT)
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [hint] " + logMessage;
@@ -62,7 +62,7 @@ namespace EN
             break;
 
         case Warning:
-            if (EnabledLogLevels & ENABLE_LOG_LEVEL_WARNING)
+            if (EnabledLogLevels & EN_LOG_LEVEL_WARNING)
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [warning] " + logMessage;
@@ -73,7 +73,7 @@ namespace EN
             break;
 
         case Error:
-            if (EnabledLogLevels & ENABLE_LOG_LEVEL_ERROR)
+            if (EnabledLogLevels & EN_LOG_LEVEL_ERROR)
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [error] " + logMessage;
@@ -99,7 +99,7 @@ namespace EN
 
     void SetLogLevelsFile(int logLevelsToEnable, std::string fileName, std::ios_base::openmode openMode)
     {
-        if (logLevelsToEnable & ENABLE_LOG_LEVEL_INFO)
+        if (logLevelsToEnable & EN_LOG_LEVEL_INFO)
         {
             LogLevelInfoFileName = fileName;
             LogLevelInfoFile.close();
@@ -116,7 +116,7 @@ namespace EN
             else LOG(EN::LogLevels::Error, "Can not create log file with empty name");
         }
 
-        if (logLevelsToEnable & ENABLE_LOG_LEVEL_HINT)
+        if (logLevelsToEnable & EN_LOG_LEVEL_HINT)
         {
             LogLevelHintFileName = fileName;
             LogLevelHintFile.close();
@@ -133,7 +133,7 @@ namespace EN
             else LOG(EN::LogLevels::Error, "Can not create log file with empty name");
         }
 
-        if (logLevelsToEnable & ENABLE_LOG_LEVEL_WARNING)
+        if (logLevelsToEnable & EN_LOG_LEVEL_WARNING)
         {
             LogLevelWarningFileName = fileName;
             LogLevelWarningFile.close();
@@ -150,7 +150,7 @@ namespace EN
             else LOG(EN::LogLevels::Error, "Can not create log file with empty name");
         }
 
-        if (logLevelsToEnable & ENABLE_LOG_LEVEL_ERROR)
+        if (logLevelsToEnable & EN_LOG_LEVEL_ERROR)
         {
             LogLevelErrorFileName = fileName;
             LogLevelErrorFile.close();
@@ -167,8 +167,8 @@ namespace EN
             else LOG(EN::LogLevels::Error, "Can not create log file with empty name");
         }
 
-        if (!(logLevelsToEnable & ENABLE_LOG_LEVEL_INFO) && !(logLevelsToEnable & ENABLE_LOG_LEVEL_HINT) &&
-        !(logLevelsToEnable & ENABLE_LOG_LEVEL_WARNING) && !(logLevelsToEnable & ENABLE_LOG_LEVEL_ERROR))
+        if (!(logLevelsToEnable & EN_LOG_LEVEL_INFO) && !(logLevelsToEnable & EN_LOG_LEVEL_HINT) &&
+        !(logLevelsToEnable & EN_LOG_LEVEL_WARNING) && !(logLevelsToEnable & EN_LOG_LEVEL_ERROR))
         {
             LOG(EN::LogLevels::Warning, "Wrong log levels to log files");
         }

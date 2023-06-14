@@ -18,11 +18,11 @@
 #endif
 
 // Dont use this. Diable logger using -DDISABLE_LOGGER key when compile project
-#define ENABLE_LOG_LEVEL_NONE    0b00000000
-#define ENABLE_LOG_LEVEL_INFO    0b00000001
-#define ENABLE_LOG_LEVEL_HINT    0b00000010
-#define ENABLE_LOG_LEVEL_WARNING 0b00000100
-#define ENABLE_LOG_LEVEL_ERROR   0b00001000
+#define EN_LOG_LEVEL_NONE    0b00000000
+#define EN_LOG_LEVEL_INFO    0b00000001
+#define EN_LOG_LEVEL_HINT    0b00000010
+#define EN_LOG_LEVEL_WARNING 0b00000100
+#define EN_LOG_LEVEL_ERROR   0b00001000
 
 
 namespace EN
@@ -63,7 +63,7 @@ namespace EN
         Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
         Using the logical operator |, you can combine the necessary logging levels.
     */
-    void SetLogFunc(void (*logFunc)(LogLevels, std::string), int logLevelsToEnable = (ENABLE_LOG_LEVEL_INFO | ENABLE_LOG_LEVEL_HINT | ENABLE_LOG_LEVEL_WARNING | ENABLE_LOG_LEVEL_ERROR));
+    void SetLogFunc(void (*logFunc)(LogLevels, std::string), int logLevelsToEnable = (EN_LOG_LEVEL_INFO | EN_LOG_LEVEL_HINT | EN_LOG_LEVEL_WARNING | EN_LOG_LEVEL_ERROR));
 
     /**
         \brief Enable log levels.

@@ -32,6 +32,9 @@ typedef int EN_SOCKET;
 
 #endif
 
+#define EN_TCP_KEEPALIVE EN::PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
+#define EN_TCP_NODELAY EN::PredefinedSocketOptions({IPPROTO_TCP}, {TCP_NODELAY}, {1})
+
 #include <vector>
 
 namespace EN
@@ -54,9 +57,6 @@ namespace EN
 
         PredefinedSocketOptions(std::vector<int> levels, std::vector<int> optionNames, std::vector<int> optionValues);
     };
-
-    #define EN_TCP_KEEPALIVE PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
-    #define EN_TCP_NODELAY PredefinedSocketOptions({IPPROTO_TCP}, {TCP_NODELAY}, {1})
 }
 
 
