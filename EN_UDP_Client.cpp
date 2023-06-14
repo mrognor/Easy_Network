@@ -4,7 +4,9 @@ namespace EN
 {
 	EN_UDP_Client::EN_UDP_Client()
 	{
-		if ((ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
+		ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+		if (ServerConnectionSocket == INVALID_SOCKET)
 		{
             LOG(Error, "Failed to create socket");
 			exit(1);
@@ -38,15 +40,14 @@ namespace EN
 	void EN_UDP_Client::ServerHandler()
 	{
 		std::string message, ipAddress;
-		int OperationRes;
+		bool OperationRes;
 		while (true)
 		{
 			OperationRes = EN::UDP_Recv(ServerConnectionSocket, ipAddress, message);
 			
-			if (OperationRes > 0)
+			if (OperationRes)
 				ServerMessageHandler(message);
-			
-			if (OperationRes == 0)
+			else
 				break;
 		}
 	}

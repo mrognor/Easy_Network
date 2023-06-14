@@ -85,8 +85,8 @@ namespace EN
 			if (IsServerConnected == false)
 			{
 				CloseSocket(ServerConnectionSocket);
-				ServerConnectionSocket = INVALID_SOCKET;
 				OnDisconnect();
+				ServerConnectionSocket = INVALID_SOCKET;
 				return;
 			}
 
@@ -107,10 +107,13 @@ namespace EN
 	void EN_TCP_Client::Disconnect()
 	{
 		CloseSocket(ServerConnectionSocket);
-		ServerHandlerMtx.lock();
-		if (ServerHandlerThread.get_id() != std::this_thread::get_id() && ServerHandlerThread.joinable())
-			ServerHandlerThread.join();
-		ServerHandlerMtx.unlock();
+		if (ServerHandlerThread.get_id() != std::this_thread::get_id())
+		{
+			ServerHandlerMtx.lock();
+			if (ServerHandlerThread.joinable())
+				ServerHandlerThread.join();
+			ServerHandlerMtx.unlock();
+		}
 	}
 
     void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)

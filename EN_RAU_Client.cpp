@@ -150,6 +150,7 @@ namespace EN
 	void EN_RAU_Client::Disconnect()
 	{
 		TCP_Client->Disconnect();
+		UDP_Client->Stop();
 	}
 
 	void EN_RAU_Client::SetTCPSocketOption(int level, int optionName, int optionValue)
