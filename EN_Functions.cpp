@@ -118,7 +118,7 @@ namespace EN
 
 		ConnectionStatus = recv(sock, msg, msg_size, MSG_WAITALL);
 
-		if (ConnectionStatus <= 0)
+		if (ConnectionStatus != msg_size)
 		{
 			message = "";
 
