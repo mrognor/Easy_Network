@@ -9,7 +9,7 @@ endif
 
 #use -D DISABLE_LOGGER to disable logger
 
-debug: CXXFLAGS += -g
+debug: CXXFLAGS += -g -Wall
 debug: all
 
 release: CXXFLAGS += -D NDEBUG -O3

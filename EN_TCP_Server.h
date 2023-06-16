@@ -21,7 +21,7 @@ typedef int EN_SOCKET;
 #include "EN_Functions.h"
 #include "EN_SocketOptions.h"
 #include "EN_ThreadCrossWalk.h"
-#include "thread"
+
 
 namespace EN
 {
@@ -29,12 +29,8 @@ namespace EN
 	class EN_TCP_Server
 	{
 	private:
-
 		// Boolean variable that displays the status of the server 
-		bool IsShutdown = false;
-
-		// A method that processes messages from clients. Sends a message to the function ClientMessageHandler().
-		void ClientHandler(int ClientID);
+		std::atomic_bool IsShutdown;
 
         // Vector with options to be set after client connected
         std::vector<SocketOption> CreateSocketsOption;
@@ -47,6 +43,9 @@ namespace EN
 
 		// Thread cross walk to synchronize access to ClientSockets between different threads
 		EN_ThreadCrossWalk CrossWalk;
+
+		// A method that processes messages from clients. Sends a message to the function ClientMessageHandler().
+		void ClientHandler(int ClientID);
 	protected:
 
 		/// Server port. Default set to 1111
@@ -80,6 +79,8 @@ namespace EN
 		virtual void OnClientDisconnect(int ClientID) = 0;
 
 	public:
+		EN_TCP_Server();
+		
 		/// Port getter
 		int GetPort();
 
@@ -89,10 +90,14 @@ namespace EN
 		/// The function returns the number of connected devices
 		size_t GetConnectionsCount();
 
-		/// The function returns whether the server is running
-		bool GetIsShutdown();
-
-		/// Method to start server.
+		/**
+			\brief Method to start server.
+			
+			Place this method in try block to catch errors.
+			Throws socket errors. To get information about the error, use the documentation of your operating system. 
+			For Windows, errors go through WSAGetLastError, for Linux, errors go through errno.  
+			All errors with the description are duplicated in the log system.
+		*/
 		void Run();
 
 		/**

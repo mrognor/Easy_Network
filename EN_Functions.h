@@ -24,6 +24,7 @@ typedef int EN_SOCKET;
 #include <vector>
 #include <ctime>
 #include <fstream>
+#include <exception>
 
 #include "EN_ParallelFor.h"
 #include "EN_Logger.h"

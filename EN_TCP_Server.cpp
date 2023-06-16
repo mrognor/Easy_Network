@@ -2,9 +2,20 @@
 
 namespace EN
 {
-	int EN_TCP_Server::GetPort() { return Port; }
+	EN_TCP_Server::EN_TCP_Server()
+	{
+		IsShutdown.store(false);
+	}
 
-	std::string EN_TCP_Server::GetIpAddr() { return IpAddress; }
+	int EN_TCP_Server::GetPort() 
+	{ 
+		return Port;
+	}
+
+	std::string EN_TCP_Server::GetIpAddr() 
+	{ 
+		return IpAddress;
+	}
 
 	size_t EN_TCP_Server::GetConnectionsCount()
 	{ 
@@ -13,8 +24,6 @@ namespace EN
 		CrossWalk.CarStopCrossRoad();
 		return res;
 	}
-
-	bool EN_TCP_Server::GetIsShutdown() { return IsShutdown; }
 
 	void EN_TCP_Server::Run()
 	{
@@ -34,6 +43,7 @@ namespace EN
 		if (ServerListenSocket == INVALID_SOCKET)
 		{
             LOG(Error, "Error: cannot create socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
 		int OperationRes;
@@ -42,6 +52,7 @@ namespace EN
 		if (OperationRes == SOCKET_ERROR)
 		{
             LOG(Error, "Error: cannot bind socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
 		OperationRes = listen(ServerListenSocket, SOMAXCONN);
@@ -49,6 +60,7 @@ namespace EN
 		if (OperationRes == SOCKET_ERROR)
 		{
             LOG(Error, "Error: cannot listen socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
 		EN_SOCKET IncomingConnection;
@@ -65,7 +77,7 @@ namespace EN
 			#endif
 
 			// Shutdown server
-			if (IsShutdown == true)
+			if (IsShutdown.load() == true)
 			{
 				CrossWalk.PedestrianStartCrossRoad();
 				for (EN_SOCKET sock : ClientSockets)
@@ -82,7 +94,7 @@ namespace EN
 			{
                 LOG(Error, "Error: Client connection failure: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
                 LOG(Hint, "Accept on server listen socket return invalid socket. It may occur by invalid server ip address");
-				break;
+				throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 			}
 			else
 			{
@@ -181,7 +193,7 @@ namespace EN
 
 	void EN_TCP_Server::Shutdown()
 	{
-		IsShutdown = true;
+		IsShutdown.store(true);
 		
 		// Check what server successfully started
 		while (true)

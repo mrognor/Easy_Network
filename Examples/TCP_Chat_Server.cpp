@@ -60,16 +60,23 @@ int main()
 	
 	MyServer A;
 
-	std::thread th([&A]() { A.Run(); });
+	std::thread th([&A]() 
+	{
+		try 
+		{
+			A.Run(); 
+		}
+		catch (std::runtime_error err)
+		{
+			LOG(EN::LogLevels::Error, "Run throw error with error code: " + std::string(err.what()));
+		}
+	});
 	
 	std::string message;
 
 	while (true)
 	{
 		getline(std::cin, message);
-
-		if (A.GetIsShutdown())
-			break;
 
 		if (message == "f")
 		{

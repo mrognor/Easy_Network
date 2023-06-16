@@ -67,7 +67,7 @@ namespace EN
 		for (int i = startIndex; i < (int)messageLength + startIndex; ++i)
 			msgBuf[i] = message[i - startIndex];
 		
-		int sendedBytes = send(sock, msgBuf, (int)messageLength + startIndex, 0);
+		int sendedBytes = send(sock, (char*)msgBuf, (int)messageLength + startIndex, 0);
 		delete[] msgBuf;
 
 		// Return true if sended butes equals message length, otherwise return false
