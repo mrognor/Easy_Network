@@ -112,7 +112,14 @@ namespace EN
 		/// Ip getter
 		std::string GetIpAddr();
 
-		/// Method to start server.
+		/**
+			\brief Method to start server. Blocking call.
+			
+			Place this method in try block to catch errors.
+			Throws socket errors. To get information about the error, use the documentation of your operating system. 
+			For Windows, errors go through WSAGetLastError, for Linux, errors go through errno.  
+			All errors with the description are duplicated in the log system.
+		*/
 		void Run();
 
 		/// Method that stops the server

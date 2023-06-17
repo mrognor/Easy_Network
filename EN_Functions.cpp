@@ -183,13 +183,13 @@ namespace EN
 		int sizeofaddr = sizeof(sourceSockAddr);
 		int ConnectionStatus;
 
-		char msg[4096];
+		char msg[16384];
 		#if defined WIN32 || defined _WIN64
 		//try to receive some data, this is a blocking call
-		ConnectionStatus = recvfrom(sock, (char*)&msg, 4096, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
+		ConnectionStatus = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
 		#else
 		//try to receive some data, this is a blocking call
-		ConnectionStatus = recvfrom(sock, (char*)&msg, 4096, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
+		ConnectionStatus = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
 		#endif
 
 		if (ConnectionStatus <= 0)

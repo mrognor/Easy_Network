@@ -50,8 +50,6 @@ namespace EN
 		virtual void ServerMessageHandler(std::string message) = 0;
 
 	public:
-		EN_UDP_Client();
-
 		/// Server port getter
 		int GetPort();
 
@@ -62,7 +60,8 @@ namespace EN
 		EN_SOCKET GetSocket();
 
 		/// Method to start server. Starts a thread to process server responses
-		void Run();
+		/// Will return the true in case of a successful launch otherwise false
+		bool Run();
 
 		/**
 			\brief Function for sending a message to a connected server

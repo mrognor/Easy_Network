@@ -57,6 +57,7 @@ namespace EN
 		if ((UDP_ServerSocket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
         {
             LOG(Error, "Could not create socket");
+			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
         }
 
 		// Server address
@@ -73,6 +74,7 @@ namespace EN
 		if (bind(UDP_ServerSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == SOCKET_ERROR)
         {
             LOG(Error, "Bind failed");
+			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
         }
 
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
@@ -96,12 +98,14 @@ namespace EN
 		ShutdownMutex.unlock();
 
 		std::string message, clientAddress;
+		bool recvRes;
+
 		// Keep listening for data
 		while (true)
 		{					
-			EN::UDP_Recv(UDP_ServerSocket, clientAddress, message);
+			recvRes = EN::UDP_Recv(UDP_ServerSocket, clientAddress, message);
 			
-			if (IsShutdown)
+			if (IsShutdown || !recvRes)
 				break;
 
 			if (InstantClientMessageHandler(message, clientAddress, 0) == false)
@@ -162,7 +166,13 @@ namespace EN
 		delete[] QueueTimeVec;
 		delete[] Mutexes;
 
-		CloseSocket(UDP_ServerSocket);	
+		CloseSocket(UDP_ServerSocket);
+
+		if (GetSocketErrorCode() != 0)
+		{
+			LOG(Error, "Error: Error on socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
+		}
 	}
 
 	void EN_UDP_Server::Shutdown()

@@ -92,9 +92,31 @@ namespace EN
 
 			if (IncomingConnection == INVALID_SOCKET)
 			{
-                LOG(Error, "Error: Client connection failure: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+				int acceptError = GetSocketErrorCode();
+                LOG(Error, "Error: Client connection failure: " + std::to_string(acceptError) + " " + EN::GetSocketErrorString(acceptError));
                 LOG(Hint, "Accept on server listen socket return invalid socket. It may occur by invalid server ip address");
-				throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
+				
+				// Disconnect all connected clients
+				CrossWalk.PedestrianStartCrossRoad();
+				for (int i = 0; i < ClientSockets.size(); ++i)
+					CloseSocket(ClientSockets[i]);
+				CrossWalk.PedestrianStopCrossRoad();
+
+				CloseSocket(IncomingConnection);
+				CloseSocket(ServerListenSocket);
+				ServerListenSocket = INVALID_SOCKET;
+
+				// Wait while all clients disconnect
+				while (true)
+				{
+					CrossWalk.PedestrianStartCrossRoad();
+					if (ClientSockets.size() == 0)
+						break;
+					CrossWalk.PedestrianStopCrossRoad();
+				}
+				CrossWalk.PedestrianStopCrossRoad();
+
+				throw (std::runtime_error(std::to_string(acceptError)));
 			}
 			else
 			{

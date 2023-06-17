@@ -91,7 +91,7 @@ namespace EN
 		size_t GetConnectionsCount();
 
 		/**
-			\brief Method to start server.
+			\brief Method to start server. Blocking call.
 			
 			Place this method in try block to catch errors.
 			Throws socket errors. To get information about the error, use the documentation of your operating system. 

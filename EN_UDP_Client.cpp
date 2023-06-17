@@ -2,30 +2,27 @@
 
 namespace EN
 {
-	EN_UDP_Client::EN_UDP_Client()
-	{
-		ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
-		if (ServerConnectionSocket == INVALID_SOCKET)
-		{
-            LOG(Error, "Failed to create socket");
-			exit(1);
-		}
-	}
-
 	int EN_UDP_Client::GetPort() { return ServerPort; }
 
 	std::string EN_UDP_Client::GetIpAddr() { return ServerIpAddress; }
 
 	EN_SOCKET EN_UDP_Client::GetSocket() { return ServerConnectionSocket; }
 
-	void EN_UDP_Client::Run()
+	bool EN_UDP_Client::Run()
 	{
 		// Server address
 		sockaddr_in ServerSockAddr;
 
 		ServerSockAddr.sin_family = AF_INET;
 		ServerSockAddr.sin_port = htons(ServerPort);
+
+		ServerConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+		if (ServerConnectionSocket == INVALID_SOCKET)
+		{
+            LOG(Error, "Failed to create socket");
+			return false;
+		}
 
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &ServerSockAddr.sin_addr);
@@ -35,6 +32,7 @@ namespace EN
 
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
+		return true;
 	}
 
 	void EN_UDP_Client::ServerHandler()
