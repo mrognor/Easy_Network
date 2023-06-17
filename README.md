@@ -5,7 +5,8 @@ Simple C++ network library
 https://mrognor.github.io/Easy_Network_Documentation/doc/html/index.html  
 
 # Library roadmap
-![image](https://github.com/mrognor/Easy_Network/assets/47296449/dd069d0a-0df6-4cbc-b10b-0b2733777612)
+![image](https://github.com/mrognor/Easy_Network/assets/47296449/3d1e5c6e-2ce4-4fb1-8590-ae5c03f5e1b5)
+
 
 # Library usage 
 Before you start, I advise you to download the code examples. For linux, you can save files to one folder, and for visual studio, you will need to add these files to different projects  
