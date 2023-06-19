@@ -185,6 +185,6 @@ namespace EN
         */
         void SetUDPSocketOption(PredefinedSocketOptions socketOptions);
 
-		~EN_RAU_Client();
+		virtual ~EN_RAU_Client();
 	};
 }

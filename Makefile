@@ -1,5 +1,5 @@
 LDFLAGS = -pthread
-CXXFLAGS = -std=c++11
+CXXFLAGS = -std=c++11 -Wall
 FILEEXT =
 
 ifeq ($(OS), Windows_NT)
@@ -9,7 +9,7 @@ endif
 
 #use -D DISABLE_LOGGER to disable logger
 
-debug: CXXFLAGS += -g -Wall
+debug: CXXFLAGS += -g
 debug: all
 
 release: CXXFLAGS += -D NDEBUG -O3

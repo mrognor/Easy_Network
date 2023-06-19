@@ -8,7 +8,7 @@ namespace EN
 		RAU_Server = rau_Server;
 	}
 
-	void EN_RAU_TCP_Server::OnClientConnected(int ClientID)
+	void EN_RAU_TCP_Server::OnClientConnected(size_t ClientID)
 	{
 		SendToClient(ClientID, std::to_string(ClientID));
 
@@ -40,13 +40,13 @@ namespace EN
 		QueueThreadHandler.detach();
 	}
 
-	void EN_RAU_TCP_Server::ClientMessageHandler(std::string message, int ClientID)
+	void EN_RAU_TCP_Server::ClientMessageHandler(std::string message, size_t ClientID)
 	{
 		RAU_Server->VectorQueuesMessages[ClientID]->push(message);
 		RAU_Server->VectorCondVars[ClientID]->notify_all();
 	}
 
-	void EN_RAU_TCP_Server::OnClientDisconnect(int ClientID)
+	void EN_RAU_TCP_Server::OnClientDisconnect(size_t ClientID)
 	{
 		RAU_Server->OnClientDisconnect(ClientID);
 		RAU_Server->KillThreads[ClientID] = true;
@@ -162,7 +162,7 @@ namespace EN
 		TCP_Server->Run();
 	}
 
-	void EN_RAU_Server::DisconnectClient(int ClientID)
+	void EN_RAU_Server::DisconnectClient(size_t ClientID)
 	{
 		TCP_Server->DisconnectClient(ClientID);
 	}
@@ -172,13 +172,13 @@ namespace EN
 		TCP_Server->Shutdown();
 		UDP_Server->Shutdown();
 		IsShutdown = true;
-		for (int i = 0; i < VectorCondVars.size(); i++)
+		for (size_t i = 0; i < VectorCondVars.size(); i++)
 		{
 			VectorCondVars[i]->notify_all();
 		}
 	}
 
-	void EN_RAU_Server::SendToClient(int ClientId, std::string message, bool IsReliable)
+	void EN_RAU_Server::SendToClient(size_t ClientId, std::string message, bool IsReliable)
 	{
 		if (UDPIpAddresses.size() > ClientId && UDPIpAddresses[ClientId] != "none")
 		{
@@ -209,12 +209,12 @@ namespace EN
 		TCP_Server->AddOnSocketCreateOption(socketOptions);
 	}
 
-	void EN_RAU_Server::SetTCPSocketOption(int ClientID, int level, int optionName, int optionValue)
+	void EN_RAU_Server::SetTCPSocketOption(size_t ClientID, int level, int optionName, int optionValue)
 	{
 		TCP_Server->SetSocketOption(ClientID, level, optionName, optionValue);
 	}
 
-	void EN_RAU_Server::SetTCPSocketOption(int ClientID, PredefinedSocketOptions socketOptions)
+	void EN_RAU_Server::SetTCPSocketOption(size_t ClientID, PredefinedSocketOptions socketOptions)
 	{
 		TCP_Server->SetSocketOption(ClientID, socketOptions);
 	}
@@ -231,7 +231,7 @@ namespace EN
 
 	EN_RAU_Server::~EN_RAU_Server()
 	{
-		for (int i = 0; i < VectorQueuesMessages.size(); i++)
+		for (size_t i = 0; i < VectorQueuesMessages.size(); i++)
 		{
 			delete VectorQueuesMessages[i];
 			delete VectorCondVars[i];

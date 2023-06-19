@@ -21,11 +21,11 @@ namespace EN
 
 		EN_RAU_TCP_Server(EN_RAU_Server* rau_Server);
 
-		void OnClientConnected(int ClientID);
+		void OnClientConnected(size_t ClientID);
 
-		void ClientMessageHandler(std::string message, int ClientID);
+		void ClientMessageHandler(std::string message, size_t ClientID);
 
-		void OnClientDisconnect(int ClientID);
+		void OnClientDisconnect(size_t ClientID);
 	};
 
 	class EN_RAU_UDP_Server : public EN_UDP_Server
@@ -82,21 +82,21 @@ namespace EN
 
 			\warning Must be defined by the user
 		*/
-		virtual void OnClientConnected(int ClientID) = 0;
+		virtual void OnClientConnected(size_t ClientID) = 0;
 
 		/**
 			\brief Method that processes incoming messages
 
 			\warning Must be defined by the user
 		*/
-		virtual void ClientMessageHandler(std::string message, int ClientID) = 0;
+		virtual void ClientMessageHandler(std::string message, size_t ClientID) = 0;
 
 		/**
 			\brief Method that runs after the client is disconnected
 			
 			\warning Must be defined by the user
 		*/
-		virtual void OnClientDisconnect(int ClientID) = 0;
+		virtual void OnClientDisconnect(size_t ClientID) = 0;
 
 	public:
 		EN_RAU_Server();
@@ -118,7 +118,7 @@ namespace EN
 
 			\param[in] ClientID The number of the client to be disconnect
 		*/
-		void DisconnectClient(int ClientID);
+		void DisconnectClient(size_t ClientID);
 
 		/// Method that stops the server
 		void Shutdown();
@@ -130,7 +130,7 @@ namespace EN
 			\param[in] message The message to be sent to the client
 			\param[in] IsReliable if the parameter is set to true, the message is guaranteed to reach. If the parameter is set to false the message delivery is not guaranteed
 		*/
-		void SendToClient(int ClientId, std::string message, bool IsReliable = true);
+		void SendToClient(size_t ClientId, std::string message, bool IsReliable = true);
 
 		/**
            \brief The method sets options for accept socket. Works with tcp(reliable)
@@ -187,7 +187,7 @@ namespace EN
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void SetTCPSocketOption(int ClientID, int level, int optionName, int optionValue);
+        void SetTCPSocketOption(size_t ClientID, int level, int optionName, int optionValue);
 
         /**
             \brief The method sets options for client socket. Works with tcp(reliable)
@@ -197,7 +197,7 @@ namespace EN
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects
         */
-        void SetTCPSocketOption(int ClientID, PredefinedSocketOptions socketOptions);
+        void SetTCPSocketOption(size_t ClientID, PredefinedSocketOptions socketOptions);
 
 		/**
            \brief The method sets options for client socket. Works with udp(unreliable)
@@ -218,6 +218,6 @@ namespace EN
         */
         void SetUDPSocketOption(PredefinedSocketOptions socketOptions);
 		
-		~EN_RAU_Server();
+		virtual ~EN_RAU_Server();
 	};
 }

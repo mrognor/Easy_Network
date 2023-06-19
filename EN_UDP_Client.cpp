@@ -67,7 +67,9 @@ namespace EN
 
     void EN_UDP_Client::SetSocketOption(PredefinedSocketOptions socketOptions)
     {        
-        for (int i = 0; i < socketOptions.Levels.size(); ++i)
+        for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
             EN::SetSocketOption(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
     }
+
+	EN_UDP_Client::~EN_UDP_Client() {}
 }

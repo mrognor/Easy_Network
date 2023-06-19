@@ -46,5 +46,12 @@ int main()
 {
 	MyServer A;
 	// Start server
-	A.Run();
+	try 
+	{
+		A.Run(); 
+	}
+	catch (std::runtime_error& err)
+	{
+		LOG(EN::LogLevels::Error, "Run throw error with error code: " + std::string(err.what()));
+	}
 }

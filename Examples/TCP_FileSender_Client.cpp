@@ -46,7 +46,7 @@ int main()
 		}
 		std::vector<std::string> IntrepretedMessage = EN::Split(message);
 
-		if (message.find("send file") != -1)
+		if (message.find("send file") != -1ull)
 		{
 			if (EN::IsFileExist(IntrepretedMessage[2]))
 			{
@@ -58,7 +58,7 @@ int main()
 			continue;
 		}
 
-		if (message.find("get file") != -1)
+		if (message.find("get file") != -1ull)
 		{
 			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
 			
@@ -95,7 +95,7 @@ int main()
 			else
 			{
 				A.SendToServer(message);
-
+				
 				std::string responce;
 				A.RecvMessageFromServer(responce);
 
@@ -119,6 +119,5 @@ int main()
 	}
 	A.Disconnect();
 
-	system("pause");
 	return 0;
 }

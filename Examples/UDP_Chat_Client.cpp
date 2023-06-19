@@ -40,6 +40,4 @@ int main()
 
 	// Stop cient
 	A.Stop();
-
-	system("pause");
 }

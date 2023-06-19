@@ -42,9 +42,11 @@ namespace EN
 		bool ContinueRecvFileFromServer(void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta));
 
 		/// Function to get message from server
-		void RecvMessageFromServer(std::string& msg);
+		bool RecvMessageFromServer(std::string& msg);
 
 		/// Function to stop file transmission
 		void StopDownloading();
+
+		virtual ~EN_TCP_FileSender();
 	};
 }

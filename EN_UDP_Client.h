@@ -91,6 +91,8 @@ namespace EN
             You can create your own sets of options using define or by creating structure objects
         */
         void SetSocketOption(PredefinedSocketOptions socketOptions);
+
+		virtual ~EN_UDP_Client();
 	};
 }
 

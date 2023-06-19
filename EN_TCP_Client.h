@@ -51,6 +51,17 @@ namespace EN
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
 	protected:
+		/**
+			Variable for disabling the incoming message handler. 
+			If it is true, then all incoming messages will be processed inside the ServerMessageHandler function, 
+			after connecting to the server, the OnConnect method will be called, 
+			and after disconnecting from the server, the onDisconnect method will be called. 
+			If this variable is false, then the OnConnect, ServerMessageHandler, 
+			onDisconnect methods will be called in another thread. 
+			Use it if you don't need to process messages in another thread. 
+			In this mode, the WaitMessage method can be used in the main thread.
+		*/
+		bool IsRunMessageHadlerThread = true;
 
 		/**
 			\brief This function is called after connecting to the server
@@ -121,7 +132,8 @@ namespace EN
 
             \warning Since the ServerMessageHandler runs in a separate thread, the call to the WaitMessage method must be in the same thread.  
             This is necessary so that there is no waiting for a new message in different threads, which leads to undefined behavior.
-            Note that you still can use this function on client connection because ServerMessageHandler invokes after OnConnect.
+            Note that you still can use this function on OnConnect and OnDisconnect methods.
+			If the variable IsRunMessageHadlerThread is false, then this method can also be used in the main thread
 
 			\param[in] message The string to store incoming message
             \return Returns true in case of success, false if it was disconnection  

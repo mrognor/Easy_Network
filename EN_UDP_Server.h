@@ -81,7 +81,7 @@ namespace EN
 
 			Used only if ServerBuferType set to EN::Stack
 		*/
-		int MaxStackBuffSize = 16;
+		size_t MaxStackBuffSize = 16;
 
 		/// Incoming message buffer type
 		EN_UDP_ServerBuferType ServerBuferType = Queue;
@@ -151,5 +151,7 @@ namespace EN
             You can create your own sets of options using define or by creating structure objects
         */
         void SetSocketOption(PredefinedSocketOptions socketOptions);
+
+		virtual ~EN_UDP_Server();
 	};
 }

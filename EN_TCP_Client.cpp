@@ -8,15 +8,24 @@ namespace EN
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
         {
-            LOG(Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+            LOG(LogLevels::Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
         }
 	}
 
-	int EN_TCP_Client::GetServerPort() { return ServerPort; }
+	int EN_TCP_Client::GetServerPort() 
+	{ 
+		return ServerPort; 
+	}
 
-	std::string EN_TCP_Client::GetServerIpAddress() { return ServerIpAddress; }
+	std::string EN_TCP_Client::GetServerIpAddress()
+	{ 
+		return ServerIpAddress; 
+	}
 
-	EN_SOCKET EN_TCP_Client::GetSocket() { return ServerConnectionSocket; }
+	EN_SOCKET EN_TCP_Client::GetSocket() 
+	{ 
+		return ServerConnectionSocket; 
+	}
 
 	bool EN_TCP_Client::IsConnected()
 	{
@@ -68,7 +77,9 @@ namespace EN
 			ServerHandlerThread.join();
 		ServerHandlerMtx.unlock();
 
-		ServerHandlerThread = std::thread([this]() { this->ServerHandler(); });
+		if (IsRunMessageHadlerThread)
+			ServerHandlerThread = std::thread([this]() { this->ServerHandler(); });
+			
 		return true;
 	}
 
@@ -123,7 +134,7 @@ namespace EN
 
     void EN_TCP_Client::SetSocketOption(PredefinedSocketOptions socketOptions)
     {        
-        for (int i = 0; i < socketOptions.Levels.size(); ++i)
+        for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
 			EN::SetSocketOption(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
     }
 

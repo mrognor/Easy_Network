@@ -71,7 +71,7 @@ namespace EN
 		delete[] msgBuf;
 
 		// Return true if sended butes equals message length, otherwise return false
-		return (sendedBytes == messageLength);
+			return ((size_t)sendedBytes == messageLength + startIndex);
 	}
 
 	bool TCP_Recv(EN_SOCKET sock, std::string& message)
@@ -83,7 +83,6 @@ namespace EN
 		if (ConnectionStatus <= 0)
 		{
 			message = "";
-
 			CloseSocket(sock);
 			return false;
 		}
@@ -97,7 +96,6 @@ namespace EN
 			if (ConnectionStatus <= 0)
 			{
 				message = "";
-
 				CloseSocket(sock);
 				return false;
 			}	
@@ -121,7 +119,6 @@ namespace EN
 		if (ConnectionStatus != msg_size)
 		{
 			message = "";
-
 			CloseSocket(sock);
 			delete[] msg;
 			return false;
@@ -195,7 +192,6 @@ namespace EN
 		if (ConnectionStatus <= 0)
 		{
 			message = "";
-
 			CloseSocket(sock);
 			return false;
 		}
@@ -212,7 +208,6 @@ namespace EN
 			if (ConnectionStatus <= 0)
 			{
 				message = "";
-
 				CloseSocket(sock);
 				return false;
 			}	
@@ -261,7 +256,7 @@ namespace EN
 			if (StringToSplit[i] == SplitterString[0])
 			{
 				bool IsSplitter = true;
-				for (int j = 1; j < SplitterString.size(); j++)
+				for (size_t j = 1; j < SplitterString.size(); ++j)
 				{
 					if (StringToSplit[i + j] != SplitterString[j])
 					{
@@ -278,7 +273,7 @@ namespace EN
 				}
 			}
 			SplittedString += StringToSplit[i];
-			i++;
+			++i;
 		}
 		ReturnVector.push_back(SplittedString);
 		return ReturnVector;
@@ -715,7 +710,7 @@ namespace EN
 			return;
 
 		std::string AllMeasureName, SpeedName, Eta;
-		int AllMeasureSize, SpeedSize, EtaSize = 0;
+		int AllMeasureSize, SpeedSize;
 
 		AllMeasureName = "KB";
 		AllMeasureSize = 1024;

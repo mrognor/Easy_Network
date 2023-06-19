@@ -10,12 +10,12 @@ public:
 		Port = port; // Default port is 1111
 	}
 
-	void OnClientConnected(int ClientID)
+	void OnClientConnected(size_t ClientID)
 	{
 		std::cout << "Client Connected! id: " << ClientID << std::endl;
 	}
 
-	void ClientMessageHandler(std::string message, int ClientID)
+	void ClientMessageHandler(std::string message, size_t ClientID)
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
@@ -23,25 +23,29 @@ public:
 		bool ShouldShutdown = false;
 		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
-		if (message.find("send file") != -1)
+		if (message.find("send file") != -1ull)
 		{
 			EN::RecvFile(ClientSockets[ClientID], ShouldShutdown, EN::DownloadStatus);
 			return;
 		}
 		
-		if (message.find("get file") != -1)
+		if (message.find("get file") != -1ull)
 		{
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
+				std::cout << "Sending file" << std::endl;
 				SendToClient(ClientID, "ok");
 				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus);
 			}
 			else
-				EN::TCP_Send(ClientSockets[ClientID], "bad");
+			{
+				std::cout << "No file with this name" << std::endl;
+				SendToClient(ClientID, "bad");
+			}
 			return;
 		}
 
-		if (message.find("continue download") != -1)
+		if (message.find("continue download") != -1ull)
 		{
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
@@ -54,7 +58,7 @@ public:
 		}
 	}
 
-	void OnClientDisconnect(int ClientID)
+	void OnClientDisconnect(size_t ClientID)
 	{
 		std::cout << "Client disconnected! ID: " << ClientID << std::endl;
 	}
@@ -75,14 +79,31 @@ int main()
 
 	// No incorrect port check
 	MyServer A(vec[0], port);
-	A.Run();
-
+	try 
+	{
+		A.Run(); 
+	}
+	catch (std::runtime_error& err)
+	{
+		LOG(EN::LogLevels::Error, "Run throw error with error code: " + std::string(err.what()));
+	}
 
 	// Uncomment this code to make server standart console input.
 	// Using this you can write logic to kick clients or shutdown server
 	/*
 	MyServer A;
-	std::thread th([&A]() { A.Run(); });
+	std::thread th([&A]() 
+	{ 
+		try 
+		{
+			A.Run(); 
+		}
+		catch (std::runtime_error err)
+		{
+			LOG(EN::LogLevels::Error, "Run throw error with error code: " + std::string(err.what()));
+		}
+	});
+
 	th.detach();
 	std::string message;
 	while (true)
@@ -95,5 +116,4 @@ int main()
 		}
 	}
 	*/
-	system("pause");
 }

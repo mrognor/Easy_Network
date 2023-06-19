@@ -45,7 +45,7 @@ namespace EN
 		EN_ThreadCrossWalk CrossWalk;
 
 		// A method that processes messages from clients. Sends a message to the function ClientMessageHandler().
-		void ClientHandler(int ClientID);
+		void ClientHandler(size_t ClientID);
 	protected:
 
 		/// Server port. Default set to 1111
@@ -62,21 +62,21 @@ namespace EN
 
 			\warning Must be defined by the user
 		*/
-		virtual void OnClientConnected(int ClientID) = 0;
+		virtual void OnClientConnected(size_t ClientID) = 0;
 
 		/**
 			\brief Method that processes incoming messages
 
 			\warning Must be defined by the user
 		*/
-		virtual void ClientMessageHandler(std::string message, int ClientID) = 0;
+		virtual void ClientMessageHandler(std::string message, size_t ClientID) = 0;
 
 		/**
 			\brief Method that runs after the client is disconnected
 			
 			\warning Must be defined by the user
 		*/
-		virtual void OnClientDisconnect(int ClientID) = 0;
+		virtual void OnClientDisconnect(size_t ClientID) = 0;
 
 	public:
 		EN_TCP_Server();
@@ -105,7 +105,7 @@ namespace EN
 
 			\param[in] ClientID The number of the client to be disconnect
 		*/
-		void DisconnectClient(int ClientID);
+		void DisconnectClient(size_t ClientID);
 
 		/// Method that stops the server
 		void Shutdown();
@@ -118,7 +118,7 @@ namespace EN
 
 			\return Returns true in case of success, false if it was disconnection  
 		*/
-		bool SendToClient(int ClientId, std::string message);
+		bool SendToClient(size_t ClientId, std::string message);
 
         /**
 			\brief Method that wait new incoming message from client
@@ -131,7 +131,7 @@ namespace EN
 			\param[in] message The string to store incoming message
             \return Returns true in case of success, false if it was disconnection 
 		*/
-        bool WaitMessage(int ClientId, std::string& message);
+        bool WaitMessage(size_t ClientId, std::string& message);
 
         /**
            \brief The method sets options for accept socket.
@@ -188,7 +188,7 @@ namespace EN
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void SetSocketOption(int ClientID, int level, int optionName, int optionValue);
+        void SetSocketOption(size_t ClientID, int level, int optionName, int optionValue);
 
         /**
             \brief The method sets options for client socket
@@ -198,6 +198,8 @@ namespace EN
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects
         */
-        void SetSocketOption(int ClientID, PredefinedSocketOptions socketOptions);
+        void SetSocketOption(size_t ClientID, PredefinedSocketOptions socketOptions);
+
+		virtual ~EN_TCP_Server();
 	};
 }

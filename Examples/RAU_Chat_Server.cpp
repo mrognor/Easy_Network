@@ -11,7 +11,7 @@ public:
 		// You have to set synchronizied it with client
 	}
 
-	void OnClientConnected(int ClientID)
+	void OnClientConnected(size_t ClientID)
 	{
 		std::cout << "Client connected! Id: " << ClientID << std::endl;
 		SendToClient(ClientID, "Welcome. You are connected to server.");
@@ -19,7 +19,7 @@ public:
 		SendToClient(ClientID, "Unreliable", false);
 	}
 
-	void ClientMessageHandler(std::string message, int ClientID)
+	void ClientMessageHandler(std::string message, size_t ClientID)
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
@@ -33,7 +33,7 @@ public:
 		if (message == "TCP F" || message == "UDP F")
 			Shutdown();
 
-		for (int j = 0; j < GetConnectionsCount(); j++)
+		for (size_t j = 0; j < GetConnectionsCount(); j++)
 		{
 			if(message.find("TCP") == 0)
 				SendToClient(j, message);
@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	void OnClientDisconnect(int ClientID)
+	void OnClientDisconnect(size_t ClientID)
 	{
 		std::cout << "Client disconnected! ID: " << ClientID << std::endl;
 	}
@@ -51,5 +51,12 @@ int main()
 {
 	RAU_Server A;
 	// Start server
-	A.Run();
+	try 
+	{
+		A.Run(); 
+	}
+	catch (std::runtime_error& err)
+	{
+		LOG(EN::LogLevels::Error, "Run throw error with error code: " + std::string(err.what()));
+	}
 }

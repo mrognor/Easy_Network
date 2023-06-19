@@ -168,10 +168,11 @@ namespace EN
 
 		CloseSocket(UDP_ServerSocket);
 
-		if (GetSocketErrorCode() != 0)
+		if (!IsShutdown)
 		{
-			LOG(Error, "Error: Error on socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
-			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
+			int lastErrorCode = GetSocketErrorCode();
+			LOG(Error, "Error: Error on socket: " + std::to_string(lastErrorCode) + " " + EN::GetSocketErrorString(lastErrorCode));
+			throw (std::runtime_error(std::to_string(lastErrorCode)));
 		}
 	}
 
@@ -209,7 +210,9 @@ namespace EN
 
     void EN_UDP_Server::SetSocketOption(PredefinedSocketOptions socketOptions)
     {        
-        for (int i = 0; i < socketOptions.Levels.size(); ++i)
+        for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
             EN::SetSocketOption(UDP_ServerSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
     }
+
+	EN_UDP_Server::~EN_UDP_Server() {}
 }
