@@ -52,7 +52,7 @@ namespace EN
 		RAU_Server->KillThreads[ClientID] = true;
 		RAU_Server->VectorCondVars[ClientID]->notify_all();
 
-		Delay(300);
+		Delay<std::chrono::milliseconds>(300);
 
 		delete RAU_Server->VectorQueuesMessages[ClientID];
 		delete RAU_Server->VectorCondVars[ClientID];

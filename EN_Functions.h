@@ -107,7 +107,7 @@ namespace EN
 		\param[in] IsStop the reference to a boolean variable to stop file transfer  
 		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer. By default using EN::DownloadStatus 
 		\param[in] PreviouslySendedSize The fifth parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
-		\param[in] ChunksNumberBetweenDelay The sixth parameter is needed to regulate the file transfer rate. Gets amount of chunks between sending delay. 0 means no delay. The delay between sending the chunks is 20 millimeconds.
+		\param[in] microsecondsBetweenSendingChunks The sixth parameter is needed to regulate the file transfer rate. Set time in microseconds between sending one kilobyte. 0 means no delay
 		\return Returns true in case of file transmition success, false otherwise
 		
 		By default, the library progress function is used to output to the console.  
@@ -115,7 +115,7 @@ namespace EN
 	*/ 
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FilePath, bool& IsStop, 
 		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, 
-		uint64_t PreviouslySendedSize = 0, int ChunksNumberBetweenDelay = 0);
+		uint64_t PreviouslySendedSize = 0, uint64_t microsecondsBetweenSendingChunks = 0);
 
 	/*!
 		\brief This function will wait incoming file.
@@ -160,9 +160,6 @@ namespace EN
 	/// \brief Return file size in bytes
 	/// If couldn't open the file return 0
 	uint64_t GetFileSize(std::string FileName);
-
-	/// Crossplatform function for program suspension
-	void Delay(int milliseconds);
 
 	/// Returns the number of processor cores
 	int GetCPUCores();
@@ -245,6 +242,13 @@ namespace EN
         \param [in] optionValue Socket option value
     */
     void SetSocketOption(EN_SOCKET socket, int level, int optionName, int optionValue);
+
+	/// Crossplatform function for program suspension
+    template <class T>
+	void Delay(uint64_t timeToWait)
+    {
+        std::this_thread::sleep_for(T(timeToWait));
+    }
 
     /**
         This function returns a fraction of a current second. 

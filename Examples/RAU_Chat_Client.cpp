@@ -83,7 +83,7 @@ int main()
 					IsSuccessConnection = true;
 					break;
 				}
-				EN::Delay(20);
+				EN::Delay<std::chrono::milliseconds>(20);
 			}
 			if (!IsSuccessConnection)
 				break;

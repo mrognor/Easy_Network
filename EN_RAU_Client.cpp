@@ -36,14 +36,14 @@ namespace EN
 		RAU_Client->OnDisconnect();
 		RAU_Client->UDP_Client->Stop();
 
-		Delay(300);
+		Delay<std::chrono::milliseconds>(300);
 
 		RAU_Client->IsServerGetUDPAddress = true;
 		RAU_Client->IsShutdown = true;
 
 		RAU_Client->CondVar.notify_all();
 
-		Delay(300);
+		Delay<std::chrono::milliseconds>(300);
 
 		RAU_Client->IsServerGetUDPAddress = false;
 		RAU_Client->IsShutdown = false;

@@ -67,18 +67,25 @@ public:
 
 int main()
 {
-	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234. \nIf you dont write port it will be default value: 1111" << std::endl;
-	std::string ip;
-	getline(std::cin, ip);
-	auto vec = EN::Split(ip, ":");
+	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234." << std::endl;
+	std::cout << "If you dont write ip it will be default value: 127.0.0.1" << std::endl;
+	std::cout << "If you dont write port it will be default value: 1111" << std::endl;
 	
+	std::string addr, ip;
 	int port;
+
+	getline(std::cin, addr);
+	auto vec = EN::Split(addr, ":");
+	
+	if (addr.empty())
+		ip = "127.0.0.1";
+
 	if (vec.size() == 2)
 		port = std::atoi(vec[1].c_str());
 	else port = 1111; // Default value 
 
 	// No incorrect port check
-	MyServer A(vec[0], port);
+	MyServer A(ip, port);
 	try 
 	{
 		A.Run(); 

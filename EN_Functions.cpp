@@ -281,7 +281,7 @@ namespace EN
 
 	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop,
 		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), 
-		uint64_t PreviouslySendedSize, int ChunksNumberBetweenDelay)
+		uint64_t PreviouslySendedSize, uint64_t microsecondsBetweenSendingChunks)
 	{	
 		// Open sending file
 		std::ifstream SendingFile(FileName, std::ios::binary);
@@ -315,7 +315,6 @@ namespace EN
 		{
 			std::time_t t = std::time(0);
 			uint64_t LastSendMessageSize = 0;
-			int SpeedStep = 0;
 
 			// Skip while loop if file size less when send buffer
 			if (FileSize < SendFileBufLen)
@@ -347,16 +346,8 @@ namespace EN
 				}
 
 				// Regulate transfering speed
-				if (ChunksNumberBetweenDelay > 0)
-				{
-					if (SpeedStep > ChunksNumberBetweenDelay)
-					{
-						EN::Delay(20);
-						SpeedStep = 0;
-					}
-					else
-						SpeedStep++;
-				}
+				if (microsecondsBetweenSendingChunks > 0)
+					EN::Delay<std::chrono::microseconds>(microsecondsBetweenSendingChunks);
 
 				// Read binary data
 				SendingFile.read(MessageBuf, SendFileBufLen);
@@ -370,7 +361,7 @@ namespace EN
 					delete[] MessageBuf;
 					return false;
 				}
-
+				
 				// Add sending bytes
 				SendMessageSize += SendBytes;
 				memset(MessageBuf, 0, SendFileBufLen);
@@ -777,16 +768,10 @@ namespace EN
 		return FileSize;
 	}
 
-	void Delay(int milliseconds)
-	{
-		#if defined WIN32 || defined _WIN64
-		Sleep(milliseconds);
-		#else
-		usleep(milliseconds * 1000);
-		#endif
+    int GetCPUCores() 
+	{ 
+		return std::thread::hardware_concurrency(); 
 	}
-
-    int GetCPUCores() { return std::thread::hardware_concurrency(); }
 
     int GetSocketErrorCode()
     {

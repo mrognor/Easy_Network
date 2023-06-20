@@ -13,9 +13,9 @@ namespace EN
 		IsRunMessageHadlerThread = false;
 	};
 
-	bool EN_TCP_FileSender::SendFileToServer(std::string FileName, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), int DelayInMilliseconds)
+	bool EN_TCP_FileSender::SendFileToServer(std::string FileName, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), uint64_t previouslySendedBytes, uint64_t microsecondsBetweenSendingChunks)
 	{
-		bool sendRes = EN::SendFile(GetSocket(), FileName, IsStop, ProgressFunction, DelayInMilliseconds);
+		bool sendRes = EN::SendFile(GetSocket(), FileName, IsStop, ProgressFunction, previouslySendedBytes, microsecondsBetweenSendingChunks);
 		if (sendRes)
 		{
 			LOG(Info, "File transfer ended");
