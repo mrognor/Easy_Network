@@ -51,8 +51,15 @@ namespace EN
 		/// Server port. Default set to 1111
 		int Port = 1111;
 
-		/// Server ip address string. Default set to localhost
-		std::string IpAddress = "127.0.0.1";
+		/**
+			\brief Server ip address string. 
+			
+			Default set to empty string. Equals INADDR_ANY Which means that the server can accept connections from any computer network.
+			For example. The computer can be connected to a local network and to a VPN network. 
+			Then it will have 2 network interfaces and it will be possible to connect from both networks. 
+			Use this variable only if you want to accept connections from one specific network.
+		*/
+		std::string IpAddress = "";
 
 		/// vector of sockets of connected clients
 		std::vector<EN_SOCKET> ClientSockets;

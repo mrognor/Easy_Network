@@ -7,7 +7,7 @@ class MyServer : public EN::EN_TCP_Server
 public:
 	MyServer()
 	{
-		// IpAddress = "192.168.1.64"; //Default set to localhost
+		// IpAddress = "192.168.1.64"; // Default set to localhost. Read description for this variable before use it.
 		// Port = <put int here> to set port. Default port is 1111
 	}
 

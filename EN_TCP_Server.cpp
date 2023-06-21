@@ -33,9 +33,12 @@ namespace EN
 		sockaddr_in ServerAddress;
 		ServerAddress.sin_family = AF_INET;
 		ServerAddress.sin_port = htons(Port);
-		
+
 		// Set ip address
-		inet_pton(AF_INET, IpAddress.c_str(), &ServerAddress.sin_addr);
+		if (IpAddress.empty())
+			ServerAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+		else
+			inet_pton(AF_INET, IpAddress.c_str(), &ServerAddress.sin_addr);
 
 		// Create socket to listen incoming connections
 		ServerListenSocket = socket(AF_INET, SOCK_STREAM, 0);
