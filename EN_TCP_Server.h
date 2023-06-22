@@ -22,6 +22,7 @@ typedef int EN_SOCKET;
 #include "EN_SocketOptions.h"
 #include "EN_ThreadCrossWalk.h"
 
+#include <list>
 
 namespace EN
 {
@@ -45,7 +46,7 @@ namespace EN
 		EN_ThreadCrossWalk CrossWalk;
 
 		// A method that processes messages from clients. Sends a message to the function ClientMessageHandler().
-		void ClientHandler(size_t ClientID);
+		void ClientHandler(EN_SOCKET clientSocket);
 	protected:
 
 		/// Server port. Default set to 1111
@@ -61,29 +62,29 @@ namespace EN
 		*/
 		std::string IpAddress = "";
 
-		/// vector of sockets of connected clients
-		std::vector<EN_SOCKET> ClientSockets;
+		/// List of sockets of connected clients
+		std::list<EN_SOCKET> ClientSockets;
 		
 		/**
 			\brief The method that is executed when the client connects to the server
 
 			\warning Must be defined by the user
 		*/
-		virtual void OnClientConnected(size_t ClientID) = 0;
+		virtual void OnClientConnected(EN_SOCKET clientSocket) = 0;
 
 		/**
 			\brief Method that processes incoming messages
 
 			\warning Must be defined by the user
 		*/
-		virtual void ClientMessageHandler(std::string message, size_t ClientID) = 0;
+		virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) = 0;
 
 		/**
 			\brief Method that runs after the client is disconnected
 			
 			\warning Must be defined by the user
 		*/
-		virtual void OnClientDisconnect(size_t ClientID) = 0;
+		virtual void OnClientDisconnect(EN_SOCKET clientSocket) = 0;
 
 	public:
 		EN_TCP_Server();
@@ -110,9 +111,9 @@ namespace EN
 		/**
 			\brief Method that disconnects the client from the server
 
-			\param[in] ClientID The number of the client to be disconnect
+			\param[in] clientSocket The number of the client to be disconnect
 		*/
-		void DisconnectClient(size_t ClientID);
+		void DisconnectClient(EN_SOCKET clientSocket);
 
 		/// Method that stops the server
 		void Shutdown();
@@ -120,12 +121,12 @@ namespace EN
 		/**
 			\brief Method that send message to client
 
-			\param[in] ClientID The number of the client 
+			\param[in] clientSocket The number of the client 
 			\param[in] message The message to be sent to the client 
 
 			\return Returns true in case of success, false if it was disconnection  
 		*/
-		bool SendToClient(size_t ClientId, std::string message);
+		bool SendToClient(EN_SOCKET clientSocket, std::string message);
 
         /**
 			\brief Method that wait new incoming message from client
@@ -134,12 +135,30 @@ namespace EN
             This is necessary so that there is no waiting for a new message in different threads, which leads to undefined behavior.
             Note that you still can use this function on client connection because ClientMessageHandler invokes after OnClientConnected.
             
-            \param[in] ClientID The number of the client 
+            \param[in] clientSocket The number of the client 
 			\param[in] message The string to store incoming message
             \return Returns true in case of success, false if it was disconnection 
 		*/
-        bool WaitMessage(size_t ClientId, std::string& message);
+        bool WaitMessage(EN_SOCKET clientSocket, std::string& message);
 
+		/**
+			\brief Function to lock client sockets list
+
+			This function is necessary to synchronize multiple threads when working with a list of connected clients. 
+			It will not allow other threads to change the list, while the ability to send messages and read them from 
+			the list items remains. Equals ThreadCrossWalk.CarStartCrossRoad();
+		 */
+		void LockClientSockets();
+
+		/**
+			\brief Function to unlock client sockets list
+
+			This function is necessary to synchronize multiple threads when working with a list of connected clients. 
+			It will not allow other threads to change the list, while the ability to send messages and read them from 
+			the list items remains. Equals ThreadCrossWalk.CarStartCrossRoad();
+		 */
+		void UnlockClientSockets();
+		
         /**
            \brief The method sets options for accept socket.
            Accept socket accepts incoming connections from clients
@@ -189,23 +208,23 @@ namespace EN
         /**
            \brief The method sets options for client socket
 
-            \param[in] ClientID The number of the client 
+            \param[in] clientSocket The number of the client 
             \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
 			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void SetSocketOption(size_t ClientID, int level, int optionName, int optionValue);
+        void SetSocketOption(EN_SOCKET clientSocket, int level, int optionName, int optionValue);
 
         /**
             \brief The method sets options for client socket
 
-            \param[in] ClientID The number of the client 
+            \param[in] clientSocket The number of the client 
             \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects
         */
-        void SetSocketOption(size_t ClientID, PredefinedSocketOptions socketOptions);
+        void SetSocketOption(EN_SOCKET clientSocket, PredefinedSocketOptions socketOptions);
 
 		virtual ~EN_TCP_Server();
 	};

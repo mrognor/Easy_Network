@@ -85,9 +85,9 @@ This is a small overview of the library classes to simplify class selection
 These classes support connection and have got only reliable message sending.  
 ### EN_TCP_Server  
 You have to define 3 methods
-1. void OnClientConnected(int ClientID)  
-2. void ClientMessageHandler(std::string message, int ClientID)  
-3. void OnClientDisconnect(int ClientID)  
+1. void OnClientConnected(EN_SOCKET clientSocket)  
+2. void ClientMessageHandler(EN_SOCKET clientSocket, std::string message)  
+3. void OnClientDisconnect(EN_SOCKET clientSocket)  
 
 The server ip address and port are set in the constructor.  
 To start the server, you need to call the Run method  

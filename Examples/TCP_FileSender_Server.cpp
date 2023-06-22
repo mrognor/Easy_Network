@@ -10,12 +10,12 @@ public:
 		Port = port; // Default port is 1111
 	}
 
-	void OnClientConnected(size_t ClientID)
+	void OnClientConnected(EN_SOCKET clientSocket)
 	{
-		std::cout << "Client Connected! id: " << ClientID << std::endl;
+		std::cout << "Client connected! Socket descriptor: " << clientSocket << std::endl;
 	}
 
-	void ClientMessageHandler(std::string message, size_t ClientID)
+	void ClientMessageHandler(EN_SOCKET clientSocket, std::string message)
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
@@ -25,7 +25,7 @@ public:
 
 		if (message.find("send file") != -1ull)
 		{
-			EN::RecvFile(ClientSockets[ClientID], ShouldShutdown, EN::DownloadStatus);
+			EN::RecvFile(clientSocket, ShouldShutdown, EN::DownloadStatus);
 			return;
 		}
 		
@@ -34,13 +34,13 @@ public:
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
 				std::cout << "Sending file" << std::endl;
-				SendToClient(ClientID, "ok");
-				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus);
+				SendToClient(clientSocket, "ok");
+				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus);
 			}
 			else
 			{
 				std::cout << "No file with this name" << std::endl;
-				SendToClient(ClientID, "bad");
+				SendToClient(clientSocket, "bad");
 			}
 			return;
 		}
@@ -49,18 +49,18 @@ public:
 		{
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
-				SendToClient(ClientID, "ok");
-				EN::SendFile(ClientSockets[ClientID], InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus, std::stoll(InterpretedMessage[3]));
+				SendToClient(clientSocket, "ok");
+				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus, std::stoll(InterpretedMessage[3]));
 			}
 			else
-				EN::TCP_Send(ClientSockets[ClientID], "bad");
+				EN::TCP_Send(clientSocket, "bad");
 			return;
 		}
 	}
 
-	void OnClientDisconnect(size_t ClientID)
+	void OnClientDisconnect(EN_SOCKET clientSocket)
 	{
-		std::cout << "Client disconnected! ID: " << ClientID << std::endl;
+		std::cout << "Client disconnected! Socket descriptor: " << clientSocket << std::endl;
 	}
 };
 

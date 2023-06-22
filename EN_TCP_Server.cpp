@@ -101,8 +101,8 @@ namespace EN
 				
 				// Disconnect all connected clients
 				CrossWalk.PedestrianStartCrossRoad();
-				for (size_t i = 0; i < ClientSockets.size(); ++i)
-					CloseSocket(ClientSockets[i]);
+				for (EN_SOCKET sock : ClientSockets)
+					CloseSocket(sock);
 				CrossWalk.PedestrianStopCrossRoad();
 
 				CloseSocket(IncomingConnection);
@@ -126,28 +126,12 @@ namespace EN
                 for (const auto& it : CreateSocketsOption)
                     EN::SetSocketOption(IncomingConnection, it.Level, it.OptionName, it.OptionValue);
 
-				bool WasReusedSocket = false;
-
 				CrossWalk.PedestrianStartCrossRoad();
-				for (size_t i = 0; i < ClientSockets.size(); ++i)
-				{
-					if (ClientSockets[i] == INVALID_SOCKET)
-					{
-						ClientSockets[i] = IncomingConnection;
-						std::thread ClientHandlerThread([this, i]() { this->ClientHandler(i); });
-						ClientHandlerThread.detach();
-						WasReusedSocket = true;
-						break;
-					}
-				}
-				if (WasReusedSocket == false)
-				{
-					ClientSockets.push_back(IncomingConnection);
 
-					size_t i = ClientSockets.size() - 1;
-					std::thread ClientHandlerThread([this, i]() { this->ClientHandler(i); });
-					ClientHandlerThread.detach();
-				}
+				ClientSockets.push_back(IncomingConnection);
+				std::thread ClientHandlerThread([this, IncomingConnection]() { this->ClientHandler(IncomingConnection); });
+				ClientHandlerThread.detach();
+
 				CrossWalk.PedestrianStopCrossRoad();
 			}
 		}
@@ -163,18 +147,12 @@ namespace EN
 		CrossWalk.PedestrianStopCrossRoad();
 	}
 
-	void EN_TCP_Server::ClientHandler(size_t ClientID)
+	void EN_TCP_Server::ClientHandler(EN_SOCKET clientSocket)
 	{
-		OnClientConnected(ClientID);
+		OnClientConnected(clientSocket);
 
 		std::string message;
 		bool ConnectionStatus = true;
-		EN_SOCKET clientSocket = INVALID_SOCKET;
-
-		CrossWalk.CarStartCrossRoad();
-		if (ClientSockets.size() > ClientID)
-			clientSocket = ClientSockets[ClientID];
-		CrossWalk.CarStopCrossRoad();
 
 		while (true)
 		{
@@ -182,38 +160,32 @@ namespace EN
 
 			if (ConnectionStatus == false)
 			{
-				OnClientDisconnect(ClientID);
+				OnClientDisconnect(clientSocket);
 				break;
 			}
 
-			ClientMessageHandler(message, ClientID);
+			ClientMessageHandler(clientSocket, message);
 		}
 
         CloseSocket(clientSocket);
 
 		CrossWalk.PedestrianStartCrossRoad();
 
-		ClientSockets[ClientID] = INVALID_SOCKET;
-		if (ClientID == ClientSockets.size() - 1)
+		for (auto sock = ClientSockets.begin(); sock != ClientSockets.end(); ++sock)
 		{
-			for (int i = (int)ClientSockets.size() - 1; i >= 0; --i)
+			if (*sock == clientSocket)
 			{
-				if (ClientSockets[i] == INVALID_SOCKET)
-					ClientSockets.pop_back();
-				else
-					break;
+				ClientSockets.erase(sock);
+				break;
 			}
 		}
 
 		CrossWalk.PedestrianStopCrossRoad();
 	}
 
-	void EN_TCP_Server::DisconnectClient(size_t ClientID)
+	void EN_TCP_Server::DisconnectClient(EN_SOCKET clientSocket)
 	{
-		CrossWalk.CarStartCrossRoad();
-		if (ClientSockets.size() > ClientID)
-			CloseSocket(ClientSockets[ClientID]);
-		CrossWalk.CarStopCrossRoad();
+		CloseSocket(clientSocket);
 	}
 
 	void EN_TCP_Server::Shutdown()
@@ -235,26 +207,25 @@ namespace EN
 		CloseSocket(ServerListenSocket);
 	}
 
-	bool EN_TCP_Server::SendToClient(size_t ClientId, std::string message)
+	bool EN_TCP_Server::SendToClient(EN_SOCKET clientSocket, std::string message)
 	{
-		bool res = false;
-		CrossWalk.CarStartCrossRoad();
-		if (ClientSockets.size() > ClientId)
-			res = EN::TCP_Send(ClientSockets[ClientId], message);
-		CrossWalk.CarStopCrossRoad();
-		return res;
+		return EN::TCP_Send(clientSocket, message);
 	}
 
-    bool EN_TCP_Server::WaitMessage(size_t ClientId, std::string& message)
+    bool EN_TCP_Server::WaitMessage(EN_SOCKET clientSocket, std::string& message)
     {
-		EN_SOCKET clientSocket = INVALID_SOCKET;
-		CrossWalk.CarStartCrossRoad();
-		if (ClientSockets.size() > ClientId)
-			clientSocket = ClientSockets[ClientId];
-		CrossWalk.CarStopCrossRoad();
-
 		return EN::TCP_Recv(clientSocket, message);;
     }
+
+	void EN_TCP_Server::LockClientSockets()
+	{
+		CrossWalk.CarStartCrossRoad();
+	}
+
+	void EN_TCP_Server::UnlockClientSockets()
+	{
+		CrossWalk.CarStopCrossRoad();
+	}
 
     void EN_TCP_Server::SetAcceptSocketOption(int level, int optionName, int optionValue)
     {
@@ -288,21 +259,15 @@ namespace EN
         }
     }
 
-    void EN_TCP_Server::SetSocketOption(size_t ClientID, int level, int optionName, int optionValue)
+    void EN_TCP_Server::SetSocketOption(EN_SOCKET clientSocket, int level, int optionName, int optionValue)
     {
-		CrossWalk.CarStartCrossRoad();
-		if (ClientSockets.size() > ClientID)
-        	EN::SetSocketOption(ClientSockets[ClientID], level, optionName, optionValue);
-		CrossWalk.CarStopCrossRoad();
+        EN::SetSocketOption(clientSocket, level, optionName, optionValue);
     }
 
-    void EN_TCP_Server::SetSocketOption(size_t ClientID, PredefinedSocketOptions socketOptions)
+    void EN_TCP_Server::SetSocketOption(EN_SOCKET clientSocket, PredefinedSocketOptions socketOptions)
     {
-		CrossWalk.CarStartCrossRoad();
         for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
-			if (ClientSockets.size() > ClientID)
-            	EN::SetSocketOption(ClientSockets[ClientID], socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
-		CrossWalk.CarStopCrossRoad();
+            	EN::SetSocketOption(clientSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
     }
 
 	EN_TCP_Server::~EN_TCP_Server() {}

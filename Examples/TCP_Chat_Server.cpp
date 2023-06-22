@@ -11,13 +11,13 @@ public:
 		// Port = <put int here> to set port. Default port is 1111
 	}
 
-	void OnClientConnected(size_t ClientID)
+	void OnClientConnected(EN_SOCKET clientSocket)
 	{
-		std::cout << "Client connected! Id: " << ClientID << std::endl;
-		SendToClient(ClientID, "Welcome. You are connected to server.");
+		std::cout << "Client connected! Socket descriptor: " << clientSocket << std::endl;
+		SendToClient(clientSocket, "Welcome. You are connected to server.");
 	}
 
-	void ClientMessageHandler(std::string message, size_t ClientID)
+	void ClientMessageHandler(EN_SOCKET clientSocket, std::string message)
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
@@ -25,7 +25,7 @@ public:
 
 		// Disconnect client
 		if (message == "d")
-			DisconnectClient(ClientID); 
+			DisconnectClient(clientSocket); 
 
 		// Shutdown server
 		if (message == "F")
@@ -34,17 +34,22 @@ public:
 			Shutdown(); 
 		}
 
-		// Send incoming message to all different clients 
-		for (size_t j = 0; j < GetConnectionsCount(); ++j)
+		// Send incoming message to all different clients
+		// Blocking the client sockets list is necessary because while the cycle is going through, 
+		// one of the clients may disconnect and UB will occur. If the client disconnects during the lock, 
+		// its socket will not be released until the unlock occurs, and the Send method for this client returns false
+		LockClientSockets();
+		for (EN_SOCKET sock : ClientSockets)
 		{
-			if (j != ClientID)
-				SendToClient(j, message);
+			if (sock != clientSocket)
+				SendToClient(sock, message);
 		}
+		UnlockClientSockets();
 	}
 
-	void OnClientDisconnect(size_t ClientID)
+	void OnClientDisconnect(EN_SOCKET clientSocket)
 	{
-		std::cout << "Client disconnected! ID: " << ClientID << std::endl;
+		std::cout << "Client disconnected! Socket descriptor: " << clientSocket << std::endl;
 	}
 };
 
