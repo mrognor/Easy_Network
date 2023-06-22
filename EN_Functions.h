@@ -243,15 +243,32 @@ namespace EN
     */
     void SetSocketOption(EN_SOCKET socket, int level, int optionName, int optionValue);
 
-	/// Crossplatform function for program suspension
-    template <class T>
+	/**
+        \brief Crossplatform function for program suspension
+
+        By default, the function takes milliseconds, but using the type definition, 
+        you can change the type of the accepted value
+        For example:
+        EN::Delay(100); Will suspend thread for 100 milliseconds
+        EN::Delay<std::chrono::microseconds>(100); Will suspend thread for 100 microseconds
+
+        Possible specializations:
+        std::chrono::nanoseconds
+        std::chrono::microseconds
+        std::chrono::milliseconds
+        std::chrono::seconds
+        std::chrono::minutes
+        std::chrono::hours
+    */
+    template <class T = std::chrono::milliseconds>
 	void Delay(uint64_t timeToWait)
     {
         std::this_thread::sleep_for(T(timeToWait));
     }
 
     /**
-        This function returns a fraction of a current second. 
+        \brief This function returns a fraction of a current second.
+
         Accepts the time data type from the chrono library as a template.
         
         Possible specializations:
