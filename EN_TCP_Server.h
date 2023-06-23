@@ -22,8 +22,6 @@ typedef int EN_SOCKET;
 #include "EN_SocketOptions.h"
 #include "EN_ThreadCrossWalk.h"
 
-#include <list>
-
 namespace EN
 {
 	/// Base tcp server class
@@ -34,7 +32,10 @@ namespace EN
 		std::atomic_bool IsShutdown;
 
         // Vector with options to be set after client connected
-        std::vector<SocketOption> CreateSocketsOption;
+        std::vector<SocketOption> SocketOptionsAfterConnection;
+
+		// Vector with options to be set on accept socket
+        std::vector<SocketOption> AcceptSocketOptions;
 
         // Socket to accept incoming clients
         EN_SOCKET ServerListenSocket = INVALID_SOCKET;
@@ -62,8 +63,13 @@ namespace EN
 		*/
 		std::string IpAddress = "";
 
-		/// List of sockets of connected clients
-		std::list<EN_SOCKET> ClientSockets;
+		/**
+			\brief Set of sockets of connected clients
+
+			\warning Dont modify set because it is not thread safety
+			You can only work with set elements, for this use the methods LockClientSockets and UnlockClientSockets
+		*/
+		std::set<EN_SOCKET> ClientSockets;
 		
 		/**
 			\brief The method that is executed when the client connects to the server
@@ -95,7 +101,13 @@ namespace EN
 		/// Ip getter
 		std::string GetIpAddr();
 
-		/// The function returns the number of connected devices
+		/**
+			\brief The function returns the number of connected devices
+
+			\warning Use the function only inside methods LockClientSockets and UnlockClientSockets
+			This is necessary because you can write logic depending on the number of connected clients, 
+			and after receiving the number, one of the clients will disconnect.
+		*/
 		size_t GetConnectionsCount();
 
 		/**
@@ -118,6 +130,12 @@ namespace EN
 		/// Method that stops the server
 		void Shutdown();
 		
+		/// Method that disconnect all connected clients
+		void DisconnectAllConnectedClients();
+
+		/// Method to wait while all clients disconnect
+		void WaitWhileAllClientsDisconnect();
+
 		/**
 			\brief Method that send message to client
 
@@ -127,6 +145,13 @@ namespace EN
 			\return Returns true in case of success, false if it was disconnection  
 		*/
 		bool SendToClient(EN_SOCKET clientSocket, std::string message);
+
+		/**
+			\brief Method that send message to all connected clients
+
+			\param[in] message The message to be sent to the client 
+		*/
+		void MulticastSend(std::string message);
 
         /**
 			\brief Method that wait new incoming message from client
@@ -168,7 +193,7 @@ namespace EN
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void SetAcceptSocketOption(int level, int optionName, int optionValue);
+        void AddAcceptSocketOption(int level, int optionName, int optionValue);
 
         /**
             \brief The method sets options for accept socket.
@@ -178,7 +203,7 @@ namespace EN
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects
         */
-        void SetAcceptSocketOption(PredefinedSocketOptions socketOptions);
+        void AddAcceptSocketOption(PredefinedSocketOptions socketOptions);
 
         /**
            \brief The method sets options for all sockets that will connect after its call
@@ -208,7 +233,7 @@ namespace EN
         /**
            \brief The method sets options for client socket
 
-            \param[in] clientSocket The number of the client 
+            \param[in] clientSocket The descriptor of the client 
             \param[in] level The level at which the option is defined (for example, SOL_SOCKET).
 			\param[in] optionName The socket option for which the value is to be set (for example, SO_BROADCAST). 
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
@@ -219,7 +244,7 @@ namespace EN
         /**
             \brief The method sets options for client socket
 
-            \param[in] clientSocket The number of the client 
+            \param[in] clientSocket The descriptor of the client 
             \param[in] socketOptions This parameter takes a predefined structure to specify a package of socket options at once. 
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects

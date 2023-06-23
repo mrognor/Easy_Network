@@ -89,7 +89,7 @@ int main()
 			break;
 		}
 		
-		A.SendToClient(0, message);
+		A.MulticastSend(message);
 	}
 
 	th.join();

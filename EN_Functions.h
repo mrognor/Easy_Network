@@ -25,6 +25,7 @@ typedef int EN_SOCKET;
 #include <ctime>
 #include <fstream>
 #include <exception>
+#include <set>
 
 #include "EN_ParallelFor.h"
 #include "EN_Logger.h"

@@ -26,7 +26,7 @@ public:
 
 
 int main()
-{	
+{
 	MyClient A;
 
 	// Check if connection success

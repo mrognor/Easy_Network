@@ -67,6 +67,10 @@ namespace EN
 		}
 
 		EN_SOCKET IncomingConnection;
+
+		for (const auto& it : AcceptSocketOptions)
+                    EN::SetSocketOption(ServerListenSocket, it.Level, it.OptionName, it.OptionValue);
+		
 		ShutdownMutex.unlock();
 
 		// Handle new connections
@@ -82,10 +86,8 @@ namespace EN
 			// Shutdown server
 			if (IsShutdown.load() == true)
 			{
-				CrossWalk.PedestrianStartCrossRoad();
-				for (EN_SOCKET sock : ClientSockets)
-					CloseSocket(sock);
-				CrossWalk.PedestrianStopCrossRoad();
+				// Disconnect all connected clients
+				DisconnectAllConnectedClients();
 
 				CloseSocket(IncomingConnection);
 				CloseSocket(ServerListenSocket);
@@ -100,35 +102,25 @@ namespace EN
                 LOG(Hint, "Accept on server listen socket return invalid socket. It may occur by invalid server ip address");
 				
 				// Disconnect all connected clients
-				CrossWalk.PedestrianStartCrossRoad();
-				for (EN_SOCKET sock : ClientSockets)
-					CloseSocket(sock);
-				CrossWalk.PedestrianStopCrossRoad();
+				DisconnectAllConnectedClients();
 
 				CloseSocket(IncomingConnection);
 				CloseSocket(ServerListenSocket);
 				ServerListenSocket = INVALID_SOCKET;
 
 				// Wait while all clients disconnect
-				while (true)
-				{
-					CrossWalk.PedestrianStartCrossRoad();
-					if (ClientSockets.size() == 0)
-						break;
-					CrossWalk.PedestrianStopCrossRoad();
-				}
-				CrossWalk.PedestrianStopCrossRoad();
+				WaitWhileAllClientsDisconnect();
 
 				throw (std::runtime_error(std::to_string(acceptError)));
 			}
 			else
 			{
-                for (const auto& it : CreateSocketsOption)
+                for (const auto& it : SocketOptionsAfterConnection)
                     EN::SetSocketOption(IncomingConnection, it.Level, it.OptionName, it.OptionValue);
 
 				CrossWalk.PedestrianStartCrossRoad();
 
-				ClientSockets.push_back(IncomingConnection);
+				ClientSockets.insert(IncomingConnection);
 				std::thread ClientHandlerThread([this, IncomingConnection]() { this->ClientHandler(IncomingConnection); });
 				ClientHandlerThread.detach();
 
@@ -137,14 +129,7 @@ namespace EN
 		}
 
 		// Wait while all clients disconnect
-		while (true)
-		{
-			CrossWalk.PedestrianStartCrossRoad();
-			if (ClientSockets.size() == 0)
-				break;
-			CrossWalk.PedestrianStopCrossRoad();
-		}
-		CrossWalk.PedestrianStopCrossRoad();
+		WaitWhileAllClientsDisconnect();
 	}
 
 	void EN_TCP_Server::ClientHandler(EN_SOCKET clientSocket)
@@ -152,7 +137,7 @@ namespace EN
 		OnClientConnected(clientSocket);
 
 		std::string message;
-		bool ConnectionStatus = true;
+		bool ConnectionStatus;
 
 		while (true)
 		{
@@ -171,21 +156,29 @@ namespace EN
 
 		CrossWalk.PedestrianStartCrossRoad();
 
-		for (auto sock = ClientSockets.begin(); sock != ClientSockets.end(); ++sock)
-		{
-			if (*sock == clientSocket)
-			{
-				ClientSockets.erase(sock);
-				break;
-			}
-		}
+		ClientSockets.erase(clientSocket);
 
 		CrossWalk.PedestrianStopCrossRoad();
 	}
 
 	void EN_TCP_Server::DisconnectClient(EN_SOCKET clientSocket)
 	{
-		CloseSocket(clientSocket);
+		CrossWalk.CarStartCrossRoad();
+		
+		bool wasDeletion = false;
+
+		if (ClientSockets.find(clientSocket) != ClientSockets.end())
+		{
+			CloseSocket(clientSocket);
+			wasDeletion = true;
+		}
+
+		CrossWalk.CarStopCrossRoad();
+
+		if (!wasDeletion)
+		{
+			LOG(LogLevels::Warning, "You are trying to close non client socket");
+		}
 	}
 
 	void EN_TCP_Server::Shutdown()
@@ -205,16 +198,67 @@ namespace EN
 		}
 
 		CloseSocket(ServerListenSocket);
+
+		// Wait while all clients disconnect
+		WaitWhileAllClientsDisconnect();
+	}
+
+	void EN_TCP_Server::DisconnectAllConnectedClients()
+	{
+		CrossWalk.PedestrianStartCrossRoad();
+		for (EN_SOCKET sock : ClientSockets)
+			CloseSocket(sock);
+		CrossWalk.PedestrianStopCrossRoad();
+	}
+
+	void EN_TCP_Server::WaitWhileAllClientsDisconnect()
+	{
+		while (true)
+		{
+			CrossWalk.CarStartCrossRoad();
+			if (ClientSockets.size() == 0)
+				break;
+			CrossWalk.CarStopCrossRoad();
+		}
+		CrossWalk.CarStopCrossRoad();
 	}
 
 	bool EN_TCP_Server::SendToClient(EN_SOCKET clientSocket, std::string message)
 	{
-		return EN::TCP_Send(clientSocket, message);
+		CrossWalk.CarStartCrossRoad();
+		
+		bool wasSend = false;
+		bool res = false;
+
+		if (ClientSockets.find(clientSocket) != ClientSockets.end())
+		{
+			res = EN::TCP_Send(clientSocket, message);
+			wasSend = true;
+		}
+		
+		CrossWalk.CarStopCrossRoad();
+
+		if (!wasSend)
+		{
+			LOG(LogLevels::Warning, "You are trying to send to non client socket");
+		}
+
+		return res;
+	}
+
+	void EN_TCP_Server::MulticastSend(std::string message)
+	{
+		CrossWalk.CarStartCrossRoad();
+
+		for (const EN_SOCKET it : ClientSockets)
+			EN::TCP_Send(it, message);
+
+		CrossWalk.CarStopCrossRoad();
 	}
 
     bool EN_TCP_Server::WaitMessage(EN_SOCKET clientSocket, std::string& message)
     {
-		return EN::TCP_Recv(clientSocket, message);;
+		return EN::TCP_Recv(clientSocket, message);
     }
 
 	void EN_TCP_Server::LockClientSockets()
@@ -227,16 +271,26 @@ namespace EN
 		CrossWalk.CarStopCrossRoad();
 	}
 
-    void EN_TCP_Server::SetAcceptSocketOption(int level, int optionName, int optionValue)
+    void EN_TCP_Server::AddAcceptSocketOption(int level, int optionName, int optionValue)
     {
-        EN::SetSocketOption(ServerListenSocket, level, optionName, optionValue);
+		SocketOption createOptions;
+        createOptions.Level = level;
+        createOptions.OptionName = optionName;
+        createOptions.OptionValue = optionValue;
+		AcceptSocketOptions.push_back(createOptions);
     }
 
-    void EN_TCP_Server::SetAcceptSocketOption(PredefinedSocketOptions socketOptions)
+    void EN_TCP_Server::AddAcceptSocketOption(PredefinedSocketOptions socketOptions)
     {
         for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
-            EN::SetSocketOption(ServerListenSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
-    }
+		{
+			SocketOption createOptions;
+        	createOptions.Level = socketOptions.Levels[i];
+        	createOptions.OptionName = socketOptions.OptionNames[i];
+        	createOptions.OptionValue = socketOptions.OptionValues[i];
+			AcceptSocketOptions.push_back(createOptions);
+		}
+	}
 
     void EN_TCP_Server::AddOnSocketCreateOption(int level, int optionName, int optionValue)
     {
@@ -244,7 +298,7 @@ namespace EN
         createOptions.Level = level;
         createOptions.OptionName = optionName;
         createOptions.OptionValue = optionValue;
-        CreateSocketsOption.push_back(createOptions);
+        SocketOptionsAfterConnection.push_back(createOptions);
     }
 
     void EN_TCP_Server::AddOnSocketCreateOption(PredefinedSocketOptions socketOptions)
@@ -255,20 +309,47 @@ namespace EN
             createOptions.Level = socketOptions.Levels[i];
             createOptions.OptionName = socketOptions.OptionNames[i];
             createOptions.OptionValue = socketOptions.OptionValues[i];
-            CreateSocketsOption.push_back(createOptions);
+            SocketOptionsAfterConnection.push_back(createOptions);
         }
     }
 
     void EN_TCP_Server::SetSocketOption(EN_SOCKET clientSocket, int level, int optionName, int optionValue)
     {
-        EN::SetSocketOption(clientSocket, level, optionName, optionValue);
+		CrossWalk.CarStartCrossRoad();
+
+		bool wasOptionSet = false;
+		if (ClientSockets.find(clientSocket) != ClientSockets.end())
+		{
+			EN::SetSocketOption(clientSocket, level, optionName, optionValue);
+			wasOptionSet = true;
+		}
+
+		CrossWalk.CarStopCrossRoad();
+
+		if (!wasOptionSet)
+		{
+			LOG(LogLevels::Warning, "You are trying to set socket option on non client socket");
+		}
     }
 
     void EN_TCP_Server::SetSocketOption(EN_SOCKET clientSocket, PredefinedSocketOptions socketOptions)
     {
-        for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
+		CrossWalk.CarStartCrossRoad();
+
+		bool wasOptionSet = false;
+		if (ClientSockets.find(clientSocket) != ClientSockets.end())
+		{
+        	for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
             	EN::SetSocketOption(clientSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
-    }
+		}
+
+		CrossWalk.CarStopCrossRoad();
+
+		if (!wasOptionSet)
+		{
+			LOG(LogLevels::Warning, "You are trying to set socket option on non client socket");
+		}
+	}
 
 	EN_TCP_Server::~EN_TCP_Server() {}
 }

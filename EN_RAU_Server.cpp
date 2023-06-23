@@ -191,12 +191,12 @@ namespace EN
 
 	void EN_RAU_Server::SetTCPAcceptSocketOption(int level, int optionName, int optionValue)
 	{
-		TCP_Server->SetAcceptSocketOption(level, optionName, optionValue);
+		TCP_Server->AddAcceptSocketOption(level, optionName, optionValue);
 	}
 
 	void EN_RAU_Server::SetTCPAcceptSocketOption(PredefinedSocketOptions socketOptions)
 	{
-		TCP_Server->SetAcceptSocketOption(socketOptions);
+		TCP_Server->AddAcceptSocketOption(socketOptions);
 	}
 
 	void EN_RAU_Server::AddOnTCPSocketCreateOption(int level, int optionName, int optionValue)
