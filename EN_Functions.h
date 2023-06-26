@@ -26,6 +26,8 @@ typedef int EN_SOCKET;
 #include <fstream>
 #include <exception>
 #include <set>
+#include <list>
+#include <atomic>
 
 #include "EN_ParallelFor.h"
 #include "EN_Logger.h"

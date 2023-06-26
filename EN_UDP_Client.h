@@ -30,13 +30,17 @@ namespace EN
 	class EN_UDP_Client
 	{
 	private:
-		/// Socket to connect to server
+		// Socket to connect to server
 		EN_SOCKET ServerConnectionSocket = INVALID_SOCKET;
 		
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
 
+		// Vector with socket options
+		std::vector<SocketOption> SocketOptions;
+
+		std::mutex ClientMtx;
 	protected:
 
 		/// Default port. Default set to 1111

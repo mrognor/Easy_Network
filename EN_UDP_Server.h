@@ -18,16 +18,6 @@ typedef int EN_SOCKET;
 
 #endif
 
-#include <thread>
-#include <mutex>
-#include <queue>
-#include <vector>
-#include <string>
-#include <condition_variable>
-#include <chrono>
-#include <stack>
-#include <list>
-
 #include "EN_Functions.h"
 #include "EN_ThreadGate.h"
 #include "EN_SocketOptions.h"
@@ -46,10 +36,13 @@ namespace EN
 	{
 	private:
 		// Variable to shutdown server
-		bool IsShutdown = false;
+		std::atomic_bool IsShutdown;
 
 		// Server socket
 		EN_SOCKET UDP_ServerSocket = INVALID_SOCKET;
+
+		// Vector with socket options
+		std::vector<SocketOption> SocketOptions;
 
 		// Array of pointers
 		std::list<std::string>** QueueMessageVec;
@@ -64,9 +57,7 @@ namespace EN
 
 		// Functions to handle incoming message buffer
 		void ThreadListHandler(int ThreadID);
-
 	protected:
-
 		/// Server port. Default set to 1111
 		int Port = 1111;
 
@@ -90,7 +81,7 @@ namespace EN
 			\brief Method that processes incoming messages
 
 			This method processes a message from the buffer
-			Get message, UDP client address and time since message come to server
+			Get message, UDP client address and time in milliseconds since message come to server
 			\warning Must be defined by the user
 		*/
 		virtual void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) = 0;
@@ -99,13 +90,15 @@ namespace EN
 			\brief Method that processes incoming messages
 
 			This method processes messages before they are placed in the buffer
-			Get message, UDP client address and time since message come to server
+			Get message, UDP client address and time in milliseconds since message come to server
 			Return true if you want to put message into bufer, false otherwise
 			\warning Must be defined by the user
 		*/
 		virtual bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) = 0;
 
 	public:
+		EN_UDP_Server();
+		
 		/// Port getter
 		int GetPort();
 

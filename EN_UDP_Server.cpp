@@ -3,15 +3,26 @@
 
 namespace EN
 {
-	int EN_UDP_Server::GetPort() { return Port; }
+	EN_UDP_Server::EN_UDP_Server()
+	{
+		IsShutdown.store(false);
+	}
 
-	std::string EN_UDP_Server::GetIpAddr() { return IpAddress; }
+	int EN_UDP_Server::GetPort() 
+	{ 
+		return Port; 
+	}
+
+	std::string EN_UDP_Server::GetIpAddr() 
+	{ 
+		return IpAddress; 
+	}
 	
 	void EN_UDP_Server::ThreadListHandler(int ThreadID)
 	{
 		while (true)
 		{
-			if (IsShutdown)
+			if (IsShutdown.load())
 				return;
 
 			while (!QueueMessageVec[ThreadID]->empty())
@@ -77,6 +88,9 @@ namespace EN
 			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
         }
 
+		for (SocketOption& opt : SocketOptions)
+            EN::SetSocketOption(UDP_ServerSocket, opt.Level, opt.OptionName, opt.OptionValue);
+		
 		QueueMessageVec = new std::list<std::string>*[ThreadAmount];
 		QueueAddrVec = new std::list<std::string>*[ThreadAmount];
 		QueueTimeVec = new std::list<std::chrono::system_clock::time_point>*[ThreadAmount];
@@ -105,7 +119,7 @@ namespace EN
 		{					
 			recvRes = EN::UDP_Recv(UDP_ServerSocket, clientAddress, message);
 			
-			if (IsShutdown || !recvRes)
+			if (IsShutdown.load() || !recvRes)
 				break;
 
 			if (InstantClientMessageHandler(message, clientAddress, 0) == false)
@@ -178,7 +192,7 @@ namespace EN
 
 	void EN_UDP_Server::Shutdown()
 	{
-		IsShutdown = true;
+		IsShutdown.store(true);
 
 		// Check what server successfully started
 		while (true)
@@ -205,14 +219,25 @@ namespace EN
 
 	void EN_UDP_Server::SetSocketOption(int level, int optionName, int optionValue)
     {
-        EN::SetSocketOption(UDP_ServerSocket, level, optionName, optionValue);
+		ShutdownMutex.lock();
+		if (UDP_ServerSocket == INVALID_SOCKET)
+			EN::SetSocketOption(UDP_ServerSocket, level, optionName, optionValue);
+		else
+			SocketOptions.push_back(SocketOption(level, optionName, optionValue));
+		ShutdownMutex.unlock();
     }
 
     void EN_UDP_Server::SetSocketOption(PredefinedSocketOptions socketOptions)
-    {        
-        for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
-            EN::SetSocketOption(UDP_ServerSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
-    }
+    {    
+		ShutdownMutex.lock();
+		if (UDP_ServerSocket == INVALID_SOCKET) 
+        	for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
+				SocketOptions.push_back(SocketOption(socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]));
+		else
+			for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
+				EN::SetSocketOption(UDP_ServerSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
+		ShutdownMutex.unlock();
+	}
 
 	EN_UDP_Server::~EN_UDP_Server() {}
 }
