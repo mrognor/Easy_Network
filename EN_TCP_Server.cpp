@@ -258,6 +258,7 @@ namespace EN
 
     bool EN_TCP_Server::WaitMessage(EN_SOCKET clientSocket, std::string& message)
     {
+		// Thread safety because this method should be called only inside handler thread
 		return EN::TCP_Recv(clientSocket, message);
     }
 
@@ -273,44 +274,24 @@ namespace EN
 
     void EN_TCP_Server::AddAcceptSocketOption(int level, int optionName, int optionValue)
     {
-		SocketOption createOptions;
-        createOptions.Level = level;
-        createOptions.OptionName = optionName;
-        createOptions.OptionValue = optionValue;
-		AcceptSocketOptions.push_back(createOptions);
+		AcceptSocketOptions.push_back(SocketOption(level, optionName, optionValue));
     }
 
     void EN_TCP_Server::AddAcceptSocketOption(PredefinedSocketOptions socketOptions)
     {
         for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
-		{
-			SocketOption createOptions;
-        	createOptions.Level = socketOptions.Levels[i];
-        	createOptions.OptionName = socketOptions.OptionNames[i];
-        	createOptions.OptionValue = socketOptions.OptionValues[i];
-			AcceptSocketOptions.push_back(createOptions);
-		}
+			AcceptSocketOptions.push_back(SocketOption(socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]));
 	}
 
     void EN_TCP_Server::AddOnSocketCreateOption(int level, int optionName, int optionValue)
     {
-        SocketOption createOptions;
-        createOptions.Level = level;
-        createOptions.OptionName = optionName;
-        createOptions.OptionValue = optionValue;
-        SocketOptionsAfterConnection.push_back(createOptions);
+        SocketOptionsAfterConnection.push_back(SocketOption(level, optionName, optionValue));
     }
 
     void EN_TCP_Server::AddOnSocketCreateOption(PredefinedSocketOptions socketOptions)
     {
         for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
-        {
-            SocketOption createOptions;
-            createOptions.Level = socketOptions.Levels[i];
-            createOptions.OptionName = socketOptions.OptionNames[i];
-            createOptions.OptionValue = socketOptions.OptionValues[i];
-            SocketOptionsAfterConnection.push_back(createOptions);
-        }
+            SocketOptionsAfterConnection.push_back(SocketOption(socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]));
     }
 
     void EN_TCP_Server::SetSocketOption(EN_SOCKET clientSocket, int level, int optionName, int optionValue)

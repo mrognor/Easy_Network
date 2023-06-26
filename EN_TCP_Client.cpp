@@ -2,16 +2,6 @@
 
 namespace EN
 {
-	EN_TCP_Client::EN_TCP_Client()
-	{
-		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
-
-		if (ServerConnectionSocket == INVALID_SOCKET)
-        {
-            LOG(LogLevels::Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
-        }
-	}
-
 	int EN_TCP_Client::GetServerPort() 
 	{ 
 		return ServerPort; 
@@ -23,15 +13,19 @@ namespace EN
 	}
 
 	EN_SOCKET EN_TCP_Client::GetSocket() 
-	{ 
-		return ServerConnectionSocket; 
+	{
+		SocketMtx.lock();
+		EN_SOCKET tmpSock = ServerConnectionSocket;
+		SocketMtx.unlock();
+		return tmpSock; 
 	}
 
 	bool EN_TCP_Client::IsConnected()
 	{
-		if (ServerConnectionSocket != INVALID_SOCKET)
-			return true;
-		else return false;
+		SocketMtx.lock();
+		bool isConnected = (ServerConnectionSocket != INVALID_SOCKET);
+		SocketMtx.unlock();
+		return isConnected;
 	}
 
 	bool EN_TCP_Client::Connect()
@@ -56,14 +50,25 @@ namespace EN
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(port);
 		
+		SocketMtx.lock();
+		
+		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+		if (ServerConnectionSocket == INVALID_SOCKET)
+        {
+            LOG(LogLevels::Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			SocketMtx.unlock();
+			return false;
+		}
+
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &addr.sin_addr);
 
 		// Winsock operation int result
-		int OperationRes;
-        OperationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
+		int operationRes;
+        operationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
             
-        if (OperationRes == 0)
+        if (operationRes == 0)
 			OnConnect();
         else
         {
@@ -72,10 +77,13 @@ namespace EN
             return false;
         }
 
-		ServerHandlerMtx.lock();
-		if (ServerHandlerThread.joinable())
-			ServerHandlerThread.join();
-		ServerHandlerMtx.unlock();
+		SocketMtx.unlock();
+
+		// If reconnection we have to join last std::thread
+		WaitForServerHandlerEnd();
+
+		for (SocketOption& opt : SocketOptions)
+			EN::SetSocketOption(ServerConnectionSocket, opt.Level, opt.OptionName, opt.OptionValue);
 
 		if (IsRunMessageHadlerThread)
 			ServerHandlerThread = std::thread([this]() { this->ServerHandler(); });
@@ -85,19 +93,21 @@ namespace EN
 
 	void EN_TCP_Client::ServerHandler()
 	{
-		bool IsServerConnected = true;
+		bool isServerConnected = true;
 		std::string message;
 
 		while (true)
 		{
-			IsServerConnected = TCP_Recv(ServerConnectionSocket, message);
+			isServerConnected = TCP_Recv(ServerConnectionSocket, message);
 
 			// Means what server was disconnected
-			if (IsServerConnected == false)
+			if (isServerConnected == false)
 			{
+				SocketMtx.lock();
 				CloseSocket(ServerConnectionSocket);
 				OnDisconnect();
 				ServerConnectionSocket = INVALID_SOCKET;
+				SocketMtx.unlock();
 				return;
 			}
 
@@ -105,47 +115,59 @@ namespace EN
 		}
 	}
 
+	void EN_TCP_Client::WaitForServerHandlerEnd()
+	{
+		ServerHandlerMtx.lock();
+		if (ServerHandlerThread.joinable())
+			ServerHandlerThread.join();
+		ServerHandlerMtx.unlock();
+	}
+
 	bool EN_TCP_Client::SendToServer(std::string message)
 	{
-		return TCP_Send(ServerConnectionSocket, message);
+		SocketMtx.lock();
+		bool sendRes = TCP_Send(ServerConnectionSocket, message);
+		SocketMtx.unlock();
+		return sendRes;
 	}
 
     bool EN_TCP_Client::WaitMessage(std::string& message)
     {
+		// Thread safety because this method should be called only inside handler thread or handler thread even not started
         return EN::TCP_Recv(ServerConnectionSocket, message);
     }
 
 	void EN_TCP_Client::Disconnect()
 	{
+		SocketMtx.lock();
 		CloseSocket(ServerConnectionSocket);
+		SocketMtx.unlock();
+		
 		if (ServerHandlerThread.get_id() != std::this_thread::get_id())
-		{
-			ServerHandlerMtx.lock();
-			if (ServerHandlerThread.joinable())
-				ServerHandlerThread.join();
-			ServerHandlerMtx.unlock();
-		}
+			WaitForServerHandlerEnd();
 	}
 
     void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)
     {
-		EN::SetSocketOption(ServerConnectionSocket, level, optionName, optionValue);
+		SocketOptions.push_back(SocketOption(level, optionName, optionValue));
     }
 
     void EN_TCP_Client::SetSocketOption(PredefinedSocketOptions socketOptions)
     {        
         for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
-			EN::SetSocketOption(ServerConnectionSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
+			SocketOptions.push_back(SocketOption(socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]));
     }
 
 	EN_TCP_Client::~EN_TCP_Client()
 	{	
+		SocketMtx.lock();
 		if (ServerConnectionSocket != INVALID_SOCKET)
-            LOG(Error, "Error: You forgot to disconnect from the server. Use method Disconnect() to do this");
+		{
+			Disconnect();
+            LOG(LogLevels::Warning, "Warning: You forgot to disconnect from the server. Use method Disconnect() to do this");
+		}
+		SocketMtx.unlock();
 
-		ServerHandlerMtx.lock();
-		if (ServerHandlerThread.joinable())
-			ServerHandlerThread.join();
-		ServerHandlerMtx.unlock();
+		WaitForServerHandlerEnd();
 	}
 }

@@ -31,7 +31,6 @@ namespace EN
 	class EN_TCP_Client
 	{
 	private:
-
 		// Default port
 		int ServerPort = 1111;
 
@@ -47,9 +46,18 @@ namespace EN
 		// Mutex to synchronize server handler logic
 		std::mutex ServerHandlerMtx;
 
+		// Mutex to synchronize socket logic
+		std::mutex SocketMtx;
+
+		// Vector with options to be set on client socket
+        std::vector<SocketOption> SocketOptions;
+
 		// The server's internal method for processing incoming messages. 
 		// Passes the incoming string to method ServerMessageHandler to interpretate incoming message
 		void ServerHandler();
+
+		// This method will wait until thread handler return
+		void WaitForServerHandlerEnd();
 	protected:
 		/**
 			Variable for disabling the incoming message handler. 
@@ -85,9 +93,7 @@ namespace EN
 		*/
 		virtual void OnDisconnect() = 0;
 
-	public:
-		EN_TCP_Client();
-		
+	public:	
 		/// Server port getter
 		int GetServerPort();
 

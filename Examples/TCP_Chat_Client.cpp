@@ -5,10 +5,16 @@
 class MyClient : public EN::EN_TCP_Client
 {
 public:
-	MyClient(){}
+	MyClient()
+	{
+		// IsRunMessageHadlerThread = true; // Variable to disable starting thread with message handler
+	}
 
 	// A function to be defined by the user. It is used for logic after connection
-	void OnConnect() {}
+	void OnConnect() 
+	{
+		std::cout << "Server connected." << std::endl;
+	}
 
 	// A function to be defined by the user. It is used to process incoming messages from the server
 	void ServerMessageHandler(std::string message)
@@ -22,7 +28,6 @@ public:
 		std::cout << "Server disconnected." << std::endl;
 	}
 };
-
 
 
 int main()
@@ -47,13 +52,24 @@ int main()
 		if (message == "f")
 			break;
 
+		// Disconnect to client
+		if (message == "d")
+		{
+			A.Disconnect();
+			continue;
+		}
+
+		// Reconnect to client
+		if (message == "r")
+			A.Connect();
+
 		// Check if we still connected
 		if (A.IsConnected())
 			A.SendToServer(message);
-
-		else break;
+		else 
+			break;
 	}
-	
+
 	// Disconnect client from server if still connected
 	if (A.IsConnected())
 		A.Disconnect();

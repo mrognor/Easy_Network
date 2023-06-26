@@ -41,6 +41,8 @@ namespace EN
 {
     struct SocketOption
     {
+        SocketOption();
+        SocketOption(int level, int optionName, int optionValue);
         int Level;
         int OptionName;
         int OptionValue;
