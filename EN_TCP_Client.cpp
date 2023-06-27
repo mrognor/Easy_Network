@@ -67,17 +67,19 @@ namespace EN
 		// Winsock operation int result
 		int operationRes;
         operationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
-            
+        
         if (operationRes == 0)
+		{
+			SocketMtx.unlock();
 			OnConnect();
+		}
         else
         {
 			ServerConnectionSocket = INVALID_SOCKET;
             LOG(Warning, "Error: failed connect to server");
+			SocketMtx.unlock();
             return false;
-        }
-
-		SocketMtx.unlock();
+        }		
 
 		// If reconnection we have to join last std::thread
 		WaitForServerHandlerEnd();
@@ -103,11 +105,13 @@ namespace EN
 			// Means what server was disconnected
 			if (isServerConnected == false)
 			{
+				OnDisconnect();
+
 				SocketMtx.lock();
 				CloseSocket(ServerConnectionSocket);
-				OnDisconnect();
 				ServerConnectionSocket = INVALID_SOCKET;
 				SocketMtx.unlock();
+
 				return;
 			}
 
@@ -143,8 +147,12 @@ namespace EN
 		CloseSocket(ServerConnectionSocket);
 		SocketMtx.unlock();
 		
-		if (ServerHandlerThread.get_id() != std::this_thread::get_id())
-			WaitForServerHandlerEnd();
+		ServerHandlerMtx.lock();
+
+		if (ServerHandlerThread.get_id() != std::this_thread::get_id() && ServerHandlerThread.joinable())
+			ServerHandlerThread.join();
+
+		ServerHandlerMtx.unlock();
 	}
 
     void EN_TCP_Client::SetSocketOption(int level, int optionName, int optionValue)
