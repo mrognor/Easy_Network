@@ -30,8 +30,8 @@ namespace EN
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
 		{
-            LOG(Error, "Failed to create socket");
 			ClientMtx.unlock();
+            LOG(Error, "Failed to create socket");
 			return false;
 		}
 

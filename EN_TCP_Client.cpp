@@ -52,21 +52,26 @@ namespace EN
 		
 		SocketMtx.lock();
 		
+		if (ServerConnectionSocket != INVALID_SOCKET)
+		{
+			SocketMtx.unlock();
+			LOG(LogLevels::Warning, "You are trying to connect but you are alredy connected");
+			return false;
+		}
+
 		ServerConnectionSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 		if (ServerConnectionSocket == INVALID_SOCKET)
         {
-            LOG(LogLevels::Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
 			SocketMtx.unlock();
+            LOG(LogLevels::Error, "Error at socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
 			return false;
 		}
 
 		// Set ip address
 		inet_pton(AF_INET, ServerIpAddress.c_str(), &addr.sin_addr);
 
-		// Winsock operation int result
-		int operationRes;
-        operationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
+        int operationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
         
         if (operationRes == 0)
 		{
@@ -76,8 +81,8 @@ namespace EN
         else
         {
 			ServerConnectionSocket = INVALID_SOCKET;
-            LOG(Warning, "Error: failed connect to server");
 			SocketMtx.unlock();
+            LOG(LogLevels::Warning, "Warning: failed connect to server");
             return false;
         }		
 
@@ -122,7 +127,7 @@ namespace EN
 	void EN_TCP_Client::WaitForServerHandlerEnd()
 	{
 		ServerHandlerMtx.lock();
-		if (ServerHandlerThread.joinable())
+		if (ServerHandlerThread.joinable() && IsRunMessageHadlerThread)
 			ServerHandlerThread.join();
 		ServerHandlerMtx.unlock();
 	}
@@ -152,6 +157,8 @@ namespace EN
 		if (ServerHandlerThread.get_id() != std::this_thread::get_id() && ServerHandlerThread.joinable())
 			ServerHandlerThread.join();
 
+		ServerConnectionSocket = INVALID_SOCKET;
+
 		ServerHandlerMtx.unlock();
 	}
 
@@ -171,11 +178,14 @@ namespace EN
 		SocketMtx.lock();
 		if (ServerConnectionSocket != INVALID_SOCKET)
 		{
+			SocketMtx.unlock();
 			Disconnect();
             LOG(LogLevels::Warning, "Warning: You forgot to disconnect from the server. Use method Disconnect() to do this");
 		}
-		SocketMtx.unlock();
-
-		WaitForServerHandlerEnd();
+		else
+		{
+			SocketMtx.unlock();
+			WaitForServerHandlerEnd();
+		}
 	}
 }
