@@ -20,7 +20,7 @@ public:
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
-		bool ShouldShutdown = false;
+		std::atomic_bool ShouldShutdown(false);
 		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
 		if (message.find("send file") != -1ull)

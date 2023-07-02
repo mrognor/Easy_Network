@@ -71,16 +71,16 @@ namespace EN
 		delete[] msgBuf;
 
 		// Return true if sended butes equals message length, otherwise return false
-			return ((size_t)sendedBytes == messageLength + startIndex);
+		return ((size_t)sendedBytes == messageLength + startIndex);
 	}
 
 	bool TCP_Recv(EN_SOCKET sock, std::string& message)
 	{
 		int msg_size;
 		unsigned char firstMessageLengthByte;
-		int ConnectionStatus = recv(sock, (char*)&firstMessageLengthByte, 1, MSG_WAITALL);
+		int receivedBytes = recv(sock, (char*)&firstMessageLengthByte, 1, MSG_WAITALL);
 
-		if (ConnectionStatus <= 0)
+		if (receivedBytes < 1)
 		{
 			message = "";
 			CloseSocket(sock);
@@ -91,9 +91,9 @@ namespace EN
 		if (firstMessageLengthByte & 0b10000000)
 		{
 			unsigned char secondMessageLengthByte;
-			ConnectionStatus = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
+			receivedBytes = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
 
-			if (ConnectionStatus <= 0)
+			if (receivedBytes < 1)
 			{
 				message = "";
 				CloseSocket(sock);
@@ -114,9 +114,9 @@ namespace EN
 
 		char* msg = new char[msg_size];
 
-		ConnectionStatus = recv(sock, msg, msg_size, MSG_WAITALL);
+		receivedBytes = recv(sock, msg, msg_size, MSG_WAITALL);
 
-		if (ConnectionStatus != msg_size)
+		if (receivedBytes != msg_size)
 		{
 			message = "";
 			CloseSocket(sock);
@@ -178,18 +178,18 @@ namespace EN
 		// Source address
 		sockaddr_in sourceSockAddr;
 		int sizeofaddr = sizeof(sourceSockAddr);
-		int ConnectionStatus;
+		int receivedBytes;
 
 		char msg[16384];
 		#if defined WIN32 || defined _WIN64
 		//try to receive some data, this is a blocking call
-		ConnectionStatus = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
+		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
 		#else
 		//try to receive some data, this is a blocking call
-		ConnectionStatus = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
+		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
 		#endif
 
-		if (ConnectionStatus <= 0)
+		if (receivedBytes <= 0)
 		{
 			message = "";
 			CloseSocket(sock);
@@ -203,9 +203,9 @@ namespace EN
 		if (firstMessageLengthByte & 0b10000000)
 		{
 			unsigned char secondMessageLengthByte;
-			ConnectionStatus = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
+			receivedBytes = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
 
-			if (ConnectionStatus <= 0)
+			if (receivedBytes < 1)
 			{
 				message = "";
 				CloseSocket(sock);
@@ -279,7 +279,7 @@ namespace EN
 		return ReturnVector;
 	}
 
-	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, bool& IsStop,
+	bool SendFile(EN_SOCKET FileSendSocket, std::string FileName, std::atomic_bool& IsStop,
 		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), 
 		uint64_t PreviouslySendedSize, uint64_t microsecondsBetweenSendingChunks)
 	{	
@@ -305,7 +305,7 @@ namespace EN
 		uint64_t SendMessageSize = 0;
 
 		// Current iteration sended bytes
-		int SendBytes;
+		int sendedBytes;
 		
 		// Amount of sended chunks previously
 		uint64_t BeforeSendedChunks = PreviouslySendedSize / SendFileBufLen;
@@ -330,14 +330,15 @@ namespace EN
 					continue;
 				}
 
-				if (IsStop == true)
+				if (IsStop.load() == true)
 				{
                     SendingFile.close();
-					IsStop = false;
+					IsStop.store(false);
 					delete[] MessageBuf;
 					return false;
 				}
-				// Print sending status
+
+				// Call progress function
 				if (ProgressFunction != nullptr && std::time(0) > t)
 				{
 					ProgressFunction(SendMessageSize, FileSize, SendMessageSize - LastSendMessageSize, (FileSize - SendMessageSize) / (SendMessageSize - LastSendMessageSize));
@@ -352,9 +353,9 @@ namespace EN
 				// Read binary data
 				SendingFile.read(MessageBuf, SendFileBufLen);
 				// Send data to server
-				SendBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
+				sendedBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
 
-				if (SendBytes <= 0)
+				if (sendedBytes != SendFileBufLen)
 				{
                     LOG(Error, "Failed to send file: " + FileName);
 					SendingFile.close();
@@ -363,17 +364,16 @@ namespace EN
 				}
 				
 				// Add sending bytes
-				SendMessageSize += SendBytes;
-				memset(MessageBuf, 0, SendFileBufLen);
+				SendMessageSize += sendedBytes;
 			}
 
 			// End while loop skipping
 		SendLittleFile:
 
 			SendingFile.read(MessageBuf, SendFileBufLen);
-			SendBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
+			sendedBytes = send(FileSendSocket, MessageBuf, SendFileBufLen, 0);
 
-			if (SendBytes <= 0)
+			if (sendedBytes != SendFileBufLen)
 			{
                 LOG(Error, "Failed to send file: " + FileName);
 				SendingFile.close();
@@ -397,7 +397,7 @@ namespace EN
 		return true;
 	}
 
-	bool RecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
@@ -441,9 +441,9 @@ namespace EN
 
 			while (ReceivedMessageSize < FileSize - SendFileBufLen)
 			{
-				if (IsStop == true)
+				if (IsStop.load() == true)
 				{
-					IsStop = false;
+					IsStop.store(false);
 					ReceivedFile.close();
 					delete[] MessageBuf;
 					return false;
@@ -456,9 +456,9 @@ namespace EN
 					t = std::time(0);
 				}
 
-				int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+				int receivedBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
-				if (ReceiveBytes <= 0)
+				if (receivedBytes != SendFileBufLen)
 				{
                     LOG(Error, "Failed to received file: " + FileName);
 					ReceivedFile.close();
@@ -466,16 +466,15 @@ namespace EN
 					return false;
 				}
 
-				ReceivedMessageSize += ReceiveBytes;
+				ReceivedMessageSize += receivedBytes;
 				ReceivedFile.write(MessageBuf, SendFileBufLen);
-				memset(MessageBuf, 0, SendFileBufLen);
 			}
 
 			// End skipping while loop
 		RecvLittleFile:
-			int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+			int receivedBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
-			if (ReceiveBytes <= 0)
+			if (receivedBytes != SendFileBufLen)
 			{
                 LOG(Error, "Failed to received file: " + FileName);
 				ReceivedFile.close();
@@ -483,7 +482,7 @@ namespace EN
 				return false;
 			}
 			
-			ReceivedFile.write(MessageBuf, FileSize % SendFileBufLen);
+			ReceivedFile.write(MessageBuf, FileSize - ReceivedMessageSize);
 
 			if (ProgressFunction != nullptr)
 				ProgressFunction(FileSize, FileSize, 0, 0);
@@ -501,7 +500,7 @@ namespace EN
 		return true;
 	}
 
-	bool ContinueRecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool ContinueRecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
@@ -539,9 +538,9 @@ namespace EN
 
 			while (ReceivedMessageSize < FileSize - SendFileBufLen)
 			{
-				if (IsStop == true)
+				if (IsStop.load() == true)
 				{
-					IsStop = false;
+					IsStop.store(false);
 					ReceivedFile.close();
 					delete[] MessageBuf;
 					return false;
@@ -554,9 +553,9 @@ namespace EN
 					t = std::time(0);
 				}
 
-				int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+				int receivedBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
-				if (ReceiveBytes <= 0)
+				if (receivedBytes != SendFileBufLen)
 				{
                     LOG(Error, "Failed to received file: " + FileName);
 					ReceivedFile.close();
@@ -564,16 +563,16 @@ namespace EN
 					return false;
 				}
 
-				ReceivedMessageSize += ReceiveBytes;
+				ReceivedMessageSize += receivedBytes;
 				ReceivedFile.write(MessageBuf, SendFileBufLen);
 				memset(MessageBuf, 0, SendFileBufLen);
 			}
 
 			// End skipping while loop
 		RecvLittleFile:
-			int ReceiveBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+			int receivedBytes = recv(FileSendSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
-			if (ReceiveBytes <= 0)
+			if (receivedBytes != SendFileBufLen)
 			{
                 LOG(Error, "Failed to received file: " + FileName);
 				ReceivedFile.close();
@@ -599,7 +598,7 @@ namespace EN
 		return true;
 	}
 
-	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, std::atomic_bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
 	{
 		// Get file name and file size
 		std::string FileInfo;
@@ -629,9 +628,9 @@ namespace EN
 
 		while (ReceivedMessageSize < FileSize - SendFileBufLen)
 		{
-			if (IsStop == true)
+			if (IsStop.load() == true)
 			{
-				IsStop = false;
+				IsStop.store(false);
 				delete[] MessageBuf;
 				return false;
 			}
@@ -643,9 +642,9 @@ namespace EN
 				t = std::time(0);
 			}
 
-			int ReceiveBytes = recv(SourceFileSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+			int receivedBytes = recv(SourceFileSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
-			if (ReceiveBytes <= 0)
+			if (receivedBytes != SendFileBufLen)
 			{
                 LOG(Error, "Failed to forward file");
 				delete[] MessageBuf;
@@ -653,25 +652,25 @@ namespace EN
 			}
 
 			// Send data to client
-			int SendBytes = send(DestinationFileSocket, MessageBuf, SendFileBufLen, 0);
+			int sendedBytes = send(DestinationFileSocket, MessageBuf, SendFileBufLen, 0);
 
-			if (SendBytes <= 0)
+			if (sendedBytes != SendFileBufLen)
 			{
 				LOG(Error, "Failed to forward file");
 				delete[] MessageBuf;
 				return false;
 			}
 
-			ReceivedMessageSize += SendBytes;
+			ReceivedMessageSize += sendedBytes;
 			memset(MessageBuf, 0, SendFileBufLen);
 		}
 
 	// End skipping while loop
 	RecvLittleFile:
 
-		int ReceiveBytes = recv(SourceFileSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
+		int receivedBytes = recv(SourceFileSocket, MessageBuf, SendFileBufLen, MSG_WAITALL);
 
-		if (ReceiveBytes <= 0)
+		if (receivedBytes != SendFileBufLen)
 		{
 			LOG(Error, "Failed to forward file");
 			delete[] MessageBuf;
@@ -679,9 +678,9 @@ namespace EN
 		}
 
 		// Send data to client
-		int SendBytes = send(DestinationFileSocket, MessageBuf, SendFileBufLen, 0);
+		int sendedBytes = send(DestinationFileSocket, MessageBuf, SendFileBufLen, 0);
 
-		if (SendBytes <= 0)
+		if (sendedBytes != SendFileBufLen)
 		{
 			LOG(Error, "Failed to forward file");
 			delete[] MessageBuf;

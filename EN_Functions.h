@@ -32,7 +32,7 @@ typedef int EN_SOCKET;
 #include "EN_ParallelFor.h"
 #include "EN_Logger.h"
 
-#define SendFileBufLen 1024
+#define SendFileBufLen 4096
 
 namespace EN
 {
@@ -116,7 +116,7 @@ namespace EN
 		By default, the library progress function is used to output to the console.  
 		Timeout between sending file chunks set to 20. You adjust the number of chunks that will be sent between the this timeout
 	*/ 
-	bool SendFile(EN_SOCKET FileSendSocket, std::string FilePath, bool& IsStop, 
+	bool SendFile(EN_SOCKET FileSendSocket, std::string FilePath, std::atomic_bool& IsStop, 
 		void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, 
 		uint64_t PreviouslySendedSize = 0, uint64_t microsecondsBetweenSendingChunks = 0);
 
@@ -127,7 +127,7 @@ namespace EN
 		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool RecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	/*!
 		\brief Function to continue receiving the file. This function will wait file.
@@ -136,7 +136,7 @@ namespace EN
 		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool ContinueRecvFile(EN_SOCKET FileSendSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool ContinueRecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	/*!
 		\brief This function will forward file from one socket to another.
@@ -146,7 +146,7 @@ namespace EN
 		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
 
 	/*!
 		\brief This function will print information about file downloading
