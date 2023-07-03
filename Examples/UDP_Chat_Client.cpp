@@ -11,7 +11,7 @@ public:
 		// ServerPort = <put int here> to set port. Default port is 1111
 	}
 
-	void ServerMessageHandler(std::string message)
+	virtual void ServerMessageHandler(std::string message) override
 	{
 		std::cout << "Message: " << message << std::endl;
 	}

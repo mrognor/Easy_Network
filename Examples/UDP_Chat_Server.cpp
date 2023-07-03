@@ -16,7 +16,7 @@ public:
 	}
 
 	// Third parametr in milliseconds
-	void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeSincePackageArrived)
+	virtual void ClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeSincePackageArrived) override
 	{
 		// Checking how much time has passed since the arrival of the message
 		if (TimeSincePackageArrived > 700)
@@ -32,7 +32,7 @@ public:
 	}
 
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
-	bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived)
+	virtual bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) override
 	{
 		std::cout << "Instant client message hadler. From: " << ClientIpAddress << " Message: " << message << std::endl;
 		if (message == "false")

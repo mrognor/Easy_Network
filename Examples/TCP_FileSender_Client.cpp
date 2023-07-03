@@ -1,9 +1,27 @@
 #include <iostream>
-#include "EN_TCP_FileSender.h"
+#include "EN_TCP_Client.h"
+
+class MyClient : public EN::EN_TCP_Client
+{
+public:
+	MyClient()
+	{
+		IsRunMessageHadlerThread = false;
+	}
+
+	// A function to be defined by the user. It is used for logic after connection
+	virtual void OnConnect() override {}
+
+	// A function to be defined by the user. It is used to process incoming messages from the server
+	virtual void ServerMessageHandler(std::string message) override {}
+
+	// A function to be defined by the user. Performed after disconnected from the server
+	virtual void OnDisconnect() override {}
+};
 
 int main()
 {
-	EN::EN_TCP_FileSender A;
+	MyClient A;
 
 	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234." << std::endl;
 	std::cout << "If you dont write ip it will be default value: 127.0.0.1" << std::endl;
@@ -53,68 +71,63 @@ int main()
 		}
 		std::vector<std::string> IntrepretedMessage = EN::Split(message);
 
-		if (message.find("send file") != -1ull)
+		if (message.find("send file") == 0ull)
 		{
 			if (EN::IsFileExist(IntrepretedMessage[2]))
 			{
+				std::atomic_bool isStop(false);
+				std::atomic_int transferingSpeed(0);
 				A.SendToServer(message);
-				A.SendFileToServer(IntrepretedMessage[2], EN::DownloadStatus);
+				EN::SendFile(A.GetSocket(), IntrepretedMessage[2] + ".tmp", isStop, transferingSpeed, EN::DownloadStatus, 0);
 			}
 			else
 				std::cout << "No file: " << IntrepretedMessage[2] << " on this directory" << std::endl;
 			continue;
 		}
 
-		if (message.find("get file") != -1ull)
+		if (message.find("get file") == 0ull)
 		{
 			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
-			
-			// An important point. 
-			// If the file that you receive exists, an index will be assigned to the name of the new file,
-			// but when the download continues, the name of the file without indexes is indicated.
+
 			if (EN::IsFileExist(IntrepretedMessage[2] + ".tmp"))
 			{
 				uint64_t FileSize = EN::GetFileSize(IntrepretedMessage[2] + ".tmp");
 
-				rename((IntrepretedMessage[2] + ".tmp").c_str(), IntrepretedMessage[2].c_str());
 				message = "continue download " + IntrepretedMessage[2] + " " + std::to_string(FileSize);
 
 				A.SendToServer(message);
 
 				std::string responce;
-				A.RecvMessageFromServer(responce);
+				A.WaitMessage(responce);
 
 				if (responce == "ok")
 				{
-					if (A.ContinueRecvFileFromServer(EN::DownloadStatus))
+					std::atomic_bool isStop(false);
+					
+					if (EN::RecvFile(A.GetSocket(), isStop, EN::DownloadStatus))
 						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
 					else
-					{
 						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
-						rename(IntrepretedMessage[2].c_str(), (IntrepretedMessage[2] + ".tmp").c_str());
-					}
 				}
 				else
-				{
 					std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
-				}
+				
 			}
 			else
 			{
 				A.SendToServer(message);
 				
 				std::string responce;
-				A.RecvMessageFromServer(responce);
+				A.WaitMessage(responce);
 
 				if (responce == "ok")
 				{
-					if (A.RecvFileFromServer(EN::DownloadStatus))
+					std::atomic_bool isStop(false);
+
+					if (EN::RecvFile(A.GetSocket(), isStop, EN::DownloadStatus))
 						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
 					else
-					{
 						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
-						rename(IntrepretedMessage[2].c_str(), (IntrepretedMessage[2] + ".tmp").c_str());
-					}
 				}
 				else
 				{

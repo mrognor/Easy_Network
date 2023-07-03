@@ -11,13 +11,13 @@ public:
 		// Port = <put int here> to set port. Default port is 1111
 	}
 
-	void OnClientConnected(EN_SOCKET clientSocket)
+	virtual void OnClientConnected(EN_SOCKET clientSocket) override
 	{
 		std::cout << "Client connected! Socket descriptor: " << clientSocket << std::endl;
 		SendToClient(clientSocket, "Welcome. You are connected to server.");
 	}
 
-	void ClientMessageHandler(EN_SOCKET clientSocket, std::string message)
+	virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) override
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
@@ -47,7 +47,7 @@ public:
 		UnlockClientSockets();
 	}
 
-	void OnClientDisconnect(EN_SOCKET clientSocket)
+	virtual void OnClientDisconnect(EN_SOCKET clientSocket) override
 	{
 		std::cout << "Client disconnected! Socket descriptor: " << clientSocket << std::endl;
 	}

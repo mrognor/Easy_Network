@@ -10,17 +10,18 @@ public:
 		Port = port; // Default port is 1111
 	}
 
-	void OnClientConnected(EN_SOCKET clientSocket)
+	virtual void OnClientConnected(EN_SOCKET clientSocket) override
 	{
 		std::cout << "Client connected! Socket descriptor: " << clientSocket << std::endl;
 	}
 
-	void ClientMessageHandler(EN_SOCKET clientSocket, std::string message)
+	virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) override
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
 		std::cout << message << std::endl;
 		std::atomic_bool ShouldShutdown(false);
+		std::atomic_int transferingSpeed(0);
 		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
 		if (message.find("send file") != -1ull)
@@ -35,7 +36,7 @@ public:
 			{
 				std::cout << "Sending file" << std::endl;
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus);
+				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, EN::DownloadStatus);
 			}
 			else
 			{
@@ -50,7 +51,7 @@ public:
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, EN::DownloadStatus, std::stoll(InterpretedMessage[3]));
+				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, EN::DownloadStatus, std::stoll(InterpretedMessage[3]));
 			}
 			else
 				EN::TCP_Send(clientSocket, "bad");
@@ -58,7 +59,7 @@ public:
 		}
 	}
 
-	void OnClientDisconnect(EN_SOCKET clientSocket)
+	virtual void OnClientDisconnect(EN_SOCKET clientSocket) override
 	{
 		std::cout << "Client disconnected! Socket descriptor: " << clientSocket << std::endl;
 	}
@@ -68,7 +69,7 @@ public:
 int main()
 {
 	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234." << std::endl;
-	std::cout << "If you dont write ip it will be default value: 127.0.0.1" << std::endl;
+	std::cout << "If you dont write ip it will be all available pc ips from all networks" << std::endl;
 	std::cout << "If you dont write port it will be default value: 1111" << std::endl;
 	
 	std::string addr, ip;

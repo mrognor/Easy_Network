@@ -44,23 +44,23 @@ target_include_directories(UDP_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(UDP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
-# RAU chat server binary
-project (RAU_Chat_Server)
+# # RAU chat server binary
+# project (RAU_Chat_Server)
 
-add_executable(RAU_Chat_Server Examples/RAU_Chat_Server.cpp)
+# add_executable(RAU_Chat_Server Examples/RAU_Chat_Server.cpp)
 
-target_include_directories(RAU_Chat_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
+# target_include_directories(RAU_Chat_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
 
-target_link_libraries(RAU_Chat_Server EasyNetwork ${StandartIncludeLibraries})
+# target_link_libraries(RAU_Chat_Server EasyNetwork ${StandartIncludeLibraries})
 
-# RAU chat server binary
-project (RAU_Chat_Client)
+# # RAU chat server binary
+# project (RAU_Chat_Client)
 
-add_executable(RAU_Chat_Client Examples/RAU_Chat_Client.cpp)
+# add_executable(RAU_Chat_Client Examples/RAU_Chat_Client.cpp)
 
-target_include_directories(RAU_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
+# target_include_directories(RAU_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
-target_link_libraries(RAU_Chat_Client EasyNetwork ${StandartIncludeLibraries})
+# target_link_libraries(RAU_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
 # TCP FileSender server binary
 project (TCP_FileSender_Server)
@@ -93,11 +93,11 @@ target_link_libraries(ParallelFor EasyNetwork ${StandartIncludeLibraries})
 project(EasyNetwork)
 
 set(LibHeaders EN_Functions.h
-EN_TCP_Client.h  EN_TCP_FileSender.h
+EN_TCP_Client.h
 EN_TCP_Server.h EN_UDP_Client.h EN_UDP_Server.h EN_ParallelFor.h EN_SocketOptions.h EN_ThreadGate.h EN_Logger.h EN_ThreadCrossWalk.h)
 
 set(LibSources EN_Functions.cpp
-EN_TCP_Client.cpp  EN_TCP_FileSender.cpp
+EN_TCP_Client.cpp
 EN_TCP_Server.cpp EN_UDP_Client.cpp EN_UDP_Server.cpp EN_SocketOptions.cpp EN_ThreadGate.cpp EN_Logger.cpp EN_ThreadCrossWalk.cpp)
 
 add_library(EasyNetwork STATIC ${LibSources} ${LibHeaders})

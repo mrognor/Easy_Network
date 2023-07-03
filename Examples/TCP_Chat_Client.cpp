@@ -11,19 +11,19 @@ public:
 	}
 
 	// A function to be defined by the user. It is used for logic after connection
-	void OnConnect() 
+	virtual void OnConnect() override
 	{
 		std::cout << "Server connected." << std::endl;
 	}
 
 	// A function to be defined by the user. It is used to process incoming messages from the server
-	void ServerMessageHandler(std::string message)
+	virtual void ServerMessageHandler(std::string message) override
 	{
 		std::cout << message << std::endl;
 	}
 
 	// A function to be defined by the user. Performed after disconnected from the server
-	void OnDisconnect()
+	virtual void OnDisconnect() override
 	{
 		std::cout << "Server disconnected." << std::endl;
 	}
