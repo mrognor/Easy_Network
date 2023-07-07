@@ -30,6 +30,7 @@ typedef int EN_SOCKET;
 #include <atomic>
 
 #include "EN_ParallelFor.h"
+#include "EN_BackgroundTimer.h"
 #include "EN_Logger.h"
 
 #define SendFileBufLen 4096

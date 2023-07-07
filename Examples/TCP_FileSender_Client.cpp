@@ -78,7 +78,7 @@ int main()
 				std::atomic_bool isStop(false);
 				std::atomic_int transferingSpeed(0);
 				A.SendToServer(message);
-				EN::SendFile(A.GetSocket(), IntrepretedMessage[2] + ".tmp", isStop, transferingSpeed, EN::DownloadStatus, 0);
+				EN::SendFile(A.GetSocket(), IntrepretedMessage[2], isStop, transferingSpeed, EN::DownloadStatus, 0);
 			}
 			else
 				std::cout << "No file: " << IntrepretedMessage[2] << " on this directory" << std::endl;

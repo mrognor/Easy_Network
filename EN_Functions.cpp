@@ -288,7 +288,7 @@ namespace EN
 
 		if (!sendingFile.is_open())
 		{
-            LOG(Error, "Failed to open sending file");
+            LOG(Error, "Failed to open sending file. File name: " + fileName);
 			return false;
 		}
 
@@ -307,25 +307,27 @@ namespace EN
 		sendingFile.seekg(0, std::ios::beg);
 
 		// Sended bytes
-		uint64_t sendMessageSize = 0;
+		uint64_t sendedMessageSize = 0;
 
 		// Current iteration sended bytes
 		int sendedBytes;
 		
 		// Amount of sended data previously
 		sendingFile.seekg(previouslySendedSize, std::ios::beg);
-		sendMessageSize += previouslySendedSize;
+		sendedMessageSize += previouslySendedSize;
 
+		EN_BackgroundTimer timer;
+		
 		if (sendingFile.is_open())
 		{
-			std::time_t t = std::time(0);
+			// Variable to store how much bytes was sended before
 			uint64_t lastSendMessageSize = 0;
 
 			// Skip while loop if file size less when send buffer
 			if (fileSize < SendFileBufLen)
 				goto SendLittleFile;
 
-			while (sendMessageSize < fileSize - SendFileBufLen)
+			while (sendedMessageSize < fileSize - SendFileBufLen)
 			{
 				if (isStop.load() == true)
 				{
@@ -334,14 +336,6 @@ namespace EN
 					delete[] messageBuf;
 					return false;
 				}
-
-				// Call progress function
-				// if (progressFunction != nullptr && std::time(0) > t)
-				// {
-				// 	progressFunction(sendMessageSize, fileSize, sendMessageSize - lastSendMessageSize, (fileSize - sendMessageSize) / (sendMessageSize - lastSendMessageSize));
-				// 	lastSendMessageSize = sendMessageSize;
-				// 	t = std::time(0);
-				// }
 
 				// Regulate transfering speed
 				if (microsecondsBetweenSendingChunks.load() > 0)
@@ -361,7 +355,15 @@ namespace EN
 				}
 				
 				// Add sending bytes
-				sendMessageSize += sendedBytes;
+				sendedMessageSize += sendedBytes;
+
+				// Call progress function
+				if (progressFunction != nullptr && !timer.IsSleep())
+				{
+					timer.StartTimer<std::chrono::seconds>(1);
+					progressFunction(sendedMessageSize, fileSize, sendedMessageSize - lastSendMessageSize, (fileSize - sendedMessageSize) / (sendedMessageSize - lastSendMessageSize));
+					lastSendMessageSize = sendedMessageSize;
+				}
 			}
 
 			// End while loop skipping
@@ -378,8 +380,8 @@ namespace EN
 				return false;
 			}
 
-			// if (progressFunction != nullptr)
-			//	progressFunction(fileSize, fileSize, 0, 0);
+			if (progressFunction != nullptr)
+				progressFunction(fileSize, fileSize, 0, 0);
 
 			sendingFile.close();
 		}
@@ -406,7 +408,17 @@ namespace EN
 		
 		std::vector<std::string> fileInfos = Split(fileInfo);
 		std::string fileName = fileInfos[0];
-		uint64_t expectedBytesCount = std::stoll(fileInfos[1]);
+		uint64_t expectedBytesCount;
+
+		try 
+		{
+			expectedBytesCount = std::stoll(fileInfos[1]);
+		}
+		catch (...)
+		{
+			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
+			return false;
+		}
 
 		// Open received file
 		std::ofstream receivedFile(fileName + ".tmp", std::ios::binary | std::ios::app);
@@ -418,9 +430,10 @@ namespace EN
 		char* messageBuf = new char[SendFileBufLen];
 		int receivedBytes;
 
+		EN_BackgroundTimer timer;
+
 		if (receivedFile.is_open())
 		{
-			std::time_t t = std::time(0);
 			uint64_t lastReceivedMessageSize = 0;
 
 			// Skip while loop if file size less when send buffer
@@ -437,13 +450,6 @@ namespace EN
 					return false;
 				}
 
-				// if (ProgressFunction != nullptr && std::time(0) > t)
-				// {
-				// 	ProgressFunction(receivedMessageSize, expectedBytesCount, receivedMessageSize - lastReceivedMessageSize, (expectedBytesCount - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));
-				// 	lastReceivedMessageSize = receivedMessageSize;
-				// 	t = std::time(0);
-				// }
-
 				receivedBytes = recv(FileSendSocket, messageBuf, SendFileBufLen, MSG_WAITALL);
 
 				if (receivedBytes != SendFileBufLen)
@@ -456,6 +462,14 @@ namespace EN
 
 				receivedMessageSize += receivedBytes;
 				receivedFile.write(messageBuf, SendFileBufLen);
+
+				// Progress function
+				if (ProgressFunction != nullptr && !timer.IsSleep())
+				{
+					timer.StartTimer<std::chrono::seconds>(1);
+					ProgressFunction(receivedMessageSize, expectedBytesCount, receivedMessageSize - lastReceivedMessageSize, (expectedBytesCount - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));
+					lastReceivedMessageSize = receivedMessageSize;
+				}
 			}
 
 			// End skipping while loop
@@ -472,8 +486,8 @@ namespace EN
 			
 			receivedFile.write(messageBuf, expectedBytesCount - receivedMessageSize);
 
-			// if (ProgressFunction != nullptr)
-			//	ProgressFunction(expectedBytesCount, expectedBytesCount, 0, 0);
+			if (ProgressFunction != nullptr)
+				ProgressFunction(expectedBytesCount, expectedBytesCount, 0, 0);
 
 			receivedFile.close();
 		}
@@ -514,7 +528,17 @@ namespace EN
 		if (!EN::TCP_Send(DestinationFileSocket, fileInfo))
 			return false;
 
-		uint64_t fileSize = std::stoll(Split(fileInfo)[1]);
+		uint64_t fileSize;
+
+		try 
+		{
+			fileSize = std::stoll(Split(fileInfo)[1]);
+		}
+		catch (...)
+		{
+			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
+			return false;
+		}
 
 		// Already received bytes
 		uint64_t receivedMessageSize = 0;
