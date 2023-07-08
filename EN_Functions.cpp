@@ -280,8 +280,7 @@ namespace EN
 	}
 
 	bool SendFile(EN_SOCKET fileSendSocket, std::string fileName, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
-		void (*progressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta), 
-		uint64_t previouslySendedSize)
+		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus)
 	{	
 		// Open sending file
 		std::ifstream sendingFile(fileName, std::ios::binary);
@@ -317,7 +316,10 @@ namespace EN
 		sendedMessageSize += previouslySendedSize;
 
 		EN_BackgroundTimer timer;
-		
+
+		// Set static file transmission variables
+		fileTransmissionStatus.SetFileSize(fileSize);
+
 		if (sendingFile.is_open())
 		{
 			// Variable to store how much bytes was sended before
@@ -358,10 +360,17 @@ namespace EN
 				sendedMessageSize += sendedBytes;
 
 				// Call progress function
-				if (progressFunction != nullptr && !timer.IsSleep())
+				if (!timer.IsSleep())
 				{
 					timer.StartTimer<std::chrono::seconds>(1);
-					progressFunction(sendedMessageSize, fileSize, sendedMessageSize - lastSendMessageSize, (fileSize - sendedMessageSize) / (sendedMessageSize - lastSendMessageSize));
+					fileTransmissionStatus.SetTransferedBytes(sendedMessageSize);
+					fileTransmissionStatus.SetTransmissionSpeed(sendedMessageSize - lastSendMessageSize);
+					if (sendedMessageSize - lastSendMessageSize != 0)
+						fileTransmissionStatus.SetTransmissionEta((fileSize - sendedMessageSize) / (sendedMessageSize - lastSendMessageSize));
+
+					if (fileTransmissionStatus.GetIsSetProgressFunction())
+						fileTransmissionStatus.InvokeProgressFunction();
+
 					lastSendMessageSize = sendedMessageSize;
 				}
 			}
@@ -380,8 +389,12 @@ namespace EN
 				return false;
 			}
 
-			if (progressFunction != nullptr)
-				progressFunction(fileSize, fileSize, 0, 0);
+			fileTransmissionStatus.SetTransferedBytes(fileSize);
+			fileTransmissionStatus.SetTransmissionSpeed(0);
+			fileTransmissionStatus.SetTransmissionEta(0);
+
+			if (fileTransmissionStatus.GetIsSetProgressFunction())
+				fileTransmissionStatus.InvokeProgressFunction();
 
 			sendingFile.close();
 		}
@@ -396,7 +409,7 @@ namespace EN
 		return true;
 	}
 
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus)
 	{
 		// Get file name and file size
 		std::string fileInfo;
@@ -408,11 +421,11 @@ namespace EN
 		
 		std::vector<std::string> fileInfos = Split(fileInfo);
 		std::string fileName = fileInfos[0];
-		uint64_t expectedBytesCount;
+		uint64_t fileSize;
 
 		try 
 		{
-			expectedBytesCount = std::stoll(fileInfos[1]);
+			fileSize = std::stoll(fileInfos[1]);
 		}
 		catch (...)
 		{
@@ -432,15 +445,18 @@ namespace EN
 
 		EN_BackgroundTimer timer;
 
+		// Set static file transmission variables
+		fileTransmissionStatus.SetFileSize(fileSize);
+
 		if (receivedFile.is_open())
 		{
 			uint64_t lastReceivedMessageSize = 0;
 
 			// Skip while loop if file size less when send buffer
-			if (expectedBytesCount < SendFileBufLen)
+			if (fileSize < SendFileBufLen)
 				goto RecvLittleFile;
 
-			while (receivedMessageSize < expectedBytesCount - SendFileBufLen)
+			while (receivedMessageSize < fileSize - SendFileBufLen)
 			{
 				if (IsStop.load() == true)
 				{
@@ -463,11 +479,18 @@ namespace EN
 				receivedMessageSize += receivedBytes;
 				receivedFile.write(messageBuf, SendFileBufLen);
 
-				// Progress function
-				if (ProgressFunction != nullptr && !timer.IsSleep())
+				// Call progress function
+				if (!timer.IsSleep())
 				{
 					timer.StartTimer<std::chrono::seconds>(1);
-					ProgressFunction(receivedMessageSize, expectedBytesCount, receivedMessageSize - lastReceivedMessageSize, (expectedBytesCount - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));
+					fileTransmissionStatus.SetTransferedBytes(receivedMessageSize);
+					fileTransmissionStatus.SetTransmissionSpeed(receivedMessageSize - lastReceivedMessageSize);
+					if (receivedMessageSize - lastReceivedMessageSize != 0)
+						fileTransmissionStatus.SetTransmissionEta((fileSize - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));
+
+					if (fileTransmissionStatus.GetIsSetProgressFunction())
+						fileTransmissionStatus.InvokeProgressFunction();
+
 					lastReceivedMessageSize = receivedMessageSize;
 				}
 			}
@@ -484,10 +507,14 @@ namespace EN
 				return false;
 			}
 			
-			receivedFile.write(messageBuf, expectedBytesCount - receivedMessageSize);
+			receivedFile.write(messageBuf, fileSize - receivedMessageSize);
 
-			if (ProgressFunction != nullptr)
-				ProgressFunction(expectedBytesCount, expectedBytesCount, 0, 0);
+			fileTransmissionStatus.SetTransferedBytes(fileSize);
+			fileTransmissionStatus.SetTransmissionSpeed(0);
+			fileTransmissionStatus.SetTransmissionEta(0);
+
+			if (fileTransmissionStatus.GetIsSetProgressFunction())
+				fileTransmissionStatus.InvokeProgressFunction();
 
 			receivedFile.close();
 		}
@@ -515,7 +542,7 @@ namespace EN
 		return true;
 	}
 
-	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, std::atomic_bool& IsStop, void(*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta))
+	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus)
 	{
 		// Get file name and file size
 		std::string fileInfo;
@@ -546,9 +573,13 @@ namespace EN
 		// Received file buffer 
 		char* messageBuf = new char[SendFileBufLen];
 
-		std::time_t t = std::time(0);
 		uint64_t lastReceivedMessageSize = 0;
 		int receivedBytes, sendedBytes;
+
+		EN_BackgroundTimer timer;
+
+		// Set static file transmission variables
+		fileTransmissionStatus.SetFileSize(fileSize);
 
 		// Skip while loop if file size less when send buffer
 		if (fileSize < SendFileBufLen)
@@ -561,13 +592,6 @@ namespace EN
 				IsStop.store(false);
 				delete[] messageBuf;
 				return false;
-			}
-
-			if (ProgressFunction != nullptr && std::time(0) > t)
-			{
-				ProgressFunction(receivedMessageSize, fileSize, receivedMessageSize - lastReceivedMessageSize, (fileSize - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));
-				lastReceivedMessageSize = receivedMessageSize;
-				t = std::time(0);
 			}
 
 			receivedBytes = recv(SourceFileSocket, messageBuf, SendFileBufLen, MSG_WAITALL);
@@ -590,6 +614,21 @@ namespace EN
 			}
 
 			receivedMessageSize += sendedBytes;
+
+			// Call progress function
+			if (!timer.IsSleep())
+			{
+				timer.StartTimer<std::chrono::seconds>(1);
+				fileTransmissionStatus.SetTransferedBytes(receivedMessageSize);
+				fileTransmissionStatus.SetTransmissionSpeed(receivedMessageSize - lastReceivedMessageSize);
+				if (receivedMessageSize - lastReceivedMessageSize != 0)
+					fileTransmissionStatus.SetTransmissionEta((fileSize - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));
+
+				if (fileTransmissionStatus.GetIsSetProgressFunction())
+					fileTransmissionStatus.InvokeProgressFunction();
+
+				lastReceivedMessageSize = receivedMessageSize;
+			}
 		}
 
 	// End skipping while loop
@@ -614,16 +653,20 @@ namespace EN
 			return false;
 		}
 
-		if (ProgressFunction != nullptr)
-			ProgressFunction(fileSize, fileSize, 0, 0);		
+		fileTransmissionStatus.SetTransferedBytes(fileSize);
+		fileTransmissionStatus.SetTransmissionSpeed(0);
+		fileTransmissionStatus.SetTransmissionEta(0);
+
+		if (fileTransmissionStatus.GetIsSetProgressFunction())
+			fileTransmissionStatus.InvokeProgressFunction();	
 
 		delete[] messageBuf;
 		return true;
 	}
 
-	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta)
+	void DefaultDownloadStatusFunction(uint64_t transferedBytes, uint64_t fileSize, uint64_t transmissionSpeed, uint64_t transmissionEta)
 	{
-		if (all <= 0)
+		if (fileSize <= 0)
 			return;
 
 		std::string AllMeasureName, SpeedName, Eta;
@@ -633,35 +676,35 @@ namespace EN
 		AllMeasureSize = 1024;
 		SpeedName = "KB/s";
 		SpeedSize = 1024;
-		if (all > 1024 * 1024)
+		if (fileSize > 1024 * 1024)
 		{
 			AllMeasureName = "MB";
 			AllMeasureSize = 1024 * 1024;
 		}
-		if (speed > 1024 * 1024)
+		if (transmissionSpeed > 1024 * 1024)
 		{
 			SpeedName = "MB/s";
 			SpeedSize = 1024 * 1024;
 		}
 
-		if (eta < 60)
+		if (transmissionEta < 60)
 		{
-			Eta = std::to_string(eta) + " s";
+			Eta = std::to_string(transmissionEta) + " s";
 		}
-		if (eta > 60 && eta < 3600)
+		if (transmissionEta > 60 && transmissionEta < 3600)
 		{
-			Eta = std::to_string(eta / 60) + " m";
+			Eta = std::to_string(transmissionEta / 60) + " m";
 		}
-		if (eta > 3600)
+		if (transmissionEta > 3600)
 		{
-			Eta = std::to_string(eta / 3600) + " h " + std::to_string((eta % 3600) / 60) + " m";
+			Eta = std::to_string(transmissionEta / 3600) + " h " + std::to_string((transmissionEta % 3600) / 60) + " m";
 		}
 
-		std::cout << "\rDownloaded: " << current / AllMeasureSize << " " << AllMeasureName << " All: " << all / AllMeasureSize
-			<< " " << AllMeasureName << " " << (100 * current / all) << " % " << " Speed : " << speed / SpeedSize << " " << SpeedName
+		std::cout << "\rDownloaded: " << transferedBytes / AllMeasureSize << " " << AllMeasureName << " All: " << fileSize / AllMeasureSize
+			<< " " << AllMeasureName << " " << (100 * transferedBytes / fileSize) << " % " << " Speed : " << transmissionSpeed / SpeedSize << " " << SpeedName
 			<< " ETA : " << Eta << "                     " << std::flush;
 
-		if (current == all)
+		if (transferedBytes == fileSize)
 			std::cout << "\nEnd file transfering" << std::endl;
 	}
 

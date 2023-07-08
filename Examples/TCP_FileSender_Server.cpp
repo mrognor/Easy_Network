@@ -22,11 +22,14 @@ public:
 		std::cout << message << std::endl;
 		std::atomic_bool ShouldShutdown(false);
 		std::atomic_int transferingSpeed(0);
+		EN::EN_FileTransmissionStatus transmissionStatus;
+		transmissionStatus.SetProgressFunction(EN::DefaultDownloadStatusFunction);
+
 		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
 		if (message.find("send file") != -1ull)
 		{
-			EN::RecvFile(clientSocket, ShouldShutdown, EN::DownloadStatus);
+			EN::RecvFile(clientSocket, ShouldShutdown, transmissionStatus);
 			return;
 		}
 		
@@ -36,7 +39,7 @@ public:
 			{
 				std::cout << "Sending file" << std::endl;
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, EN::DownloadStatus);
+				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, 0, transmissionStatus);
 			}
 			else
 			{
@@ -51,7 +54,7 @@ public:
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, EN::DownloadStatus, std::stoll(InterpretedMessage[3]));
+				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, std::stoll(InterpretedMessage[3]), transmissionStatus);
 			}
 			else
 				EN::TCP_Send(clientSocket, "bad");

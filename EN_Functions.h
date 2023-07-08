@@ -32,6 +32,7 @@ typedef int EN_SOCKET;
 #include "EN_ParallelFor.h"
 #include "EN_BackgroundTimer.h"
 #include "EN_Logger.h"
+#include "EN_FileTransmissionStatus.h"
 
 #define SendFileBufLen 4096
 
@@ -108,18 +109,19 @@ namespace EN
 		\brief The function gets socket and filename and send file to socket. 
 		\param[in] fileSendSocket the socket for sending files
 		\param[in] filePath the full path to the file to be sent
-		\param[in] isStop the reference to a boolean variable to stop file transfer  
-		\param[in] progressFunction the pointer to a function that is used to track the status of file transfer. By default using EN::DownloadStatus 
-		\param[in] previouslySendedSize The fifth parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
-		\param[in] microsecondsBetweenSendingChunks The sixth parameter is needed to regulate the file transfer rate. Set time in microseconds between sending one kilobyte. 0 means no delay
+		\param[in] isStop the reference to a boolean variable to stop file transfer
+        \param[in] microsecondsBetweenSendingChunks the parameter is needed to regulate the file transfer rate. Set time in microseconds between sending one kilobyte. 0 means no delay
+		\param[in] previouslySendedSize the parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
+        \param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
+        If desired, you can set a function in it that will be called once a second
+		
 		\return Returns true in case of file transmition success, false otherwise
 		
 		By default, the library progress function is used to output to the console.  
 		Timeout between sending file chunks set to 20. You adjust the number of chunks that will be sent between the this timeout
 	*/ 
 	bool SendFile(EN_SOCKET fileSendSocket, std::string filePath, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
-		void (*progressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr, 
-		uint64_t previouslySendedSize = 0);
+		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus);
 
 	/*!
 		\brief This function will wait incoming file.
@@ -129,29 +131,32 @@ namespace EN
         it will be saved with the postscript tmp. After successful receipt of the file, the tmp postscript will be removed
 		\param[in] FileSendSocket the socket for receiving files
 		\param[in] IsStop the reference to a boolean variable to stop file transfer
-		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
+		\param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
+        If desired, you can set a function in it that will be called once a second
+
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus);
 
 	/*!
 		\brief This function will forward file from one socket to another.
 		\param[in] SourceFileSocket the source socket for receiving files
 		\param[in] DestinationFileSocket the destination socket for sending files
 		\param[in] IsStop the reference to a boolean variable to stop file transfer
-		\param[in] ProgressFunction the pointer to a function that is used to track the status of file transfer
+		\param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
+        If desired, you can set a function in it that will be called once a second
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, std::atomic_bool& IsStop, void (*ProgressFunction)(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta) = nullptr);
+	bool ForwardFile(EN_SOCKET SourceFileSocket, EN_SOCKET DestinationFileSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus);
 
 	/*!
 		\brief This function will print information about file downloading
-		\param[in] current the first is how many bytes were transmitted.  
-		\param[in] all the second is the total number of bytes.  
-		\param[in] speed the third parameter shows the transfer rate in bytes.  
-		\param[in] eta the fourth shows the remaining time in seconds
+		\param[in] thisSessionTransferedBytes the first is how many bytes were transmitted.
+		\param[in] fileSize the second is the total number of bytes.
+		\param[in] transmissionSpeed the third parameter shows the transfer rate in bytes.
+		\param[in] transmissionEta the fourth shows the remaining time in seconds
 	*/
-	void DownloadStatus(uint64_t current, uint64_t all, uint64_t speed, uint64_t eta);
+	void DefaultDownloadStatusFunction(uint64_t thisSessionTransferedBytes, uint64_t fileSize, uint64_t transmissionSpeed, uint64_t transmissionEta);
 
 	/// Return true if file exists, otherwise rerurn false
 	bool IsFileExist(std::string filePath);

@@ -57,8 +57,11 @@ int main()
 		return 0;
 	}
 
-
 	std::string message;
+	
+	std::atomic_bool isStop(false);
+	std::atomic_int transferingSpeed(0);
+	EN::EN_FileTransmissionStatus transmissionStatus;
 
 	while (true)
 	{
@@ -75,10 +78,10 @@ int main()
 		{
 			if (EN::IsFileExist(IntrepretedMessage[2]))
 			{
-				std::atomic_bool isStop(false);
-				std::atomic_int transferingSpeed(0);
+				transmissionStatus.SetProgressFunction(EN::DefaultDownloadStatusFunction);
+
 				A.SendToServer(message);
-				EN::SendFile(A.GetSocket(), IntrepretedMessage[2], isStop, transferingSpeed, EN::DownloadStatus, 0);
+				EN::SendFile(A.GetSocket(), IntrepretedMessage[2], isStop, transferingSpeed, 0, transmissionStatus);
 			}
 			else
 				std::cout << "No file: " << IntrepretedMessage[2] << " on this directory" << std::endl;
@@ -101,10 +104,8 @@ int main()
 				A.WaitMessage(responce);
 
 				if (responce == "ok")
-				{
-					std::atomic_bool isStop(false);
-					
-					if (EN::RecvFile(A.GetSocket(), isStop, EN::DownloadStatus))
+				{					
+					if (EN::RecvFile(A.GetSocket(), isStop, transmissionStatus))
 						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
 					else
 						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
@@ -122,9 +123,7 @@ int main()
 
 				if (responce == "ok")
 				{
-					std::atomic_bool isStop(false);
-
-					if (EN::RecvFile(A.GetSocket(), isStop, EN::DownloadStatus))
+					if (EN::RecvFile(A.GetSocket(), isStop, transmissionStatus))
 						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
 					else
 						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
