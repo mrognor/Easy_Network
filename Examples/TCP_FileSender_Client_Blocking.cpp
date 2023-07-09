@@ -62,6 +62,7 @@ int main()
 	std::atomic_bool isStop(false);
 	std::atomic_int transferingSpeed(0);
 	EN::EN_FileTransmissionStatus transmissionStatus;
+	transmissionStatus.SetProgressFunction(EN::DefaultDownloadStatusFunction);
 
 	while (true)
 	{
@@ -78,8 +79,6 @@ int main()
 		{
 			if (EN::IsFileExist(IntrepretedMessage[2]))
 			{
-				transmissionStatus.SetProgressFunction(EN::DefaultDownloadStatusFunction);
-
 				A.SendToServer(message);
 				EN::SendFile(A.GetSocket(), IntrepretedMessage[2], isStop, transferingSpeed, 0, transmissionStatus);
 			}
