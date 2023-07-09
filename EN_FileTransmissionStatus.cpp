@@ -10,6 +10,16 @@ namespace EN
         TransmissionEta.store(0);
     }
 
+    EN_FileTransmissionStatus::EN_FileTransmissionStatus(const EN::EN_FileTransmissionStatus& status)
+    {
+        TransferedBytes.store(status.TransferedBytes.load());
+        FileSize.store(status.FileSize.load());
+        TransmissionSpeed.store(status.TransmissionSpeed.load());
+        TransmissionEta.store(status.TransmissionEta.load());
+        IsSetProgressFunction = status.IsSetProgressFunction;
+        ProgressFunction = status.ProgressFunction;
+    }
+
     void EN_FileTransmissionStatus::SetTransferedBytes(uint64_t transferedBytes)
     {
         TransferedBytes.store(transferedBytes);

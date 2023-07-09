@@ -20,6 +20,8 @@ namespace EN
     public:
         EN_FileTransmissionStatus();
 
+        EN_FileTransmissionStatus(const EN::EN_FileTransmissionStatus& status);
+
         void SetTransferedBytes(uint64_t transferedBytes);
         uint64_t GetThisSessionTransferedBytes();
         

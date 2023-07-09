@@ -334,7 +334,6 @@ namespace EN
 				if (isStop.load() == true)
 				{
                     sendingFile.close();
-					isStop.store(false);
 					delete[] messageBuf;
 					return false;
 				}
