@@ -227,23 +227,36 @@ namespace EN
 	{
 		CrossWalk.CarStartCrossRoad();
 		
-		bool wasSend = false;
-		bool res = false;
+        // Variable to store sending result
+        // -2 - no client with this socket id on server
+        // -1 - failed to send to client. For example if socket closed at sending time
+        // 0 - sending succeeded
+		int resCode = -2;
 
 		if (ClientSockets.find(clientSocket) != ClientSockets.end())
 		{
-			res = EN::TCP_Send(clientSocket, message);
-			wasSend = true;
+			if(!EN::TCP_Send(clientSocket, message))
+                resCode = -1;
+            else 
+                resCode = 0;
 		}
 		
 		CrossWalk.CarStopCrossRoad();
 
-		if (!wasSend)
+		if (resCode == -2)
 		{
-			LOG(LogLevels::Warning, "You are trying to send to non client socket");
+			LOG(LogLevels::Warning, "You are trying to send to non client socket. Socket descriptor: " + std::to_string(clientSocket));
+            LOG(LogLevels::Hint, "Check that you are dont forget to lock sockets" + std::to_string(clientSocket));
+            return false;
 		}
+        
+        if (resCode == -1)
+		{
+			LOG(LogLevels::Warning, "Failed to send data to socket. Socket descriptor: " + std::to_string(clientSocket));
+            return false;
+        }
 
-		return res;
+		return true;
 	}
 
 	void EN_TCP_Server::MulticastSend(std::string message)
