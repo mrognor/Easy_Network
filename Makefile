@@ -15,7 +15,7 @@ debug: all
 release: CXXFLAGS += -D NDEBUG -O3
 release: all
 
-all: bin/TCP_Chat_Server$(FILEEXT) bin/TCP_Chat_Client$(FILEEXT) bin/UDP_Chat_Server$(FILEEXT) bin/UDP_Chat_Client$(FILEEXT) bin/TCP_FileSender_Server$(FILEEXT) bin/TCP_FileSender_Client$(FILEEXT) bin/ParallelFor$(FILEEXT)
+all: bin/TCP_Chat_Server$(FILEEXT) bin/TCP_Chat_Client$(FILEEXT) bin/UDP_Chat_Server$(FILEEXT) bin/UDP_Chat_Client$(FILEEXT) bin/TCP_FileSender_Server_Blocking$(FILEEXT) bin/TCP_FileSender_Client_Blocking$(FILEEXT) bin/ParallelFor$(FILEEXT)
 # bin/RAU_Chat_Server$(FILEEXT) bin/RAU_Chat_Client$(FILEEXT)
 
 # TCP_Chat
