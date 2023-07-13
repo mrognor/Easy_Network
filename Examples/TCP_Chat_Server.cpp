@@ -1,5 +1,4 @@
-﻿#include <iostream>
-#include "EN_TCP_Server.h"
+﻿#include "EN_TCP_Server.h"
 
 class MyServer : public EN::EN_TCP_Server
 {

@@ -1,6 +1,4 @@
-#include <iostream>
 #include "EN_UDP_Client.h"
-#include <string>
 
 class MyClient : public EN::EN_UDP_Client
 {
