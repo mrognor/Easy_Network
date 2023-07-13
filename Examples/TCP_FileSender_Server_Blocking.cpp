@@ -12,14 +12,14 @@ public:
 
 	virtual void OnClientConnected(EN_SOCKET clientSocket) override
 	{
-		std::cout << "Client connected! Socket descriptor: " << clientSocket << std::endl;
+		LOG(EN::LogLevels::Info, "Client connected! Socket descriptor: " + std::to_string(clientSocket));
 	}
 
 	virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) override
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
-		std::cout << message << std::endl;
+		LOG(EN::LogLevels::Info, message);
 		std::atomic_bool ShouldShutdown(false);
 		std::atomic_int transferingSpeed(0);
 		EN::EN_FileTransmissionStatus transmissionStatus;
@@ -37,13 +37,13 @@ public:
 		{
 			if (EN::IsFileExist(InterpretedMessage[2]))
 			{
-				std::cout << "Sending file" << std::endl;
+				LOG(EN::LogLevels::Info, "Sending file");
 				SendToClient(clientSocket, "ok");
 				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, 0, transmissionStatus);
 			}
 			else
 			{
-				std::cout << "No file with this name" << std::endl;
+				LOG(EN::LogLevels::Info, "No file with this name");
 				SendToClient(clientSocket, "bad");
 			}
 			return;
@@ -64,16 +64,16 @@ public:
 
 	virtual void OnClientDisconnect(EN_SOCKET clientSocket) override
 	{
-		std::cout << "Client disconnected! Socket descriptor: " << clientSocket << std::endl;
+		LOG(EN::LogLevels::Info, "Client disconnected! Socket descriptor: " + std::to_string(clientSocket));
 	}
 };
 
 
 int main()
 {
-	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234." << std::endl;
-	std::cout << "If you dont write ip it will be all available pc ips from all networks" << std::endl;
-	std::cout << "If you dont write port it will be default value: 1111" << std::endl;
+	LOG(EN::LogLevels::Info, "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234.");
+	LOG(EN::LogLevels::Info, "If you dont write ip it will be all available pc ips from all networks");
+	LOG(EN::LogLevels::Info, "If you dont write port it will be default value: 1111");
 	
 	std::string addr, ip;
 	int port;

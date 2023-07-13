@@ -26,7 +26,7 @@ public:
 		if (message == "f")
 			Shutdown();
 		
-		std::cout << "From: " << ClientIpAddress << " Message: " << message << std::endl;
+		LOG(EN::LogLevels::Info, "From: " + ClientIpAddress + " Message: " + message);
 
 		SendToClient(ClientIpAddress, message);
 	}
@@ -34,7 +34,7 @@ public:
 	// Function work between putting message in buffer. Return true if you want to put message in buffer
 	virtual bool InstantClientMessageHandler(std::string message, std::string ClientIpAddress, long long TimeWhenPackageArrived) override
 	{
-		std::cout << "Instant client message hadler. From: " << ClientIpAddress << " Message: " << message << std::endl;
+		LOG(EN::LogLevels::Info, "Instant client message hadler. From: " + ClientIpAddress + " Message: " + message);
 		if (message == "false")
 			return false;
 		return true;

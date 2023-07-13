@@ -1,7 +1,6 @@
 ﻿#include <iostream>
 #include "EN_TCP_Server.h"
 
-
 class MyServer : public EN::EN_TCP_Server
 {
 public:
@@ -13,7 +12,7 @@ public:
 
 	virtual void OnClientConnected(EN_SOCKET clientSocket) override
 	{
-		std::cout << "Client connected! Socket descriptor: " << clientSocket << std::endl;
+		LOG(EN::LogLevels::Info, "Client connected! Socket descriptor: " + std::to_string(clientSocket));
 		SendToClient(clientSocket, "Welcome. You are connected to server.");
 	}
 
@@ -21,7 +20,7 @@ public:
 	{
 		// Important. This function is run in a separate thread. 
 		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
-		std::cout << message << std::endl;
+		LOG(EN::LogLevels::Info, "From: " + std::to_string(clientSocket) + " Message: " + message);
 
 		// Disconnect client
 		if (message == "d")
@@ -30,7 +29,7 @@ public:
 		// Shutdown server
 		if (message == "F")
 		{
-			std::cout << "Server was shutdown by client. Enter any key to end programm" << std::endl;
+			LOG(EN::LogLevels::Info, "Server was shutdown by client. Enter any key to end programm");
 			Shutdown(); 
 		}
 
@@ -49,7 +48,7 @@ public:
 
 	virtual void OnClientDisconnect(EN_SOCKET clientSocket) override
 	{
-		std::cout << "Client disconnected! Socket descriptor: " << clientSocket << std::endl;
+		LOG(EN::LogLevels::Info, "Client disconnected! Socket descriptor: " + std::to_string(clientSocket));
 	}
 };
 

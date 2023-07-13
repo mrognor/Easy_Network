@@ -13,7 +13,7 @@ public:
 
 	virtual void ServerMessageHandler(std::string message) override
 	{
-		std::cout << "Message: " << message << std::endl;
+		LOG(EN::LogLevels::Info, "Message: " + message);
 	}
 
 };

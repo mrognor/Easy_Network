@@ -13,19 +13,19 @@ public:
 	// A function to be defined by the user. It is used for logic after connection
 	virtual void OnConnect() override
 	{
-		std::cout << "Server connected." << std::endl;
+		LOG(EN::LogLevels::Info, "Server connected.");
 	}
 
 	// A function to be defined by the user. It is used to process incoming messages from the server
 	virtual void ServerMessageHandler(std::string message) override
 	{
-		std::cout << message << std::endl;
+		LOG(EN::LogLevels::Info, message);
 	}
 
 	// A function to be defined by the user. Performed after disconnected from the server
 	virtual void OnDisconnect() override
 	{
-		std::cout << "Server disconnected." << std::endl;
+		LOG(EN::LogLevels::Info, "Server disconnected.");
 	}
 };
 
@@ -37,7 +37,7 @@ int main()
 	// Check if connection success
 	if (A.Connect() == false)
 	{
-		std::cout << "Failed to connect" << std::endl;
+		LOG(EN::LogLevels::Info, "Failed to connect");
 		return 0;
 	}
 

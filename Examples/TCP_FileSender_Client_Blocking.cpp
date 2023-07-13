@@ -23,9 +23,9 @@ int main()
 {
 	MyClient A;
 
-	std::cout << "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234." << std::endl;
-	std::cout << "If you dont write ip it will be default value: 127.0.0.1" << std::endl;
-	std::cout << "If you dont write port it will be default value: 1111" << std::endl;
+	LOG(EN::LogLevels::Info, "Write server ip or/and port. Format: ip:port. Example: 192.168.1.85:1234.");
+	LOG(EN::LogLevels::Info, "If you dont write ip it will be default value: 127.0.0.1");
+	LOG(EN::LogLevels::Info, "If you dont write port it will be default value: 1111");
 
 	std::string addr, ip;
 	int port;
@@ -43,17 +43,15 @@ int main()
 	// No incorrect port check
 	if (A.Connect(ip, port) == false)
 	{
-		std::cout << "Failed to connect" << std::endl;
+		LOG(EN::LogLevels::Warning, "Failed to connect");
 		return 0;
 	}
 
-	std::cout << "Connected to server" << std::endl;
+	LOG(EN::LogLevels::Info, "Connected to server");
 
-	if (A.IsConnected())
-		A.SendToServer("FileSender client connected");
-	else
+	if (!A.SendToServer("FileSender client connected"))
 	{
-		std::cout << "Server disconnected" << std::endl;
+		LOG(EN::LogLevels::Info, "Server disconnected");
 		return 0;
 	}
 
@@ -70,7 +68,7 @@ int main()
 
 		if (A.IsConnected() == false)
 		{
-			std::cout << "Server disconnected" << std::endl;
+			LOG(EN::LogLevels::Warning, "Server disconnected");
 			break;
 		}
 		std::vector<std::string> IntrepretedMessage = EN::Split(message);
@@ -83,13 +81,13 @@ int main()
 				EN::SendFile(A.GetSocket(), IntrepretedMessage[2], isStop, transferingSpeed, 0, transmissionStatus);
 			}
 			else
-				std::cout << "No file: " << IntrepretedMessage[2] << " on this directory" << std::endl;
+				LOG(EN::LogLevels::Info, "No file: " + IntrepretedMessage[2] + " on this directory");
 			continue;
 		}
 
 		if (message.find("get file") == 0ull)
 		{
-			std::cout << "Getting file " << IntrepretedMessage[2] << std::endl;
+			LOG(EN::LogLevels::Info, "Getting file " + IntrepretedMessage[2]);
 
 			if (EN::IsFileExist(IntrepretedMessage[2] + ".tmp"))
 			{
@@ -105,13 +103,18 @@ int main()
 				if (responce == "ok")
 				{					
 					if (EN::RecvFile(A.GetSocket(), isStop, transmissionStatus))
-						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+					{
+						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " downloaded");
+					}
 					else
-						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
+					{
+						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " dont downloaded");
+					}
 				}
 				else
-					std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
-				
+				{
+					LOG(EN::LogLevels::Info, "No file: " + IntrepretedMessage[2] + " on server");
+				}
 			}
 			else
 			{
@@ -123,13 +126,17 @@ int main()
 				if (responce == "ok")
 				{
 					if (EN::RecvFile(A.GetSocket(), isStop, transmissionStatus))
-						std::cout << "File: " << IntrepretedMessage[2] << " downloaded" << std::endl;
+					{
+						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " downloaded");
+					}
 					else
-						std::cout << "File: " << IntrepretedMessage[2] << " dont downloaded" << std::endl;
+					{
+						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " dont downloaded");
+					}
 				}
 				else
 				{
-					std::cout << "No file: " << IntrepretedMessage[2] << " on server" << std::endl;
+					LOG(EN::LogLevels::Info, "No file: " + IntrepretedMessage[2] + " on server");
 				}
 			}
 			continue;
