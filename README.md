@@ -5,7 +5,7 @@ Simple C++ network library
 https://mrognor.github.io/Easy_Network_Documentation/doc/html/index.html  
 
 # Library roadmap
-![image](https://github.com/mrognor/Easy_Network/assets/47296449/3d1e5c6e-2ce4-4fb1-8590-ae5c03f5e1b5)
+![image](https://github.com/mrognor/Easy_Network/assets/47296449/9a022e92-f98e-4fb5-8103-9f8afb730f93)
 
 
 # Library usage 
