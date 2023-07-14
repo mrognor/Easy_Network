@@ -25,6 +25,9 @@ namespace EN
 
 	#endif
 
+	bool (*TCP_Send)(EN_SOCKET sock, const std::string& message) = Default_TCP_Send;
+	bool (*TCP_Recv)(EN_SOCKET sock, std::string& message) = Default_TCP_Recv;
+
 	std::string GetIpByURL(std::string url)
 	{
 		// First is gethostbyname. Return hostent struct
@@ -39,7 +42,7 @@ namespace EN
 			return "";
 	}
 
-	bool TCP_Send(EN_SOCKET sock, const std::string& message)
+	bool Default_TCP_Send(EN_SOCKET sock, const std::string& message)
 	{
 		size_t messageLength = message.length();
 
@@ -74,7 +77,7 @@ namespace EN
 		return ((size_t)sendedBytes == messageLength + startIndex);
 	}
 
-	bool TCP_Recv(EN_SOCKET sock, std::string& message)
+	bool Default_TCP_Recv(EN_SOCKET sock, std::string& message)
 	{
 		int msg_size;
 		unsigned char firstMessageLengthByte;

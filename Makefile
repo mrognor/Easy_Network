@@ -15,8 +15,18 @@ debug: all
 release: CXXFLAGS += -D NDEBUG -O3
 release: all
 
-all: bin/TCP_Chat_Server$(FILEEXT) bin/TCP_Chat_Client$(FILEEXT) bin/UDP_Chat_Server$(FILEEXT) bin/UDP_Chat_Client$(FILEEXT) bin/TCP_FileSender_Server_Blocking$(FILEEXT) bin/TCP_FileSender_Client_Blocking$(FILEEXT) bin/ParallelFor$(FILEEXT)
+all: bin/TCP_Chat_Server$(FILEEXT) bin/TCP_Chat_Client$(FILEEXT) bin/UDP_Chat_Server$(FILEEXT) bin/UDP_Chat_Client$(FILEEXT) bin/TCP_FileSender_Server_Blocking$(FILEEXT) bin/TCP_FileSender_Client_Blocking$(FILEEXT) bin/ParallelFor$(FILEEXT) bin/HTTP_Server$(FILEEXT)
 # bin/RAU_Chat_Server$(FILEEXT) bin/RAU_Chat_Client$(FILEEXT)
+
+# HTTP_Server
+bin/HTTP_Server$(FILEEXT): bin/libEasyNetwork.a Examples/http/HTTP_Server.cpp
+	g++ $(CXXFLAGS) Examples/http/HTTP_Server.cpp -I. -Lbin -lEasyNetwork -o bin/HTTP_Server$(FILEEXT) $(LDFLAGS)
+	cp -n Examples/http/index.html bin
+	cp -n Examples/http/page.html bin
+	cp -n Examples/http/404.html bin
+	cp -n Examples/http/Picture.png bin
+	cp -n Examples/http/Picture.jpg bin
+	cp -n Examples/http/Picture.svg bin
 
 # TCP_Chat
 bin/TCP_Chat_Server$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Server.cpp

@@ -81,7 +81,7 @@ namespace EN
         Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
         Using the logical operator |, you can combine the necessary logging levels.
         \param [in] fileName The name of the file to record this logging level
-        \param [in] openMode Optional parametr to open log files. Works like standart fstream open. 
+        \param [in] openMode Optional parametr to open log files. Works like standart fstream open. By default set to std::ios_base::in
     */
-    void SetLogLevelsFile(int logLevelsToEnable, std::string fileName, std::ios_base::openmode openMode = (std::ios_base::openmode)16);
+    void SetLogLevelsFile(int logLevelsToEnable, std::string fileName, std::ios_base::openmode openMode = std::ios_base::in);
 }

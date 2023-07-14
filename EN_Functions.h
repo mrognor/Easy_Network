@@ -52,6 +52,9 @@ namespace EN
     extern WSA_Init_Cleanup WSA_IC;
     #endif
 
+    extern bool (*TCP_Send)(EN_SOCKET sock, const std::string& message);
+    extern bool (*TCP_Recv)(EN_SOCKET sock, std::string& message);
+
 	/// Function for getting an ip address from a url.
 	/// \param[in] url address to get ip
 	/// \return Return host ip or empty string if cannot get host ip.
@@ -64,7 +67,7 @@ namespace EN
         
         \return Returns true in case of success, false if it was disconnection 
 	*/
-	bool TCP_Send(EN_SOCKET sock, const std::string& message);
+	bool Default_TCP_Send(EN_SOCKET sock, const std::string& message);
 
 	/*!
 		Wrapper over the recv function. Allows you to recv std::string. 
@@ -72,7 +75,7 @@ namespace EN
 		\param[out] message string to put received data
 		\return Returns true in case of success, false if it was disconnection 
 	*/ 
-	bool TCP_Recv(EN_SOCKET sock, std::string& message);
+	bool Default_TCP_Recv(EN_SOCKET sock, std::string& message);
 
 	/*!
 		Wrapper over the sendto function. Allows you to send std::string. 
