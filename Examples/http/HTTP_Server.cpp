@@ -1,5 +1,5 @@
-﻿#include "..\..\EN_TCP_Server.h"
-#include "..\..\EN_Functions.h"
+﻿#include "../../EN_TCP_Server.h"
+#include "../../EN_Functions.h"
 #include <map>
 
 bool ReadFile(std::string fileName, std::string& fileString, std::ios_base::openmode openMode = std::ios_base::in)
@@ -136,7 +136,19 @@ public:
 						
 					ReadFile(requestFileName, requestFile, std::ios::binary);
 				}
-				
+				if (requestedDataType == "style")
+				{
+					if (requestFileName.substr(requestFileName.rfind(".") + 1) == "css")
+						responce += "content-type: text/css\r\n";
+					ReadFile(requestFileName, requestFile);
+				}
+				if (requestedDataType == "script")
+				{
+					if (requestFileName.substr(requestFileName.rfind(".") + 1) == "js")
+						responce += "content-type: text/javascript\r\n";
+					ReadFile(requestFileName, requestFile);
+				}
+
 				responce += "content-length: " + std::to_string(requestFile.length()) + "\r\n";
 				responce += "connection: closed\r\n\r\n";
 				responce += requestFile;
