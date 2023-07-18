@@ -2,6 +2,9 @@
 #include "../../EN_Functions.h"
 #include <map>
 
+// String with path to directory with server files
+std::string ServerPrefix = "bin/";
+
 bool ReadFile(std::string fileName, std::string& fileString, std::ios_base::openmode openMode = std::ios_base::in)
 {
 	std::ifstream file(fileName, openMode);
@@ -106,13 +109,13 @@ public:
 
 		if (parsedRequstHeaderVec[0] == "GET")
 		{
-			std::string requestFileName = "bin/index.html";
+			std::string requestFileName = ServerPrefix + "index.html";
 			if (parsedRequstHeaderVec[1] != "/")
 			{
 				if (parsedRequstHeaderVec[1].back() == '?')
-					requestFileName = "bin/" + parsedRequstHeaderVec[1].substr(1, parsedRequstHeaderVec[1].length() - 2);
+					requestFileName = ServerPrefix + parsedRequstHeaderVec[1].substr(1, parsedRequstHeaderVec[1].length() - 2);
 				else
-					requestFileName = "bin/" + parsedRequstHeaderVec[1].substr(1, parsedRequstHeaderVec[1].length() - 1);
+					requestFileName = ServerPrefix + parsedRequstHeaderVec[1].substr(1, parsedRequstHeaderVec[1].length() - 1);
 			}
 
 			std::string requestFile;
@@ -155,7 +158,7 @@ public:
 			}
 			else
 			{
-				if (ReadFile("bin/404.html", requestFile))
+				if (ReadFile(ServerPrefix + "404.html", requestFile))
 				{
 					responce = "HTTP/1.1 404 Not Found\r\n";
 					responce += "content-type: text/html\r\n";
