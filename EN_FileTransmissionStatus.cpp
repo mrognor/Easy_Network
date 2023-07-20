@@ -10,7 +10,7 @@ namespace EN
         TransmissionEta.store(0);
     }
 
-    EN_FileTransmissionStatus::EN_FileTransmissionStatus(const EN::EN_FileTransmissionStatus& status)
+    EN_FileTransmissionStatus::EN_FileTransmissionStatus(EN::EN_FileTransmissionStatus& status)
     {
         TransferedBytes.store(status.TransferedBytes.load());
         FileSize.store(status.FileSize.load());

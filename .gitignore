@@ -1,4 +1,5 @@
 bin
 build
+scripts/*.test
 .vs
 .vscode

@@ -1,10 +1,29 @@
 LDFLAGS = -pthread
 CXXFLAGS = -std=c++11 -Wall
 FILEEXT =
+TARGETS = bin/EN_Functions.o \
+	bin/EN_TCP_Client.o \
+	bin/EN_TCP_Server.o \
+	bin/EN_UDP_Client.o \
+	bin/EN_UDP_Server.o \
+	bin/EN_Logger.o \
+	bin/EN_ThreadGate.o \
+	bin/EN_ThreadCrossWalk.o \
+	bin/EN_SocketOptions.o \
+	bin/EN_BackgroundTimer.o \
+	bin/EN_FileTransmissionStatus.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
 
+# Check os
 ifeq ($(OS), Windows_NT)
 	LDFLAGS += -lws2_32
 	FILEEXT = .exe
+endif
+
+# Check native atomic_int64 support
+ifneq ($(shell test -e ./scripts/CheckAtomicInt64Support.test && echo -n yes), yes)
+	CXXFLAGS += -D NATIVE_ATOMIC_INT64_NOT_SUPPORTED
+    TARGETS += bin/EN_Atomic_Int64.o
+   	$(warning Your system does not have native atomic_int64 support. A software implementation will be used)
 endif
 
 #use -D DISABLE_LOGGER to disable logger
@@ -61,8 +80,8 @@ bin/ParallelFor$(FILEEXT): bin/libEasyNetwork.a Examples/ParallelFor.cpp
 	g++ $(CXXFLAGS) Examples/ParallelFor.cpp -I. -Lbin -lEasyNetwork -o bin/ParallelFor$(FILEEXT) $(LDFLAGS)
 	
 # Library binary
-bin/libEasyNetwork.a: bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o bin/EN_SocketOptions.o bin/EN_BackgroundTimer.o bin/EN_FileTransmissionStatus.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
-	ar rc bin/libEasyNetwork.a bin/EN_Functions.o bin/EN_TCP_Client.o bin/EN_TCP_Server.o bin/EN_UDP_Client.o bin/EN_UDP_Server.o bin/EN_Logger.o bin/EN_ThreadGate.o bin/EN_ThreadCrossWalk.o bin/EN_SocketOptions.o bin/EN_BackgroundTimer.o bin/EN_FileTransmissionStatus.o
+bin/libEasyNetwork.a: $(TARGETS)
+	ar rc bin/libEasyNetwork.a $(TARGETS)
 	ranlib bin/libEasyNetwork.a
 
 # Build all object files
@@ -117,6 +136,10 @@ bin/EN_BackgroundTimer.o: EN_BackgroundTimer.cpp EN_BackgroundTimer.h
 bin/EN_FileTransmissionStatus.o: EN_FileTransmissionStatus.cpp EN_FileTransmissionStatus.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_FileTransmissionStatus.cpp -o bin/EN_FileTransmissionStatus.o
+
+bin/EN_Atomic_Int64.o: EN_Atomic_Int64.cpp EN_Atomic_Int64.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_Atomic_Int64.cpp -o bin/EN_Atomic_Int64.o
 
 # Clean all
 clean:

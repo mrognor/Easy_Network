@@ -1,18 +1,25 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <atomic>
 #include <functional>
+#include "EN_Atomic_Int64.h"
+
+#ifdef NATIVE_ATOMIC_INT64_NOT_SUPPORTED
+    typedef EN::EN_Atomic_Uint64_T AtomicUint64;
+#else
+    typedef std::atomic_uint64_t AtomicUint64;
+#endif
 
 namespace EN
 {
     class EN_FileTransmissionStatus
     {
     private:
-        std::atomic_uint64_t TransferedBytes;
-        std::atomic_uint64_t FileSize;
-        std::atomic_uint64_t TransmissionSpeed;
-        std::atomic_uint64_t TransmissionEta;
+        AtomicUint64 TransferedBytes;
+        AtomicUint64 FileSize;
+        AtomicUint64 TransmissionSpeed;
+        AtomicUint64 TransmissionEta;
         
         bool IsSetProgressFunction = false;
         std::function<void(uint64_t, uint64_t, uint64_t, uint64_t)> ProgressFunction;
@@ -20,7 +27,7 @@ namespace EN
     public:
         EN_FileTransmissionStatus();
 
-        EN_FileTransmissionStatus(const EN::EN_FileTransmissionStatus& status);
+        EN_FileTransmissionStatus(EN::EN_FileTransmissionStatus& status);
 
         void SetTransferedBytes(uint64_t transferedBytes);
         uint64_t GetThisSessionTransferedBytes();

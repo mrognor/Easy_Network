@@ -1,0 +1,1 @@
+g++ CheckAtomicInt64Support.cpp -o CheckAtomicInt64Support.test
