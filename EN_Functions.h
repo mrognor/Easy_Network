@@ -102,11 +102,19 @@ namespace EN
 
 	/*!
 		Divides the string to std::vector<std::string>. 
-		\param[in] StringToSplit string to split
-		\param[in] SplitterString the string that divides the string. Default set to space(" ")
+		\param[in] stringToSplit string to split
+		\param[in] splitterString the string that divides the string. Default set to space(" ")
 		\return Vector of strings
 	*/ 
-	std::vector<std::string> Split(std::string stringToSplit, std::string splitterString = " ");
+	std::vector<std::string> Split(const std::string& stringToSplit, const std::string& splitterString = " ");
+
+	/*!
+		Find all substring occurrences and put theirs positions inside result vector
+		\param[in] stringToFindIn string to split
+		\param[in] splitterString the string that divides the string. Default set to space(" ")
+		\return Vector of strings
+	*/ 
+    std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& splitterString);
 
 	/*! 
 		\brief The function gets socket and filename and send file to socket. 

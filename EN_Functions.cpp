@@ -5,7 +5,7 @@ namespace EN
 	#if defined WIN32 || defined _WIN64
 
     WSA_Init_Cleanup::WSA_Init_Cleanup()
-	{ 
+	{
 		// WSAStartup
 		WSAData wsaData;
 		if (WSAStartup(MAKEWORD(2, 1), &wsaData) != 0)
@@ -33,7 +33,7 @@ namespace EN
 		// First is gethostbyname. Return hostent struct
 		// Second is h_addr_list from hostent struct
 		// Fird is type conversion from h_addr_list[0] to in_addr*
-		// Fourth is get data from in_addr pointer 
+		// Fourth is get data from in_addr pointer
 		// Fifth is convert in_addr to char* using inet_ntoa
 		auto addr = gethostbyname(url.c_str());
 		if (addr != nullptr)
@@ -48,8 +48,8 @@ namespace EN
 
 		// If message length more than 128, then set first bit to 1, that means that message
 		// length stored in 2 bytes
-		// If message length less or equal 128, than set first bit to 0, and send only 
-		// one byte with message length	
+		// If message length less or equal 128, than set first bit to 0, and send only
+		// one byte with message length
 
 		unsigned char* msgBuf;
 		int startIndex;
@@ -65,11 +65,11 @@ namespace EN
 			msgBuf = new unsigned char[1 + (int)messageLength];
 			msgBuf[0] = (unsigned char)messageLength;
 			startIndex = 1;
-		}	
+		}
 
 		for (int i = startIndex; i < (int)messageLength + startIndex; ++i)
 			msgBuf[i] = message[i - startIndex];
-		
+
 		int sendedBytes = send(sock, (char*)msgBuf, (int)messageLength + startIndex, 0);
 		delete[] msgBuf;
 
@@ -89,7 +89,7 @@ namespace EN
 			CloseSocket(sock);
 			return false;
 		}
-		
+
 		// If first bit equls 1, then message length store in 2 bytes and we need to read next byte
 		if (firstMessageLengthByte & 0b10000000)
 		{
@@ -101,14 +101,14 @@ namespace EN
 				message = "";
 				CloseSocket(sock);
 				return false;
-			}	
+			}
 
 			msg_size = (firstMessageLengthByte & 0b01111111) * 128;
 			msg_size += secondMessageLengthByte & 0b01111111;
 		}
 		else
 			msg_size = firstMessageLengthByte & 0b01111111;
-		
+
 		if (msg_size <= 0)
 		{
 			message = "";
@@ -151,7 +151,7 @@ namespace EN
 
 		// If message length more than 128, then set first bit to 1, that means that message
 		// length stored in 2 bytes
-		// If message length less or equal 128, than set first bit to 0, and send only 
+		// If message length less or equal 128, than set first bit to 0, and send only
 		// one byte with message length
 		if (messageLength >= 128)
 		{
@@ -166,13 +166,13 @@ namespace EN
 			msgBuf = new unsigned char[1  + messageLength];
 			msgBuf[0] = (int)messageLength;
 			messageByteLength = 1;
-		}		
+		}
 
 		for (size_t i = 0; i < messageLength; ++i)
 			msgBuf[i + messageByteLength] = message[i];
 
 		sendto(sock, (char*)msgBuf, messageLength + messageByteLength, 0, (sockaddr*)&ClientAddr, (int)sizeof(ClientAddr));
-		
+
 		delete[] msgBuf;
 	}
 
@@ -213,7 +213,7 @@ namespace EN
 				message = "";
 				CloseSocket(sock);
 				return false;
-			}	
+			}
 
 			msg_size = (firstMessageLengthByte & 0b01111111) * 128;
 			msg_size += secondMessageLengthByte & 0b01111111;
@@ -221,7 +221,7 @@ namespace EN
 		}
 		else
 			msg_size = firstMessageLengthByte & 0b01111111;
-		
+
 		if (msg_size <= 0)
 		{
 			message = "";
@@ -249,7 +249,7 @@ namespace EN
 		#endif
 	}
 
-	std::vector<std::string> Split(std::string stringToSplit, std::string splitterString)
+	std::vector<std::string> Split(const std::string& stringToSplit, const std::string& splitterString)
 	{
 		std::vector<std::string> returnVector;
 		size_t i = 0;
@@ -282,9 +282,38 @@ namespace EN
 		return returnVector;
 	}
 
+	std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& splitterString)
+	{
+		std::vector<std::size_t> returnVector;
+		size_t i = 0;
+		while (i < stringToFindIn.size())
+		{
+			if (stringToFindIn[i] == splitterString[0])
+			{
+				bool isSplitter = true;
+				for (size_t j = 1; j < splitterString.size(); ++j)
+				{
+					if (stringToFindIn[i + j] != splitterString[j])
+					{
+						isSplitter = false;
+						break;
+					}
+				}
+				if (isSplitter)
+				{
+					returnVector.push_back(i);
+					i += splitterString.size();
+					continue;
+				}
+			}
+			++i;
+		}
+		return returnVector;
+	}
+
 	bool SendFile(EN_SOCKET fileSendSocket, std::string fileName, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
 		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus)
-	{	
+	{
 		// Open sending file
 		std::ifstream sendingFile(fileName, std::ios::binary);
 
@@ -313,7 +342,7 @@ namespace EN
 
 		// Current iteration sended bytes
 		int sendedBytes;
-		
+
 		// Amount of sended data previously
 		sendingFile.seekg(previouslySendedSize, std::ios::beg);
 		sendedMessageSize += previouslySendedSize;
@@ -357,7 +386,7 @@ namespace EN
 					delete[] messageBuf;
 					return false;
 				}
-				
+
 				// Add sending bytes
 				sendedMessageSize += sendedBytes;
 
@@ -420,12 +449,12 @@ namespace EN
             LOG(Error, "Failed to received file name");
 			return false;
 		}
-		
+
 		std::vector<std::string> fileInfos = Split(fileInfo);
 		std::string fileName = fileInfos[0];
 		uint64_t fileSize;
 
-		try 
+		try
 		{
 			fileSize = std::stoll(fileInfos[1]);
 		}
@@ -441,7 +470,7 @@ namespace EN
 		// Already received bytes
 		uint64_t receivedMessageSize = 0;
 
-		// Received file buffer 
+		// Received file buffer
 		char* messageBuf = new char[SendFileBufLen];
 		int receivedBytes;
 
@@ -508,7 +537,7 @@ namespace EN
 				delete[] messageBuf;
 				return false;
 			}
-			
+
 			receivedFile.write(messageBuf, fileSize - receivedMessageSize);
 
 			fileTransmissionStatus.SetTransferedBytes(fileSize);
@@ -526,7 +555,7 @@ namespace EN
 			delete[] messageBuf;
 			return false;
 		}
-		
+
 		// Check if it was file with same name
 		std::string newFileName = fileName;
 		if (IsFileExist(fileName))
@@ -553,13 +582,13 @@ namespace EN
             LOG(Error, "Failed to received file name");
 			return false;
 		}
-		
+
 		if (!EN::TCP_Send(DestinationFileSocket, fileInfo))
 			return false;
 
 		uint64_t fileSize;
 
-		try 
+		try
 		{
 			fileSize = std::stoll(Split(fileInfo)[1]);
 		}
@@ -572,7 +601,7 @@ namespace EN
 		// Already received bytes
 		uint64_t receivedMessageSize = 0;
 
-		// Received file buffer 
+		// Received file buffer
 		char* messageBuf = new char[SendFileBufLen];
 
 		uint64_t lastReceivedMessageSize = 0;
@@ -660,7 +689,7 @@ namespace EN
 		fileTransmissionStatus.SetTransmissionEta(0);
 
 		if (fileTransmissionStatus.GetIsSetProgressFunction())
-			fileTransmissionStatus.InvokeProgressFunction();	
+			fileTransmissionStatus.InvokeProgressFunction();
 
 		delete[] messageBuf;
 		return true;
@@ -739,14 +768,14 @@ namespace EN
 		return fileSize;
 	}
 
-    int GetCPUCores() 
-	{ 
-		return std::thread::hardware_concurrency(); 
+    int GetCPUCores()
+	{
+		return std::thread::hardware_concurrency();
 	}
 
     int GetSocketErrorCode()
     {
-        #if defined WIN32 || defined _WIN64 
+        #if defined WIN32 || defined _WIN64
             return WSAGetLastError();
         #else
             return (errno);
@@ -755,7 +784,7 @@ namespace EN
 
 	std::string GetSocketErrorString(int socketErrorCode)
     {
-        #if defined WIN32 || defined _WIN64 
+        #if defined WIN32 || defined _WIN64
 
         if (socketErrorCode  == -1)
             socketErrorCode = WSAGetLastError();
@@ -841,7 +870,7 @@ namespace EN
         {
         case 0: return "Monday";
         case 1: return "Tuesday";
-        case 2: return "Wednesday"; 
+        case 2: return "Wednesday";
         case 3: return "Thursday";
         case 4: return "Friday";
         case 5: return "Saturday";
@@ -896,7 +925,7 @@ namespace EN
         currentTime += ".";
         if (ltm->tm_sec < 10) currentTime += "0";
         currentTime += std::to_string(ltm->tm_sec);
-        
+
         return currentTime;
     }
 
