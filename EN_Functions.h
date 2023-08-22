@@ -426,12 +426,12 @@ namespace EN
     T StringToInt(const std::string& str)
     {
         T n = 0;
-        for (auto it = str.rbegin(); it != str.rend(); ++it)
+        for (auto it = str.rbegin(); it != --str.rend(); ++it)
         {
             n += (unsigned char)*it;
             n *= 256;
         }
-        n /= 256;
+        n += (unsigned char)str[0];
         return n;
     }
 
@@ -447,12 +447,12 @@ namespace EN
     T WStringToInt(const std::string& str)
     {
         T n = 0;
-        for (auto it = str.rbegin(); it != str.rend(); ++it)
+        for (auto it = str.rbegin(); it != --str.rend(); ++it)
         {
             n += (unsigned char)*it;
             n <<= 8;
         }
-        n >>= 8;
+        n += (unsigned char)str[0];
         return n;
     }
 }
