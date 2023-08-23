@@ -75,6 +75,11 @@ void ParseHTTPRequest(const std::string& request, std::map<std::string, std::str
 	}
 }
 
+void GetUrlParamsHandler(const std::string& urlParams)
+{
+
+}
+
 class MyServer : public EN::EN_TCP_Server
 {
 public:
@@ -112,10 +117,10 @@ public:
 			std::string requestFileName = ServerPrefix + "index.html";
 			if (parsedRequstHeaderVec[1] != "/")
 			{
-				if (parsedRequstHeaderVec[1].back() == '?')
-					requestFileName = ServerPrefix + parsedRequstHeaderVec[1].substr(1, parsedRequstHeaderVec[1].length() - 2);
-				else
-					requestFileName = ServerPrefix + parsedRequstHeaderVec[1].substr(1, parsedRequstHeaderVec[1].length() - 1);
+				auto splittedFileRequest = EN::Split(parsedRequstHeaderVec[1], "?");
+				requestFileName = ServerPrefix + splittedFileRequest[0];
+				if (splittedFileRequest.size() > 1)
+					GetUrlParamsHandler(splittedFileRequest[1]);
 			}
 
 			std::string requestFile;
