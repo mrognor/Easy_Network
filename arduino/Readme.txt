@@ -1,0 +1,1 @@
+This code is provided without any guarantees of operation. It is needed for the convenience of working with microcontrollers, but it is very likely that it will require code completion. At a minimum, you will have to change the header file
