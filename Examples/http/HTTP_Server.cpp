@@ -85,8 +85,8 @@ class MyServer : public EN::EN_TCP_Server
 public:
 	MyServer()
 	{
-		EN::TCP_Recv = HTTP_Recv;
-		EN::TCP_Send = HTTP_Send;
+		SetTCPSendFunction(HTTP_Send);
+		SetTCPRecvFunction(HTTP_Recv);
 
 		// IpAddress = "192.168.1.64"; // Default set to localhost. Read description for this variable before use it.
 		Port = 80;

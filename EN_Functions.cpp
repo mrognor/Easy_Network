@@ -25,9 +25,6 @@ namespace EN
 
 	#endif
 
-	bool (*TCP_Send)(EN_SOCKET sock, const std::string& message) = Default_TCP_Send;
-	bool (*TCP_Recv)(EN_SOCKET sock, std::string& message) = Default_TCP_Recv;
-
 	std::string GetIpByURL(std::string url)
 	{
 		// First is gethostbyname. Return hostent struct
@@ -140,7 +137,7 @@ namespace EN
 		return true;
 	}
 
-	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message)
+	void Default_UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message)
 	{
 		auto SplittedAddr = Split(destinationAddress, ":");
 		sockaddr_in ClientAddr;
@@ -181,7 +178,7 @@ namespace EN
 		delete[] msgBuf;
 	}
 
-	bool UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message)
+	bool Default_UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message)
 	{
 		// Source address
 		sockaddr_in sourceSockAddr;
@@ -336,7 +333,7 @@ namespace EN
 		uint64_t fileSize = sendingFile.tellg();
 
 		// Send file name and file size
-		if (!EN::TCP_Send(fileSendSocket, fileName + " " + std::to_string(fileSize - previouslySendedSize)))
+		if (!EN::Default_TCP_Send(fileSendSocket, fileName + " " + std::to_string(fileSize - previouslySendedSize)))
 			return false;
 
 		// See file start
@@ -449,7 +446,7 @@ namespace EN
 	{
 		// Get file name and file size
 		std::string fileInfo;
-		if (EN::TCP_Recv(FileSendSocket, fileInfo) == false)
+		if (EN::Default_TCP_Recv(FileSendSocket, fileInfo) == false)
 		{
             LOG(Error, "Failed to received file name");
 			return false;
@@ -582,13 +579,13 @@ namespace EN
 	{
 		// Get file name and file size
 		std::string fileInfo;
-		if (EN::TCP_Recv(SourceFileSocket, fileInfo) == false)
+		if (EN::Default_TCP_Recv(SourceFileSocket, fileInfo) == false)
 		{
             LOG(Error, "Failed to received file name");
 			return false;
 		}
 
-		if (!EN::TCP_Send(DestinationFileSocket, fileInfo))
+		if (!EN::Default_TCP_Send(DestinationFileSocket, fileInfo))
 			return false;
 
 		uint64_t fileSize;

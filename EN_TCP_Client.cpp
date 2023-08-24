@@ -143,7 +143,7 @@ namespace EN
     bool EN_TCP_Client::WaitMessage(std::string& message)
     {
 		// Thread safety because this method should be called only inside handler thread or handler thread even not started
-        return EN::TCP_Recv(ServerConnectionSocket, message);
+        return TCP_Recv(ServerConnectionSocket, message);
     }
 
 	void EN_TCP_Client::Disconnect()
@@ -172,6 +172,16 @@ namespace EN
         for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
 			SocketOptions.push_back(SocketOption(socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]));
     }
+
+	void EN_TCP_Client::SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&))
+	{
+		TCP_Send = TCPSendFunction;
+	}
+
+	void EN_TCP_Client::SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&))
+	{
+		TCP_Recv = TCPRecvFunction;
+	}
 
 	EN_TCP_Client::~EN_TCP_Client()
 	{	

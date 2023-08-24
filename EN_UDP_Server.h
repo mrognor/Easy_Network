@@ -57,6 +57,12 @@ namespace EN
 
 		// Functions to handle incoming message buffer
 		void ThreadListHandler(int ThreadID);
+
+		// A pointer to a function for sending messages. Allows you to use custom network protocols. Send message to socket
+		void (*UDP_Send)(EN_SOCKET sock, std::string destinationAddress, const std::string& message) = EN::Default_UDP_Send;
+		
+		// A pointer to a function for recv messages. Allows you to use custom network protocols. Recv message from socket
+		bool (*UDP_Recv)(EN_SOCKET sock, std::string& sourceAddress, std::string& message) = EN::Default_UDP_Recv;
 	protected:
 		/// Server port. Default set to 1111
 		int Port = 1111;
@@ -144,6 +150,29 @@ namespace EN
             You can create your own sets of options using define or by creating structure objects
         */
         void SetSocketOption(PredefinedSocketOptions socketOptions);
+
+        /**
+           \brief The method sets custom send function. Allow you use your own protocol
+
+            \param[in] UDPSendFunction This parameter is a pointer to a function for sending messages to the socket. 
+			The function accepts the socket of the connected client, where you want to send 
+			the message and the message itself
+
+			\warning If you want to use your protocol, use only one send call. 
+			This is necessary because the send function is thread-safe, 
+			but if you send one message to 2 send calls, then if 2 threads write to the same socket, 
+			then the data of two different messages may be mixed and you will receive errors
+        */
+		void SetUDPSendFunction(void (*UDPSendFunction)(EN_SOCKET sock, std::string destinationAddress, const std::string& message));
+
+        /**
+           \brief The method sets custom recv function. Allow you use your own protocol
+
+            \param[in] UDPRecvFunction This parameter is a pointer to a function for receiving messages from the socket. 
+			The function accepts the socket of the connected client, where you want to recv from 
+			the message and the message itself
+        */
+		void SetUDPRecvFunction(bool (*UDPRecvFunction)(EN_SOCKET sock, std::string& sourceAddress, std::string& message));
 
 		virtual ~EN_UDP_Server();
 	};

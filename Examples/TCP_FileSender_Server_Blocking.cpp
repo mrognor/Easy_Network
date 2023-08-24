@@ -56,7 +56,7 @@ public:
 				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, std::stoll(InterpretedMessage[3]), transmissionStatus);
 			}
 			else
-				EN::TCP_Send(clientSocket, "bad");
+				SendToClient(clientSocket, "bad");
 			return;
 		}
 	}

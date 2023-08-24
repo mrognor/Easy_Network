@@ -117,7 +117,7 @@ namespace EN
 		// Keep listening for data
 		while (true)
 		{					
-			recvRes = EN::UDP_Recv(UDP_ServerSocket, clientAddress, message);
+			recvRes = UDP_Recv(UDP_ServerSocket, clientAddress, message);
 			
 			if (IsShutdown.load() || !recvRes)
 				break;
@@ -214,7 +214,7 @@ namespace EN
 
 	void EN_UDP_Server::SendToClient(std::string ClientIpAddress, std::string message)
 	{
-		EN::UDP_Send(UDP_ServerSocket, ClientIpAddress, message);
+		UDP_Send(UDP_ServerSocket, ClientIpAddress, message);
 	}
 
 	void EN_UDP_Server::SetSocketOption(int level, int optionName, int optionValue)
@@ -237,6 +237,16 @@ namespace EN
 			for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
 				EN::SetSocketOption(UDP_ServerSocket, socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]);
 		ShutdownMutex.unlock();
+	}
+
+	void EN_UDP_Server::SetUDPSendFunction(void (*UDPSendFunction)(EN_SOCKET sock, std::string destinationAddress, const std::string& message))
+	{
+		UDP_Send = UDPSendFunction;
+	}
+
+	void EN_UDP_Server::SetUDPRecvFunction(bool (*UDPRecvFunction)(EN_SOCKET sock, std::string& sourceAddress, std::string& message))
+	{
+		UDP_Recv = UDPRecvFunction;
 	}
 
 	EN_UDP_Server::~EN_UDP_Server() {}

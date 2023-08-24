@@ -58,6 +58,12 @@ namespace EN
 
 		// This method will wait until thread handler return
 		void WaitForServerHandlerEnd();
+
+		// A pointer to a function for sending messages. Allows you to use custom network protocols. Send message to socket
+		bool (*TCP_Send)(EN_SOCKET sock, const std::string& message) = EN::Default_TCP_Send;
+		
+		// A pointer to a function for recv messages. Allows you to use custom network protocols. Recv message from socket
+		bool (*TCP_Recv)(EN_SOCKET sock, std::string& message) = EN::Default_TCP_Recv;
 	protected:
 		/**
 			Variable for disabling the incoming message handler. 
@@ -167,6 +173,29 @@ namespace EN
             You can create your own sets of options using define or by creating structure objects
         */
         void SetSocketOption(PredefinedSocketOptions socketOptions);
+
+        /**
+           \brief The method sets custom send function. Allow you use your own protocol
+
+            \param[in] TCPSendFunction This parameter is a pointer to a function for sending messages to the socket. 
+			The function accepts the socket of the connected client, where you want to send 
+			the message and the message itself
+
+			\warning If you want to use your protocol, use only one send call. 
+			This is necessary because the send function is thread-safe, 
+			but if you send one message to 2 send calls, then if 2 threads write to the same socket, 
+			then the data of two different messages may be mixed and you will receive errors
+        */
+		void SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&));
+
+        /**
+           \brief The method sets custom recv function. Allow you use your own protocol
+
+            \param[in] TCPRecvFunction This parameter is a pointer to a function for receiving messages from the socket. 
+			The function accepts the socket of the connected client, where you want to recv from 
+			the message and the message itself
+        */
+		void SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&));
 
 		// Default destructor
 		virtual ~EN_TCP_Client();

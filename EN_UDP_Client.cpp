@@ -42,7 +42,7 @@ namespace EN
 			EN::SetSocketOption(ServerConnectionSocket, opt.Level, opt.OptionName, opt.OptionValue);
 
 		// Get port from os
-		EN::UDP_Send(ServerConnectionSocket, "0.0.0.0:0", "");
+		UDP_Send(ServerConnectionSocket, "0.0.0.0:0", "");
 
 		std::thread ServerHandlerThread([this]() { this->ServerHandler(); });
 		ServerHandlerThread.detach();
@@ -56,7 +56,7 @@ namespace EN
 		bool operationRes;
 		while (true)
 		{
-			operationRes = EN::UDP_Recv(ServerConnectionSocket, ipAddress, message);
+			operationRes = UDP_Recv(ServerConnectionSocket, ipAddress, message);
 			
 			if (!operationRes)
 				break;
@@ -67,7 +67,7 @@ namespace EN
 
 	void EN_UDP_Client::SendToServer(std::string message)
 	{
-		EN::UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), message);
+		UDP_Send(ServerConnectionSocket, ServerIpAddress + ":" + std::to_string(ServerPort), message);
 	}
 
 	void EN_UDP_Client::Stop()
@@ -95,6 +95,16 @@ namespace EN
 			for (size_t i = 0; i < socketOptions.Levels.size(); ++i)
 				SocketOptions.push_back(SocketOption(socketOptions.Levels[i], socketOptions.OptionNames[i], socketOptions.OptionValues[i]));
 		ClientMtx.unlock();
+	}
+
+	void EN_UDP_Client::SetUDPSendFunction(void (*UDPSendFunction)(EN_SOCKET sock, std::string destinationAddress, const std::string& message))
+	{
+		UDP_Send = UDPSendFunction;
+	}
+
+	void EN_UDP_Client::SetUDPRecvFunction(bool (*UDPRecvFunction)(EN_SOCKET sock, std::string& sourceAddress, std::string& message))
+	{
+		UDP_Recv = UDPRecvFunction;
 	}
 
 	EN_UDP_Client::~EN_UDP_Client() {}

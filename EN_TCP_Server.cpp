@@ -141,7 +141,7 @@ namespace EN
 
 		while (true)
 		{
-			ConnectionStatus = EN::TCP_Recv(clientSocket, message);
+			ConnectionStatus = TCP_Recv(clientSocket, message);
 
 			if (ConnectionStatus == false)
 			{
@@ -235,7 +235,7 @@ namespace EN
 
 		if (ClientSockets.find(clientSocket) != ClientSockets.end())
 		{
-			if(!EN::TCP_Send(clientSocket, message))
+			if(!TCP_Send(clientSocket, message))
                 resCode = -1;
             else 
                 resCode = 0;
@@ -264,7 +264,7 @@ namespace EN
 		CrossWalk.CarStartCrossRoad();
 
 		for (const EN_SOCKET it : ClientSockets)
-			EN::TCP_Send(it, message);
+			TCP_Send(it, message);
 
 		CrossWalk.CarStopCrossRoad();
 	}
@@ -272,7 +272,7 @@ namespace EN
     bool EN_TCP_Server::WaitMessage(EN_SOCKET clientSocket, std::string& message)
     {
 		// Thread safety because this method should be called only inside handler thread
-		return EN::TCP_Recv(clientSocket, message);
+		return TCP_Recv(clientSocket, message);
     }
 
 	void EN_TCP_Server::LockClientSockets()
@@ -343,6 +343,16 @@ namespace EN
 		{
 			LOG(LogLevels::Warning, "You are trying to set socket option on non client socket");
 		}
+	}
+
+	void EN_TCP_Server::SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&))
+	{
+		TCP_Send = TCPSendFunction;
+	}
+
+	void EN_TCP_Server::SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&))
+	{
+		TCP_Recv = TCPRecvFunction;
 	}
 
 	EN_TCP_Server::~EN_TCP_Server() {}

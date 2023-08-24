@@ -52,9 +52,6 @@ namespace EN
     extern WSA_Init_Cleanup WSA_IC;
     #endif
 
-    extern bool (*TCP_Send)(EN_SOCKET sock, const std::string& message);
-    extern bool (*TCP_Recv)(EN_SOCKET sock, std::string& message);
-
 	/// Function for getting an ip address from a url.
 	/// \param[in] url address to get ip
 	/// \return Return host ip or empty string if cannot get host ip.
@@ -102,7 +99,7 @@ namespace EN
 
 		\return Returns true in case of success, false if it was disconnection 
 	*/ 
-	void UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message);
+	void Default_UDP_Send(EN_SOCKET sock, std::string destinationAddress, const std::string& message);
 
 	/*!
 		Wrapper over the recv function. Allows you to recv std::string. 
@@ -112,7 +109,7 @@ namespace EN
 
 		\return Returns true in case of success, false if it was disconnection 
 	*/ 
-	bool UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message);
+	bool Default_UDP_Recv(EN_SOCKET sock, std::string& sourceAddress, std::string& message);
 
 	/// Close socket
 	void CloseSocket(EN_SOCKET sock);
