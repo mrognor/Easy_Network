@@ -44,57 +44,57 @@ namespace EN
 
 	bool Default_TCP_Send(EN_SOCKET sock, const std::string& message)
 	{
-		size_t messageLength = message.length();
+		// Sending data prefix with information about message length
+		std::string messageLengthString;
+		std::size_t messageLength = message.length();
 
-		// If message length more than 128, then set first bit to 1, that means that message
-		// length stored in 2 bytes
-		// If message length less or equal 128, than set first bit to 0, and send only
-		// one byte with message length
-
-		unsigned char* msgBuf;
-		int startIndex;
-		if (messageLength >= 128)
+		if (messageLength == 0) messageLengthString += '\0';
+		
+		// Convert message length to 128 base system
+		while(messageLength > 0)
 		{
-			msgBuf = new unsigned char[2 + (int)messageLength];
-			msgBuf[0] = (unsigned char)((messageLength / 128) | 0b10000000);
-			msgBuf[1] = (unsigned char)(messageLength % 128);
-			startIndex = 2;
-		}
-		else
-		{
-			msgBuf = new unsigned char[1 + (int)messageLength];
-			msgBuf[0] = (unsigned char)messageLength;
-			startIndex = 1;
+			// Get last seven bits. Equals to % 128
+			messageLengthString += (unsigned char)(messageLength & 0b01111111);
+			messageLength >>= 7;
 		}
 
-		for (int i = startIndex; i < (int)messageLength + startIndex; ++i)
-			msgBuf[i] = message[i - startIndex];
+		messageLength = message.length();
 
-		int sendedBytes = send(sock, (char*)msgBuf, (int)messageLength + startIndex, 0);
+		// Alloc memory to sending message
+		unsigned char* msgBuf = new unsigned char[messageLengthString.length() + messageLength];
+
+		// Set first bit in length bytes except last length byte
+		for (std::size_t i = 0; i < messageLengthString.length() - 1; ++i)
+			msgBuf[i] = ((unsigned char)messageLengthString[i]) | 0b10000000;
+		
+		msgBuf[messageLengthString.length() - 1] = messageLengthString[messageLengthString.length() - 1];
+
+		// Fill sending buffer with data from string
+		std::size_t counter = messageLengthString.length();
+		for (auto& it : message)
+		{
+			msgBuf[counter] = (unsigned char)it;
+			++counter;
+		}
+
+		// Send all data in one send call
+		int sendedBytes = send(sock, (char*)msgBuf, messageLengthString.length() + messageLength, 0);
 		delete[] msgBuf;
 
-		// Return true if sended butes equals message length, otherwise return false
-		return ((size_t)sendedBytes == messageLength + startIndex);
+		return ((size_t)sendedBytes == messageLengthString.length() + messageLength);
 	}
 
 	bool Default_TCP_Recv(EN_SOCKET sock, std::string& message)
 	{
-		int msg_size;
-		unsigned char firstMessageLengthByte;
-		int receivedBytes = recv(sock, (char*)&firstMessageLengthByte, 1, MSG_WAITALL);
+		std::string messageSizeString;
+		int receivedBytes;
 
-		if (receivedBytes < 1)
+		// We read the incoming data one byte at a time until we get the first byte with the first bit equal to 0, 
+		// which means that this is the last byte with the size.
+		while (true)
 		{
-			message = "";
-			CloseSocket(sock);
-			return false;
-		}
-
-		// If first bit equls 1, then message length store in 2 bytes and we need to read next byte
-		if (firstMessageLengthByte & 0b10000000)
-		{
-			unsigned char secondMessageLengthByte;
-			receivedBytes = recv(sock, (char*)&secondMessageLengthByte, 1, MSG_WAITALL);
+			char sizeByte;
+			receivedBytes = recv(sock, &sizeByte, 1, MSG_WAITALL);
 
 			if (receivedBytes < 1)
 			{
@@ -103,23 +103,28 @@ namespace EN
 				return false;
 			}
 
-			msg_size = (firstMessageLengthByte & 0b01111111) * 128;
-			msg_size += secondMessageLengthByte & 0b01111111;
-		}
-		else
-			msg_size = firstMessageLengthByte & 0b01111111;
-
-		if (msg_size <= 0)
-		{
-			message = "";
-			return true;
+			messageSizeString += sizeByte;
+			if ((sizeByte & 0b10000000) == 0)
+				break;
 		}
 
-		char* msg = new char[msg_size];
+		std::size_t messageSize = 0;
 
-		receivedBytes = recv(sock, msg, msg_size, MSG_WAITALL);
+		// Calculate message size
+        for (auto it = messageSizeString.rbegin(); it != --messageSizeString.rend(); ++it)
+        {
+            messageSize += (unsigned char)*it & 0b01111111;
+            messageSize *= 128;
+        }
 
-		if (receivedBytes != msg_size)
+        messageSize += (unsigned char)messageSizeString[0] & 0b01111111;
+
+		// Allocate memory to incoming message
+		char* msg = new char[messageSize];
+
+		receivedBytes = recv(sock, msg, messageSize, MSG_WAITALL);
+
+		if ((std::size_t)receivedBytes != messageSize)
 		{
 			message = "";
 			CloseSocket(sock);
@@ -128,7 +133,7 @@ namespace EN
 		}
 
 	    message.clear();
-	    for (int i = 0; i < msg_size; ++i)
+	    for (std::size_t i = 0; i < messageSize; ++i)
 		    message += msg[i];
 
 		delete[] msg;

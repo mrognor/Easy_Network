@@ -66,6 +66,14 @@ namespace EN
 		\param[in] message message to send
         
         \return Returns true in case of success, false if it was disconnection 
+
+        Description of the protocol. Information about the length of the message is added before the transmitted message. 
+        The information is provided in the following form: the length of the message is translated into 
+        a number system with a base of 128, and then each digit of the resulting number is stored in a separate byte. 
+        After that, for all bytes of the number, except the last one, the first bit is set to 1. 
+        This allows you to read the incoming message one character at a time, 
+        and determine when the information about the length of the message ends and start reading the data itself.
+        Byte write order - little endian
 	*/
 	bool Default_TCP_Send(EN_SOCKET sock, const std::string& message);
 
@@ -73,7 +81,16 @@ namespace EN
 		Wrapper over the recv function. Allows you to recv std::string. 
 		\param[in] sock socket to get data
 		\param[out] message string to put received data
-		\return Returns true in case of success, false if it was disconnection 
+        
+		\return Returns true in case of success, false if it was disconnection
+
+        Description of the protocol. Information about the length of the message is added before the transmitted message. 
+        The information is provided in the following form: the length of the message is translated into 
+        a number system with a base of 128, and then each digit of the resulting number is stored in a separate byte. 
+        After that, for all bytes of the number, except the last one, the first bit is set to 1. 
+        This allows you to read the incoming message one character at a time, 
+        and determine when the information about the length of the message ends and start reading the data itself.
+        Byte write order - little endian 
 	*/ 
 	bool Default_TCP_Recv(EN_SOCKET sock, std::string& message);
 
