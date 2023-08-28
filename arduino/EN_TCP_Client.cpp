@@ -117,34 +117,37 @@ bool TCP_Client::WaitMessage(std::string &msg)
     // Allocate memory to incoming message
     char *msgBuf = new char[messageSize];
 
-    // while (Client.available() < messageSize && Client.connected()) { volatile int i = 0; }
-
-    // if (!Client.connected())
-    //     return false;
-
-    // receivedBytes = Client.read((uint8_t*)msgBuf, messageSize);
-
-    // if ((std::size_t)receivedBytes != messageSize)
-    // {
-    // 	msg = "";
-    // 	delete[] msgBuf;
-    // 	return false;
-    // }
-
+    #if defined(ESP8266)
     std::size_t counter = 0;
     while (counter < messageSize)
     {
-        while (Client.available() < 1 && Client.connected())
-        {
-            volatile int i = 0;
-        }
+        while (Client.available() < 1 && Client.connected()) { volatile int i = 0; }
 
         if (!Client.connected())
+        {
+            delete[] msgBuf;
             return false;
+        }
 
         msgBuf[counter] = Client.read();
         ++counter;
     }
+    #elif defined(ESP32)
+    while (Client.available() < messageSize && Client.connected()) { volatile int i = 0; }
+
+    if (!Client.connected())
+        return false;
+
+    receivedBytes = Client.read((uint8_t*)msgBuf, messageSize);
+
+    if ((std::size_t)receivedBytes != messageSize)
+    {
+        msg = "";
+    	delete[] msgBuf;
+     	return false;
+    }
+    #endif
+
 
     msg.clear();
     for (std::size_t i = 0; i < messageSize; ++i)

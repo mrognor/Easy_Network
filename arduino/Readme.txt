@@ -1,1 +1,3 @@
 This code is provided without any guarantees of operation. It is needed for the convenience of working with microcontrollers, but it is very likely that it will require code completion. At a minimum, you will have to change the header file
+Check #if defined(ESP8266) to compile code on your board
+In cpp file 2 algorithms to get data from server. First check esp32 algorithm and if it works use it. If esp32 algorithm dont work use esp8266 algorithm
