@@ -45,7 +45,7 @@ namespace EN
 		std::string messageLengthString;
 		std::size_t messageLength = message.length();
 
-		if (messageLength == 0) messageLengthString += '\0';
+		if (messageLength == 0) messageLengthString = '\0';
 		
 		// Convert message length to 128 base system
 		while(messageLength > 0)
@@ -116,24 +116,32 @@ namespace EN
 
         messageSize += (unsigned char)messageSizeString[0] & 0b01111111;
 
-		// Allocate memory to incoming message
-		char* msg = new char[messageSize];
-
-		receivedBytes = recv(sock, msg, messageSize, MSG_WAITALL);
-
-		if ((std::size_t)receivedBytes != messageSize)
+		if (messageSize != 0)
 		{
-			message = "";
-			CloseSocket(sock);
+			// Allocate memory to incoming message
+			char* msg = new char[messageSize];
+
+			receivedBytes = recv(sock, msg, messageSize, MSG_WAITALL);
+
+			if ((std::size_t)receivedBytes != messageSize)
+			{
+				message = "";
+				CloseSocket(sock);
+				delete[] msg;
+				return false;
+			}
+
+	    	message.clear();
+	    	for (std::size_t i = 0; i < messageSize; ++i)
+			{
+		    	message += msg[i];
+			}
+			
 			delete[] msg;
-			return false;
 		}
+		else
+			message.clear();
 
-	    message.clear();
-	    for (std::size_t i = 0; i < messageSize; ++i)
-		    message += msg[i];
-
-		delete[] msg;
 		return true;
 	}
 
