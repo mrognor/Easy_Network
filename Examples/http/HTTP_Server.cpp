@@ -114,14 +114,16 @@ public:
 
 		if (parsedRequstHeaderVec[0] == "GET")
 		{
-			std::string requestFileName = ServerPrefix + "index.html";
-			if (parsedRequstHeaderVec[1] != "/")
-			{
-				auto splittedFileRequest = EN::Split(parsedRequstHeaderVec[1], "?");
-				requestFileName = ServerPrefix + splittedFileRequest[0];
-				if (splittedFileRequest.size() > 1)
-					GetUrlParamsHandler(splittedFileRequest[1]);
-			}
+            auto splittedFileRequest = EN::Split(parsedRequstHeaderVec[1], "?");
+			std::string requestFileName;
+
+			if (splittedFileRequest[0] == "/")
+                requestFileName = ServerPrefix + "index.html";
+            else
+                requestFileName = ServerPrefix + splittedFileRequest[0].substr(1);
+
+            if (splittedFileRequest.size() > 1)
+				GetUrlParamsHandler(splittedFileRequest[1]);
 
 			std::string requestFile;
 			std::string responce;
