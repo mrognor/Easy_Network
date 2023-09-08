@@ -80,8 +80,8 @@ int main()
 	getline(std::cin, addr);
 	auto vec = EN::Split(addr, ":");
 	
-	if (addr.empty())
-		ip = "127.0.0.1";
+	if (!addr.empty())
+		ip = vec[0];
 
 	if (vec.size() == 2)
 		port = std::atoi(vec[1].c_str());

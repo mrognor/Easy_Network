@@ -33,8 +33,10 @@ int main()
 	auto vec = EN::Split(addr, ":");
 	
 	if (addr.empty())
-		ip = "127.0.0.1";
-
+		ip = "127.0.0.1"; // Default value
+	else
+		ip = vec[0];
+	
 	if (vec.size() == 2)
 		port = std::atoi(vec[1].c_str());
 	else port = 1111; // Default value 
