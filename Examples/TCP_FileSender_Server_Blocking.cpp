@@ -26,37 +26,53 @@ public:
 
 		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
-		if (message.find("send file") != -1ull)
+		if (InterpretedMessage[0] == "was")
 		{
+			if (EN::IsFileExist(InterpretedMessage[1] + ".tmp"))
+			{
+				LOG(EN::LogLevels::Info, "Continue the previous file receiving");
+				SendToClient(clientSocket, "ok " + std::to_string(EN::GetFileSize(InterpretedMessage[1] + ".tmp")));
+			}
+			else
+			{
+				LOG(EN::LogLevels::Info, "Starting the file receiving");
+				SendToClient(clientSocket, "bad");
+			}
+
 			EN::RecvFile(clientSocket, ShouldShutdown, transmissionStatus);
 			return;
 		}
 		
-		if (message.find("get file") != -1ull)
+		if (InterpretedMessage[0] == "get")
 		{
-			if (EN::IsFileExist(InterpretedMessage[2]))
+			if (EN::IsFileExist(InterpretedMessage[1]))
 			{
-				LOG(EN::LogLevels::Info, "Sending file");
+				LOG(EN::LogLevels::Info, "Starting to send the file");
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, 0, transmissionStatus);
+				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, 0, transmissionStatus);
 			}
 			else
 			{
-				LOG(EN::LogLevels::Info, "No file with this name");
+				LOG(EN::LogLevels::Info, "The file is not on the server");
 				SendToClient(clientSocket, "bad");
 			}
+
 			return;
 		}
 
-		if (message.find("continue download") != -1ull)
+		if (InterpretedMessage[0] == "continue")
 		{
-			if (EN::IsFileExist(InterpretedMessage[2]))
+			if (EN::IsFileExist(InterpretedMessage[1]))
 			{
+				LOG(EN::LogLevels::Info, "Continue the previous sending");
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[2], ShouldShutdown, transferingSpeed, std::stoll(InterpretedMessage[3]), transmissionStatus);
+				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, std::atoi(InterpretedMessage[2].c_str()), transmissionStatus);
 			}
 			else
+			{
+				LOG(EN::LogLevels::Info, "The file is not on the server");
 				SendToClient(clientSocket, "bad");
+			}
 			return;
 		}
 	}

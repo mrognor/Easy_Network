@@ -57,7 +57,7 @@ int main()
 	}
 
 	std::string message;
-	
+	std::string responce;
 	std::atomic_bool isStop(false);
 	std::atomic_int transferingSpeed(0);
 	EN::EN_FileTransmissionStatus transmissionStatus;
@@ -72,75 +72,74 @@ int main()
 			LOG(EN::LogLevels::Warning, "Server disconnected");
 			break;
 		}
-		std::vector<std::string> IntrepretedMessage = EN::Split(message);
+		std::vector<std::string> InterpretedMessage = EN::Split(message);
 
-		if (message.find("send file") == 0ull)
+		if (InterpretedMessage[0] == "send")
 		{
-			if (EN::IsFileExist(IntrepretedMessage[2]))
+			if (EN::IsFileExist(InterpretedMessage[1]))
 			{
-				A.SendToServer(message);
-				EN::SendFile(A.GetSocket(), IntrepretedMessage[2], isStop, transferingSpeed, 0, transmissionStatus);
+				A.SendToServer("was " + InterpretedMessage[1]);
+				A.WaitMessage(responce);
+
+				std::vector<std::string> parsedResponce = EN::Split(responce);
+
+				if (parsedResponce[0] == "ok")
+				{
+					LOG(EN::LogLevels::Info, "Continue the previous sending");
+					EN::SendFile(A.GetSocket(), InterpretedMessage[1], isStop, transferingSpeed, std::stoll(parsedResponce[1]), transmissionStatus);
+				}
+				else
+				{
+					LOG(EN::LogLevels::Info, "Starting to send the file");
+					EN::SendFile(A.GetSocket(), InterpretedMessage[1], isStop, transferingSpeed, 0, transmissionStatus);
+				}
 			}
 			else
-				LOG(EN::LogLevels::Info, "No file: " + IntrepretedMessage[2] + " on this directory");
+				LOG(EN::LogLevels::Info, "The file is not in the directory");
 			continue;
 		}
 
-		if (message.find("get file") == 0ull)
+		if (InterpretedMessage[0] == "get")
 		{
-			LOG(EN::LogLevels::Info, "Getting file " + IntrepretedMessage[2]);
-
-			if (EN::IsFileExist(IntrepretedMessage[2] + ".tmp"))
+			if (EN::IsFileExist(InterpretedMessage[1] + ".tmp"))
 			{
-				uint64_t FileSize = EN::GetFileSize(IntrepretedMessage[2] + ".tmp");
-
-				message = "continue download " + IntrepretedMessage[2] + " " + std::to_string(FileSize);
-
-				A.SendToServer(message);
-
-				std::string responce;
+				LOG(EN::LogLevels::Info, "Continue the previous file receiving");
+				A.SendToServer("continue " + InterpretedMessage[1] + " " + std::to_string(EN::GetFileSize(InterpretedMessage[1] + ".tmp")));
 				A.WaitMessage(responce);
 
 				if (responce == "ok")
 				{					
 					if (EN::RecvFile(A.GetSocket(), isStop, transmissionStatus))
 					{
-						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " downloaded");
+						LOG(EN::LogLevels::Info, "The file was received");
 					}
 					else
-					{
-						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " dont downloaded");
-					}
+						LOG(EN::LogLevels::Info, "The file was not received");
 				}
 				else
 				{
-					LOG(EN::LogLevels::Info, "No file: " + IntrepretedMessage[2] + " on server");
+					LOG(EN::LogLevels::Info, "The file is not on the server");
 				}
 			}
 			else
 			{
-				A.SendToServer(message);
-				
-				std::string responce;
-				A.WaitMessage(responce);
+				LOG(EN::LogLevels::Info, "Starting the file receiving");
 
+				A.SendToServer("get " + InterpretedMessage[1]);
+				A.WaitMessage(responce);
+				
 				if (responce == "ok")
-				{
+				{					
 					if (EN::RecvFile(A.GetSocket(), isStop, transmissionStatus))
 					{
-						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " downloaded");
+						LOG(EN::LogLevels::Info, "The file was received");
 					}
 					else
-					{
-						LOG(EN::LogLevels::Info, "File: " + IntrepretedMessage[2] + " dont downloaded");
-					}
+						LOG(EN::LogLevels::Info, "The file was not received");
 				}
 				else
-				{
-					LOG(EN::LogLevels::Info, "No file: " + IntrepretedMessage[2] + " on server");
-				}
+					LOG(EN::LogLevels::Info, "The file is not on the server");
 			}
-			continue;
 		}
 	}
 	A.Disconnect();
