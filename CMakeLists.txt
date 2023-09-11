@@ -72,22 +72,22 @@ target_link_libraries(UDP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 # target_link_libraries(RAU_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
 # TCP FileSender server binary
-project (TCP_FileSender_Server_Blocking)
+project (TCP_BlockingFileTransmitter_Server)
 
-add_executable(TCP_FileSender_Server Examples/TCP_FileSender_Server_Blocking.cpp)
+add_executable(TCP_BlockingFileTransmitter_Server Examples/TCP_BlockingFileTransmitter_Server.cpp)
 
-target_include_directories(TCP_FileSender_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
+target_include_directories(TCP_BlockingFileTransmitter_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
 
-target_link_libraries(TCP_FileSender_Server EasyNetwork ${StandartIncludeLibraries})
+target_link_libraries(TCP_BlockingFileTransmitter_Server EasyNetwork ${StandartIncludeLibraries})
 
 # TCP FileSender server binary
-project (TCP_FileSender_Client_Blocking)
+project (TCP_BlockingFileTransmitter_Client)
 
-add_executable(TCP_FileSender_Client Examples/TCP_FileSender_Client_Blocking.cpp)
+add_executable(TCP_BlockingFileTransmitter_Client Examples/TCP_BlockingFileTransmitter_Client.cpp)
 
-target_include_directories(TCP_FileSender_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
+target_include_directories(TCP_BlockingFileTransmitter_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
-target_link_libraries(TCP_FileSender_Client EasyNetwork ${StandartIncludeLibraries})
+target_link_libraries(TCP_BlockingFileTransmitter_Client EasyNetwork ${StandartIncludeLibraries})
 
 # Parallel for binary
 project (ParallelFor)
