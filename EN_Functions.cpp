@@ -340,22 +340,21 @@ namespace EN
 		sendingFile.seekg(0, std::ios::end);
 		uint64_t fileSize = sendingFile.tellg();
 
-		// Send file name and file size
-		if (!EN::Default_TCP_Send(fileSendSocket, fileName + " " + std::to_string(fileSize - previouslySendedSize)))
+		// Send file name, previosly sended size and full file size
+		if (!EN::Default_TCP_Send(fileSendSocket, fileName + " " + std::to_string(previouslySendedSize) + " "+ std::to_string(fileSize - previouslySendedSize)))
 			return false;
 
 		// See file start
 		sendingFile.seekg(0, std::ios::beg);
-
-		// Sended bytes
-		uint64_t sendedMessageSize = 0;
 
 		// Current iteration sended bytes
 		int sendedBytes;
 
 		// Amount of sended data previously
 		sendingFile.seekg(previouslySendedSize, std::ios::beg);
-		sendedMessageSize += previouslySendedSize;
+
+		// Sended bytes
+		uint64_t sendedMessageSize = previouslySendedSize;
 
 		EN_BackgroundTimer timer;
 
@@ -463,10 +462,12 @@ namespace EN
 		std::vector<std::string> fileInfos = Split(fileInfo);
 		std::string fileName = fileInfos[0];
 		uint64_t fileSize;
+		uint64_t previoslySendedBytes;
 
 		try
 		{
-			fileSize = std::stoll(fileInfos[1]);
+			previoslySendedBytes = std::stoll(fileInfos[1]);
+			fileSize = std::stoll(fileInfos[2]);
 		}
 		catch (...)
 		{
@@ -524,7 +525,7 @@ namespace EN
 				if (!timer.IsSleep())
 				{
 					timer.StartTimer<std::chrono::seconds>(1);
-					fileTransmissionStatus.SetTransferedBytes(receivedMessageSize);
+					fileTransmissionStatus.SetTransferedBytes(previoslySendedBytes + receivedMessageSize);
 					fileTransmissionStatus.SetTransmissionSpeed(receivedMessageSize - lastReceivedMessageSize);
 					if (receivedMessageSize - lastReceivedMessageSize != 0)
 						fileTransmissionStatus.SetTransmissionEta((fileSize - receivedMessageSize) / (receivedMessageSize - lastReceivedMessageSize));

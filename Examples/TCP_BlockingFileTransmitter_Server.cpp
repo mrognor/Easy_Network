@@ -66,7 +66,7 @@ public:
 			{
 				LOG(EN::LogLevels::Info, "Continue the previous sending");
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, std::atoi(InterpretedMessage[2].c_str()), transmissionStatus);
+				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, std::atoll(InterpretedMessage[2].c_str()), transmissionStatus);
 			}
 			else
 			{
