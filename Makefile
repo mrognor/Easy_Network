@@ -11,7 +11,9 @@ TARGETS = bin/EN_Functions.o \
 	bin/EN_ThreadCrossWalk.o \
 	bin/EN_SocketOptions.o \
 	bin/EN_BackgroundTimer.o \
-	bin/EN_FileTransmissionStatus.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
+	bin/EN_FileTransmissionStatus.o \
+	bin/EN_FT_Server.o \
+	bin/EN_FT_Client.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
 
 # Check os
 ifeq ($(OS), Windows_NT)
@@ -34,7 +36,17 @@ debug: all
 release: CXXFLAGS += -D NDEBUG -O3
 release: all
 
-all: bin/TCP_Chat_Server$(FILEEXT) bin/TCP_Chat_Client$(FILEEXT) bin/UDP_Chat_Server$(FILEEXT) bin/UDP_Chat_Client$(FILEEXT) bin/TCP_BlockingFileTransmitter_Server$(FILEEXT) bin/TCP_BlockingFileTransmitter_Client$(FILEEXT) bin/ParallelFor$(FILEEXT) bin/HTTP_Server$(FILEEXT)
+all: bin/TCP_Chat_Server$(FILEEXT) \
+	bin/TCP_Chat_Client$(FILEEXT) \
+	bin/UDP_Chat_Server$(FILEEXT) \
+	bin/UDP_Chat_Client$(FILEEXT) \
+	bin/TCP_BlockingFileTransmitter_Server$(FILEEXT) \
+	bin/TCP_BlockingFileTransmitter_Client$(FILEEXT) \
+	bin/ParallelFor$(FILEEXT) \
+	bin/HTTP_Server$(FILEEXT) \
+	bin/FT_Chat_Server$(FILEEXT) \
+	bin/FT_Chat_Client$(FILEEXT) \
+
 # bin/RAU_Chat_Server$(FILEEXT) bin/RAU_Chat_Client$(FILEEXT)
 
 # HTTP_Server
@@ -75,6 +87,13 @@ bin/TCP_BlockingFileTransmitter_Server$(FILEEXT): bin/libEasyNetwork.a Examples/
 bin/TCP_BlockingFileTransmitter_Client$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_BlockingFileTransmitter_Client.cpp
 	g++ $(CXXFLAGS) Examples/TCP_BlockingFileTransmitter_Client.cpp -I. -Lbin -lEasyNetwork -o bin/TCP_BlockingFileTransmitter_Client$(FILEEXT) $(LDFLAGS)
 
+# FileTransmitter_Chat
+bin/FT_Chat_Server$(FILEEXT): bin/libEasyNetwork.a Examples/FT_Chat_Server.cpp
+	g++ $(CXXFLAGS) Examples/FT_Chat_Server.cpp -I. -Lbin -lEasyNetwork -o bin/FT_Chat_Server$(FILEEXT) $(LDFLAGS)
+
+bin/FT_Chat_Client$(FILEEXT): bin/libEasyNetwork.a Examples/FT_Chat_Client.cpp
+	g++ $(CXXFLAGS) Examples/FT_Chat_Client.cpp -I. -Lbin -lEasyNetwork -o bin/FT_Chat_Client$(FILEEXT) $(LDFLAGS)
+
 # ParallelFor
 bin/ParallelFor$(FILEEXT): bin/libEasyNetwork.a Examples/ParallelFor.cpp
 	g++ $(CXXFLAGS) Examples/ParallelFor.cpp -I. -Lbin -lEasyNetwork -o bin/ParallelFor$(FILEEXT) $(LDFLAGS)
@@ -92,6 +111,14 @@ bin/libEasyNetwork.a: $(TARGETS)
 # bin/EN_RAU_Server.o: EN_RAU_Server.cpp EN_RAU_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 # 	mkdir -p bin
 #	g++ $(CXXFLAGS) -c EN_RAU_Server.cpp -o bin/EN_RAU_Server.o
+
+bin/EN_FT_Client.o: EN_FT_Client.cpp EN_FT_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_FT_Client.cpp -o bin/EN_FT_Client.o
+
+bin/EN_FT_Server.o: EN_FT_Server.cpp EN_FT_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_FT_Server.cpp -o bin/EN_FT_Server.o
 
 bin/EN_UDP_Client.o: EN_UDP_Client.cpp EN_UDP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
 	mkdir -p bin
