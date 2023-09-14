@@ -185,17 +185,15 @@ namespace EN
 
 	EN_TCP_Client::~EN_TCP_Client()
 	{	
-		SocketMtx.lock();
-		if (ServerConnectionSocket != INVALID_SOCKET)
-		{
-			SocketMtx.unlock();
-			Disconnect();
-            LOG(LogLevels::Warning, "Warning: You forgot to disconnect from the server. Use method Disconnect() to do this");
-		}
-		else
-		{
-			SocketMtx.unlock();
-			WaitForServerHandlerEnd();
-		}
+        SocketMtx.lock();
+        if (ServerConnectionSocket != INVALID_SOCKET)
+        {
+            LOG(LogLevels::Error, "Error: You forgot to disconnect from the server. Use method Disconnect() to do this");
+        }
+
+		CloseSocket(ServerConnectionSocket);
+		SocketMtx.unlock();
+
+		WaitForServerHandlerEnd();
 	}
 }
