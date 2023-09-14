@@ -89,6 +89,24 @@ target_include_directories(TCP_BlockingFileTransmitter_Client PRIVATE ${CMAKE_SO
 
 target_link_libraries(TCP_BlockingFileTransmitter_Client EasyNetwork ${StandartIncludeLibraries})
 
+# FT server binary
+project (FT_Chat_Server)
+
+add_executable(FT_Chat_Server Examples/FT_Chat_Server.cpp)
+
+target_include_directories(FT_Chat_Server PRIVATE ${CMAKE_SOURCE_DIR}/)
+
+target_link_libraries(FT_Chat_Server EasyNetwork ${StandartIncludeLibraries})
+
+# FT client binary
+project (FT_Chat_Client)
+
+add_executable(FT_Chat_Client Examples/FT_Chat_Client.cpp)
+
+target_include_directories(FT_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
+
+target_link_libraries(FT_Chat_Client EasyNetwork ${StandartIncludeLibraries})
+
 # Parallel for binary
 project (ParallelFor)
 
@@ -103,10 +121,12 @@ project(EasyNetwork)
 
 set(LibHeaders EN_Functions.h
 EN_TCP_Client.h EN_BackgroundTimer.h EN_FileTransmissionStatus.h
-EN_TCP_Server.h EN_UDP_Client.h EN_UDP_Server.h EN_ParallelFor.h EN_SocketOptions.h EN_ThreadGate.h EN_Logger.h EN_ThreadCrossWalk.h)
+EN_TCP_Server.h EN_UDP_Client.h EN_UDP_Server.h EN_ParallelFor.h EN_SocketOptions.h EN_ThreadGate.h EN_Logger.h 
+EN_ThreadCrossWalk.h EN_FT_Server.h EN_FT_Client.h)
 
 set(LibSources EN_Functions.cpp
 EN_TCP_Client.cpp EN_BackgroundTimer.cpp EN_FileTransmissionStatus.cpp
-EN_TCP_Server.cpp EN_UDP_Client.cpp EN_UDP_Server.cpp EN_SocketOptions.cpp EN_ThreadGate.cpp EN_Logger.cpp EN_ThreadCrossWalk.cpp)
+EN_TCP_Server.cpp EN_UDP_Client.cpp EN_UDP_Server.cpp EN_SocketOptions.cpp EN_ThreadGate.cpp EN_Logger.cpp 
+EN_ThreadCrossWalk.cpp EN_FT_Server.cpp EN_FT_Client.cpp)
 
 add_library(EasyNetwork STATIC ${LibSources} ${LibHeaders})

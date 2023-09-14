@@ -9,7 +9,7 @@ namespace EN
 
 	void EN_FT_EternalClient::ServerMessageHandler(std::string message)
 	{
-		LOG(EN::LogLevels::Info, message);
+		LOG(EN::LogLevels::Info, "Message from file transmitter server" + message);
 	}
 
 	void EN_FT_EternalClient::OnDisconnect()
@@ -22,7 +22,16 @@ namespace EN
         if (!EN_TCP_Client::Connect(ipAddr, tcpPort))
             return false;
         if (!EternalFTCient.Connect(ipAddr, ftPort))
+		{
+			EN_TCP_Client::Disconnect();
             return false;
-        return true;
+		}
+		return true;
     }
+
+	void EN_FT_Client::Disconnect()
+	{
+		EN::EN_TCP_Client::Disconnect();
+		EternalFTCient.Disconnect();
+	}
 }

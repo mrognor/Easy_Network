@@ -28,15 +28,6 @@ namespace EN
 		return isConnected;
 	}
 
-	bool EN_TCP_Client::Connect()
-	{
-		return Connect(ServerIpAddress, ServerPort);
-	}
-
-	bool EN_TCP_Client::Connect(int port)
-	{
-		return Connect(ServerIpAddress, port);
-	}
 
 	bool EN_TCP_Client::Connect(std::string ipAddr, int port)
 	{
@@ -94,7 +85,7 @@ namespace EN
 
 		if (IsRunMessageHadlerThread)
 			ServerHandlerThread = std::thread([this]() { this->ServerHandler(); });
-			
+
 		return true;
 	}
 

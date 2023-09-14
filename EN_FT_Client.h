@@ -18,43 +18,14 @@ namespace EN
     {
     private:
         EN_FT_EternalClient EternalFTCient;
-        std::atomic_bool IsStop;
-        std::atomic_int DelayBetweenSendingFileChunks;
-        EN::EN_FileTransmissionStatus FileTransmissionStatus;
-        std::thread FileSendingThread;
     public:
-        EN_FT_Client()
-        {
-            IsStop.store(false);
-            DelayBetweenSendingFileChunks.store(0);
-        }
+        bool Connect(std::string ipAddr = "127.0.0.1", int tcpPort = 1111, int ftPort = 1112);
 
-		bool Connect(std::string ipAddr, int tcpPort, int ftPort);
+        void Disconnect();
 
-        void SendFileToServer(std::string filePath, uint64_t previoslySendedBytes)
+        void SendTest(std::string test)
         {
-            FileSendingThread = std::thread([&]()
-            {
-                SendFile(GetSocket(), filePath, IsStop, DelayBetweenSendingFileChunks, previoslySendedBytes, FileTransmissionStatus);
-            });
-        }
-
-        void StopSendingFile()
-        {
-            IsStop.store(true);
-            if (FileSendingThread.joinable())
-			    FileSendingThread.join();
-        }
-
-        void SetFileSendingSpeed(int delayBetweenSendingFileChunks)
-        {
-            DelayBetweenSendingFileChunks = delayBetweenSendingFileChunks;
-        }
-
-        void Disconnect()
-        {
-            EN::EN_TCP_Client::Disconnect();
-            EternalFTCient.Disconnect();
+            EternalFTCient.SendToServer(test);
         }
     };
 }

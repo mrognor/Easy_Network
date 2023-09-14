@@ -62,7 +62,10 @@ int main()
 
 		// Check if we still connected
 		if (A.IsConnected())
+		{
 			A.SendToServer(message);
+			A.SendTest(message);
+		}
 		else 
 			break;
 	}

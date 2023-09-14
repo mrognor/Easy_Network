@@ -113,25 +113,12 @@ namespace EN
 		bool IsConnected();
 
 		/**
-			\brief Connect to localhost and default port. 
-			\return Returns true in case of success, false otherwise
-		*/ 
-		bool Connect();
-
-		/**
-			\brief Connect to localhost and current port.
-			\param[in] port port to connect
-			\return Returns true in case of success, false otherwise
-		*/
-		bool Connect(int port);
-
-		/**
 			\brief Connect to current ip and current port.
-			\param[in] ip server ip address
-			\param[in] port port to connect
+			\param[in] ip server ip address. Default is 127.0.0.1
+			\param[in] port port to connect. Default is 1111
 			\return Returns true in case of success, false otherwise
 		*/
-		bool Connect(std::string ipAddr, int port);
+		bool Connect(std::string ipAddr = "127.0.0.1", int port = 1111);
 
 		/**
 			\brief Function for sending a message to a connected server.
