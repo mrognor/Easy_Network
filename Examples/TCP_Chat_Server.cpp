@@ -28,7 +28,7 @@ public:
 		// Shutdown server
 		if (message == "F")
 		{
-			LOG(EN::LogLevels::Info, "Server was shutdown by client. Enter any key to end programm");
+			LOG(EN::LogLevels::Info, "Server was shutdown by client. Enter f to end programm or r to restart server");
 			Shutdown(); 
 		}
 
@@ -62,6 +62,7 @@ int main()
 	// Using this you can write logic to kick clients or shutdown server
 	
 	MyServer A;
+start:
 
 	std::thread th([&A]() 
 	{
@@ -72,6 +73,7 @@ int main()
 		catch (std::runtime_error& err)
 		{
 			LOG(EN::LogLevels::Error, "Run throw error with error code: " + std::string(err.what()));
+			LOG(EN::LogLevels::Info, "Enter f to end programm");
 		}
 	});
 	
@@ -87,6 +89,12 @@ int main()
 			break;
 		}
 		
+		if (message == "r")
+		{
+			th.join();
+			goto start;
+		}
+
 		A.MulticastSend(message);
 	}
 

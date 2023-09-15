@@ -97,7 +97,6 @@ namespace EN
 			\warning Must be defined by the user
 		*/
 		virtual void OnClientDisconnect(EN_SOCKET clientSocket) = 0;
-
 	public:
 		EN_TCP_Server();
 		
@@ -117,7 +116,7 @@ namespace EN
 		size_t GetConnectionsCount();
 
 		/**
-			\brief Method to start server. Blocking call.
+			\brief Method to start server. Blocking call. Returns control to the thread after the last client is disconnected
 			
 			Place this method in try block to catch errors.
 			Throws socket errors. To get information about the error, use the documentation of your operating system. 
@@ -133,14 +132,16 @@ namespace EN
 		*/
 		void DisconnectClient(EN_SOCKET clientSocket);
 
-		/// Method that stops the server
+		/**
+			\brief Method that stops the server
+
+			If it is called before the Run method, then the next Run method will not start the server.
+			This method will not wait for all clients to be disconnected. If you need to wait for all clients to finish, use the WaitWhileAllClientsDisconnect method
+		*/
 		void Shutdown();
 		
 		/// Method that disconnect all connected clients
 		void DisconnectAllConnectedClients();
-
-		/// Method to wait while all clients disconnect
-		void WaitWhileAllClientsDisconnect();
 
 		/**
 			\brief Method that send message to client
@@ -158,6 +159,9 @@ namespace EN
 			\param[in] message The message to be sent to the client 
 		*/
 		void MulticastSend(std::string message);
+
+		/// Method to wait while all clients disconnect
+		void WaitWhileAllClientsDisconnect();
 
         /**
 			\brief Method that wait new incoming message from client

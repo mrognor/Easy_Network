@@ -29,6 +29,13 @@ namespace EN
 	{
 		ShutdownMutex.lock();
 
+		if (IsShutdown.load())
+		{
+			ShutdownMutex.unlock();
+			IsShutdown.store(false);
+			return;
+		}
+
 		// Configure ip address
 		sockaddr_in ServerAddress;
 		ServerAddress.sin_family = AF_INET;
@@ -46,6 +53,7 @@ namespace EN
 		if (ServerListenSocket == INVALID_SOCKET)
 		{
             LOG(Error, "Error: cannot create socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			ShutdownMutex.unlock();
 			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
@@ -55,6 +63,7 @@ namespace EN
 		if (OperationRes == SOCKET_ERROR)
 		{
             LOG(Error, "Error: cannot bind socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			ShutdownMutex.unlock();
 			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
@@ -63,6 +72,7 @@ namespace EN
 		if (OperationRes == SOCKET_ERROR)
 		{
             LOG(Error, "Error: cannot listen socket: " + std::to_string(GetSocketErrorCode()) + " " + EN::GetSocketErrorString());
+			ShutdownMutex.unlock();
 			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
@@ -89,9 +99,11 @@ namespace EN
 				// Disconnect all connected clients
 				DisconnectAllConnectedClients();
 
+				ShutdownMutex.lock();
 				CloseSocket(IncomingConnection);
 				CloseSocket(ServerListenSocket);
 				ServerListenSocket = INVALID_SOCKET;
+				ShutdownMutex.unlock();
 				break;
 			}
 
@@ -104,9 +116,11 @@ namespace EN
 				// Disconnect all connected clients
 				DisconnectAllConnectedClients();
 
+				ShutdownMutex.lock();
 				CloseSocket(IncomingConnection);
 				CloseSocket(ServerListenSocket);
 				ServerListenSocket = INVALID_SOCKET;
+				ShutdownMutex.unlock();
 
 				// Wait while all clients disconnect
 				WaitWhileAllClientsDisconnect();
@@ -130,6 +144,7 @@ namespace EN
 
 		// Wait while all clients disconnect
 		WaitWhileAllClientsDisconnect();
+		IsShutdown.store(false);
 	}
 
 	void EN_TCP_Server::ClientHandler(EN_SOCKET clientSocket)
@@ -184,23 +199,10 @@ namespace EN
 	void EN_TCP_Server::Shutdown()
 	{
 		IsShutdown.store(true);
-		
-		// Check what server successfully started
-		while (true)
-		{
-			ShutdownMutex.lock();
-			if (ServerListenSocket != INVALID_SOCKET)
-			{
-				ShutdownMutex.unlock();
-				break;
-			}
-			ShutdownMutex.unlock();
-		}
-
-		CloseSocket(ServerListenSocket);
-
-		// Wait while all clients disconnect
-		WaitWhileAllClientsDisconnect();
+		ShutdownMutex.lock();
+		if (ServerListenSocket != INVALID_SOCKET)
+			CloseSocket(ServerListenSocket);
+		ShutdownMutex.unlock();
 	}
 
 	void EN_TCP_Server::DisconnectAllConnectedClients()
