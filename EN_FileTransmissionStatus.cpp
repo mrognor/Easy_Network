@@ -8,6 +8,8 @@ namespace EN
         FileSize.store(0);
         TransmissionSpeed.store(0);
         TransmissionEta.store(0);
+        IsTransmissionEnded.store(false);
+        IsTransmissionSucceed.store(false);
     }
 
     EN_FileTransmissionStatus::EN_FileTransmissionStatus(EN::EN_FileTransmissionStatus& status)
@@ -16,6 +18,9 @@ namespace EN
         FileSize.store(status.FileSize.load());
         TransmissionSpeed.store(status.TransmissionSpeed.load());
         TransmissionEta.store(status.TransmissionEta.load());
+        IsTransmissionEnded.store(status.IsTransmissionEnded);
+        IsTransmissionSucceed.store(status.IsTransmissionSucceed);
+
         IsSetProgressFunction = status.IsSetProgressFunction;
         ProgressFunction = status.ProgressFunction;
     }
@@ -58,6 +63,26 @@ namespace EN
     uint64_t EN_FileTransmissionStatus::GetTransmissionEta()
     {
         return TransmissionEta.load();
+    }
+
+    void EN_FileTransmissionStatus::SetIsTransmissionEnded(bool isTransmissionEnded)
+    {
+        IsTransmissionEnded.store(isTransmissionEnded);
+    }
+
+    bool EN_FileTransmissionStatus::GetIsTransmissionEnded()
+    {
+        return IsTransmissionEnded.load();
+    }
+
+    void EN_FileTransmissionStatus::SetIsTransmissionSucceed(bool isTransmissionSucceed)
+    {
+        IsTransmissionSucceed.store(isTransmissionSucceed);
+    }
+
+    bool EN_FileTransmissionStatus::GetIsTransmissionSucceed()
+    {
+        return IsTransmissionSucceed.load();
     }
 
     bool EN_FileTransmissionStatus::GetIsSetProgressFunction()

@@ -24,6 +24,8 @@ namespace EN
         bool IsSetProgressFunction = false;
         std::function<void(uint64_t, uint64_t, uint64_t, uint64_t)> ProgressFunction;
 
+        std::atomic_bool IsTransmissionEnded;
+        std::atomic_bool IsTransmissionSucceed;
     public:
         EN_FileTransmissionStatus();
 
@@ -40,6 +42,12 @@ namespace EN
 
         void SetTransmissionEta(uint64_t transmissionEta);
         uint64_t GetTransmissionEta();
+
+        void SetIsTransmissionEnded(bool isTransmissionEnded);
+        bool GetIsTransmissionEnded();
+
+        void SetIsTransmissionSucceed(bool isTransmissionSucceed);
+        bool GetIsTransmissionSucceed();
 
         bool GetIsSetProgressFunction();
         void SetProgressFunction(std::function<void(uint64_t, uint64_t, uint64_t, uint64_t)> progressFunction);

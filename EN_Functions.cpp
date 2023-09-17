@@ -330,6 +330,8 @@ namespace EN
 		if (!sendingFile.is_open())
 		{
             LOG(Error, "Failed to open sending file. File name: " + fileName);
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);			
 			return false;
 		}
 
@@ -342,7 +344,11 @@ namespace EN
 
 		// Send file name, previosly sended size and full file size
 		if (!EN::Default_TCP_Send(fileSendSocket, fileName + " " + std::to_string(previouslySendedSize) + " "+ std::to_string(fileSize - previouslySendedSize)))
+		{
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
+		}
 
 		// See file start
 		sendingFile.seekg(0, std::ios::beg);
@@ -376,6 +382,8 @@ namespace EN
 				{
                     sendingFile.close();
 					delete[] messageBuf;
+					fileTransmissionStatus.SetIsTransmissionSucceed(false);
+					fileTransmissionStatus.SetIsTransmissionEnded(true);
 					return false;
 				}
 
@@ -393,6 +401,8 @@ namespace EN
                     LOG(Error, "Failed to send file: " + fileName);
 					sendingFile.close();
 					delete[] messageBuf;
+					fileTransmissionStatus.SetIsTransmissionSucceed(false);
+					fileTransmissionStatus.SetIsTransmissionEnded(true);
 					return false;
 				}
 
@@ -426,6 +436,8 @@ namespace EN
                 LOG(Error, "Failed to send file: " + fileName);
 				sendingFile.close();
 				delete[] messageBuf;
+				fileTransmissionStatus.SetIsTransmissionSucceed(false);
+				fileTransmissionStatus.SetIsTransmissionEnded(true);
 				return false;
 			}
 
@@ -442,10 +454,14 @@ namespace EN
 		{
             LOG(Error, "Failed to open file: " + fileName);
 			delete[] messageBuf;
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
 		delete[] messageBuf;
+		fileTransmissionStatus.SetIsTransmissionSucceed(true);
+		fileTransmissionStatus.SetIsTransmissionEnded(true);
 		return true;
 	}
 
@@ -456,6 +472,8 @@ namespace EN
 		if (EN::Default_TCP_Recv(FileSendSocket, fileInfo) == false)
 		{
             LOG(Error, "Failed to received file name");
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
@@ -472,6 +490,8 @@ namespace EN
 		catch (...)
 		{
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
@@ -505,6 +525,8 @@ namespace EN
 					IsStop.store(false);
 					receivedFile.close();
 					delete[] messageBuf;
+					fileTransmissionStatus.SetIsTransmissionSucceed(false);
+					fileTransmissionStatus.SetIsTransmissionEnded(true);
 					return false;
 				}
 
@@ -515,6 +537,8 @@ namespace EN
                     LOG(Error, "Failed to received file: " + fileName);
 					receivedFile.close();
 					delete[] messageBuf;
+					fileTransmissionStatus.SetIsTransmissionSucceed(false);
+					fileTransmissionStatus.SetIsTransmissionEnded(true);
 					return false;
 				}
 
@@ -546,6 +570,8 @@ namespace EN
                 LOG(Error, "Failed to received file: " + fileName);
 				receivedFile.close();
 				delete[] messageBuf;
+				fileTransmissionStatus.SetIsTransmissionSucceed(false);
+				fileTransmissionStatus.SetIsTransmissionEnded(true);
 				return false;
 			}
 
@@ -564,6 +590,8 @@ namespace EN
 		{
             LOG(Error, "Failed to send file: " + fileName);
 			delete[] messageBuf;
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
@@ -581,6 +609,8 @@ namespace EN
 		rename((fileName + ".tmp").c_str(), newFileName.c_str());
 
 		delete[] messageBuf;
+		fileTransmissionStatus.SetIsTransmissionSucceed(true);
+		fileTransmissionStatus.SetIsTransmissionEnded(true);
 		return true;
 	}
 
@@ -591,11 +621,17 @@ namespace EN
 		if (EN::Default_TCP_Recv(SourceFileSocket, fileInfo) == false)
 		{
             LOG(Error, "Failed to received file name");
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
 		if (!EN::Default_TCP_Send(DestinationFileSocket, fileInfo))
+		{
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
+		}
 
 		uint64_t fileSize;
 
@@ -606,6 +642,8 @@ namespace EN
 		catch (...)
 		{
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
@@ -633,6 +671,8 @@ namespace EN
 			{
 				IsStop.store(false);
 				delete[] messageBuf;
+				fileTransmissionStatus.SetIsTransmissionSucceed(false);
+				fileTransmissionStatus.SetIsTransmissionEnded(true);
 				return false;
 			}
 
@@ -642,6 +682,8 @@ namespace EN
 			{
                 LOG(Error, "Failed to forward file");
 				delete[] messageBuf;
+				fileTransmissionStatus.SetIsTransmissionSucceed(false);
+				fileTransmissionStatus.SetIsTransmissionEnded(true);
 				return false;
 			}
 
@@ -652,6 +694,8 @@ namespace EN
 			{
 				LOG(Error, "Failed to forward file");
 				delete[] messageBuf;
+				fileTransmissionStatus.SetIsTransmissionSucceed(false);
+				fileTransmissionStatus.SetIsTransmissionEnded(true);
 				return false;
 			}
 
@@ -682,6 +726,8 @@ namespace EN
 		{
 			LOG(Error, "Failed to forward file");
 			delete[] messageBuf;
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
@@ -692,6 +738,8 @@ namespace EN
 		{
 			LOG(Error, "Failed to forward file");
 			delete[] messageBuf;
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
 			return false;
 		}
 
@@ -703,6 +751,9 @@ namespace EN
 			fileTransmissionStatus.InvokeProgressFunction();
 
 		delete[] messageBuf;
+
+		fileTransmissionStatus.SetIsTransmissionSucceed(true);
+		fileTransmissionStatus.SetIsTransmissionEnded(true);
 		return true;
 	}
 
