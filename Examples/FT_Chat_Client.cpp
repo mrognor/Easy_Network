@@ -1,35 +1,85 @@
-#include  "../EN_FT_Client.h"
+#include  "../EN_TCP_Client.h"
 
-class MyClient : public EN::EN_FT_Client
+class EN_FT_Client;
+
+class EN_FT_Client_Internal_FileTransmitter : public EN::EN_TCP_Client
 {
+private:
+	EN_FT_Client* FT_Client;
+protected:
+	virtual void OnConnect() override { std::cout << "FT conn" << std::endl; }
+
+	virtual void ServerMessageHandler(std::string message) override {}
+
+	virtual void OnDisconnect() override { std::cout << "FT disconn" << std::endl; }
 public:
-	MyClient()
+	EN_FT_Client_Internal_FileTransmitter(EN_FT_Client* fT_Client);
+};
+
+class EN_FT_Client_Internal_MessageTransmitter : public EN::EN_TCP_Client
+{
+private:
+	EN_FT_Client* FT_Client;
+protected:
+	virtual void OnConnect() override { std::cout << "MSG conn" << std::endl; }
+
+	virtual void ServerMessageHandler(std::string message) override {}
+
+	virtual void OnDisconnect() override { std::cout << "MSG disconn" << std::endl; }
+public:
+	EN_FT_Client_Internal_MessageTransmitter(EN_FT_Client* fT_Client);
+};
+
+class EN_FT_Client
+{
+private:
+	friend EN_FT_Client_Internal_MessageTransmitter;
+	friend EN_FT_Client_Internal_FileTransmitter;
+
+	EN_FT_Client_Internal_MessageTransmitter MessageTransmitter;
+	EN_FT_Client_Internal_FileTransmitter FileTransmitter;
+public:
+	EN_FT_Client() : MessageTransmitter(this), FileTransmitter(this) {}
+
+	bool Connect(std::string serverIpAddress = "127.0.0.1", int messageTransmitterPort = 1111, int fileTransmitterPort = 1112)
 	{
-		// IsRunMessageHadlerThread = true; // Variable to disable starting thread with message handler
+		if (!MessageTransmitter.Connect(serverIpAddress, messageTransmitterPort))
+			return false;
+
+		if (!FileTransmitter.Connect(serverIpAddress, fileTransmitterPort))
+		{
+			MessageTransmitter.Disconnect();
+			return false;
+		}
+
+		return true;
 	}
 
-	// A function to be defined by the user. It is used for logic after connection
-	virtual void OnConnect() override
+	void Disconnect()
 	{
-		LOG(EN::LogLevels::Info, "Server connected.");
+		MessageTransmitter.Disconnect();
+		FileTransmitter.Disconnect();
 	}
 
-	// A function to be defined by the user. It is used to process incoming messages from the server
-	virtual void ServerMessageHandler(std::string message) override
+	bool IsConnected()
 	{
-		LOG(EN::LogLevels::Info, message);
-	}
-
-	// A function to be defined by the user. Performed after disconnected from the server
-	virtual void OnDisconnect() override
-	{
-		LOG(EN::LogLevels::Info, "Server disconnected.");
+		return (MessageTransmitter.IsConnected() || FileTransmitter.IsConnected());
 	}
 };
 
+EN_FT_Client_Internal_FileTransmitter::EN_FT_Client_Internal_FileTransmitter(EN_FT_Client* fT_Client)
+{
+	FT_Client = fT_Client;
+}
+
+EN_FT_Client_Internal_MessageTransmitter::EN_FT_Client_Internal_MessageTransmitter(EN_FT_Client* fT_Client)
+{
+	FT_Client = fT_Client;
+}
+
 int main()
 {
-    MyClient A;
+    EN_FT_Client A;
 
 	// Check if connection success
 	if (A.Connect() == false)
@@ -61,13 +111,12 @@ int main()
 			A.Connect();
 
 		// Check if we still connected
-		if (A.IsConnected())
-		{
-			A.SendToServer(message);
-			A.SendTest(message);
-		}
-		else 
-			break;
+		//if (A.IsConnected())
+		//{
+			// A.SendToServer(message);
+		//}
+		//else 
+		//	break;
 	}
 
 	// Disconnect client from server if still connected
