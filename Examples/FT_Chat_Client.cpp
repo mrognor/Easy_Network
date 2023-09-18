@@ -1,85 +1,110 @@
 #include  "../EN_TCP_Client.h"
 
-class EN_FT_Client;
-
-class EN_FT_Client_Internal_FileTransmitter : public EN::EN_TCP_Client
+namespace EN
 {
-private:
-	EN_FT_Client* FT_Client;
-protected:
-	virtual void OnConnect() override { std::cout << "FT conn" << std::endl; }
+	class EN_FT_Client;
 
-	virtual void ServerMessageHandler(std::string message) override {}
-
-	virtual void OnDisconnect() override { std::cout << "FT disconn" << std::endl; }
-public:
-	EN_FT_Client_Internal_FileTransmitter(EN_FT_Client* fT_Client);
-};
-
-class EN_FT_Client_Internal_MessageTransmitter : public EN::EN_TCP_Client
-{
-private:
-	EN_FT_Client* FT_Client;
-protected:
-	virtual void OnConnect() override { std::cout << "MSG conn" << std::endl; }
-
-	virtual void ServerMessageHandler(std::string message) override {}
-
-	virtual void OnDisconnect() override { std::cout << "MSG disconn" << std::endl; }
-public:
-	EN_FT_Client_Internal_MessageTransmitter(EN_FT_Client* fT_Client);
-};
-
-class EN_FT_Client
-{
-private:
-	friend EN_FT_Client_Internal_MessageTransmitter;
-	friend EN_FT_Client_Internal_FileTransmitter;
-
-	EN_FT_Client_Internal_MessageTransmitter MessageTransmitter;
-	EN_FT_Client_Internal_FileTransmitter FileTransmitter;
-public:
-	EN_FT_Client() : MessageTransmitter(this), FileTransmitter(this) {}
-
-	bool Connect(std::string serverIpAddress = "127.0.0.1", int messageTransmitterPort = 1111, int fileTransmitterPort = 1112)
+	class EN_FT_Client_Internal_FileTransmitter : public EN::EN_TCP_Client
 	{
-		if (!MessageTransmitter.Connect(serverIpAddress, messageTransmitterPort))
-			return false;
+	private:
+		EN_FT_Client* FT_Client;
+	protected:
+		void OnConnect();
 
-		if (!FileTransmitter.Connect(serverIpAddress, fileTransmitterPort))
+		virtual void ServerMessageHandler(std::string message) override { std::cout << "FT " << message << std::endl; }
+
+		virtual void OnDisconnect() override { std::cout << "FT disconn" << std::endl; }
+	public:
+		EN_FT_Client_Internal_FileTransmitter(EN_FT_Client* fT_Client);
+	};
+
+	class EN_FT_Client_Internal_MessageTransmitter : public EN::EN_TCP_Client
+	{
+	private:
+		EN_FT_Client* FT_Client;
+	protected:
+		virtual void OnConnect() override
 		{
-			MessageTransmitter.Disconnect();
-			return false;
+			LOG(LogLevels::Info, "Internal message transmitter connected!");
 		}
 
-		return true;
-	}
+		virtual void ServerMessageHandler(std::string message) override { std::cout << "MT " << message << std::endl; }
 
-	void Disconnect()
+		virtual void OnDisconnect() override { std::cout << "MSG disconn" << std::endl; }
+	public:
+		EN_FT_Client_Internal_MessageTransmitter(EN_FT_Client* fT_Client);
+	};
+
+	class EN_FT_Client
 	{
-		MessageTransmitter.Disconnect();
-		FileTransmitter.Disconnect();
-	}
+	private:
+		friend EN_FT_Client_Internal_MessageTransmitter;
+		friend EN_FT_Client_Internal_FileTransmitter;
 
-	bool IsConnected()
+		EN_FT_Client_Internal_MessageTransmitter MessageTransmitter;
+		EN_FT_Client_Internal_FileTransmitter FileTransmitter;
+	public:
+		EN_FT_Client() : MessageTransmitter(this), FileTransmitter(this) {}
+
+		bool Connect(std::string serverIpAddress = "127.0.0.1", int messageTransmitterPort = 1111, int fileTransmitterPort = 1112)
+		{
+			if (!MessageTransmitter.Connect(serverIpAddress, messageTransmitterPort))
+				return false;
+
+			if (!FileTransmitter.Connect(serverIpAddress, fileTransmitterPort))
+			{
+				MessageTransmitter.Disconnect();
+				return false;
+			}
+
+			return true;
+		}
+
+		void Disconnect()
+		{
+			MessageTransmitter.Disconnect();
+			FileTransmitter.Disconnect();
+		}
+
+		bool IsConnected()
+		{
+			return (MessageTransmitter.IsConnected() || FileTransmitter.IsConnected());
+		}
+	};
+
+	EN_FT_Client_Internal_FileTransmitter::EN_FT_Client_Internal_FileTransmitter(EN_FT_Client* fT_Client)
 	{
-		return (MessageTransmitter.IsConnected() || FileTransmitter.IsConnected());
+		FT_Client = fT_Client;
 	}
-};
 
-EN_FT_Client_Internal_FileTransmitter::EN_FT_Client_Internal_FileTransmitter(EN_FT_Client* fT_Client)
-{
-	FT_Client = fT_Client;
+	void EN_FT_Client_Internal_FileTransmitter::OnConnect() 
+	{
+		LOG(LogLevels::Info, "Internal file transmitter connected!");
+		std::string ftSockDesc;
+
+		if (!WaitMessage(ftSockDesc))
+			return;
+
+		auto vec = Split(ftSockDesc);
+		if (vec[0] != "FtSockDesc")
+		{
+			FT_Client->Disconnect();
+			return;
+		}
+
+		FT_Client->MessageTransmitter.SendToServer(ftSockDesc);
+	}
+
+	EN_FT_Client_Internal_MessageTransmitter::EN_FT_Client_Internal_MessageTransmitter(EN_FT_Client* fT_Client)
+	{
+		FT_Client = fT_Client;
+	}
 }
 
-EN_FT_Client_Internal_MessageTransmitter::EN_FT_Client_Internal_MessageTransmitter(EN_FT_Client* fT_Client)
-{
-	FT_Client = fT_Client;
-}
 
 int main()
 {
-    EN_FT_Client A;
+    EN::EN_FT_Client A;
 
 	// Check if connection success
 	if (A.Connect() == false)

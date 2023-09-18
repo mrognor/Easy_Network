@@ -64,18 +64,15 @@ namespace EN
 
         int operationRes = connect(ServerConnectionSocket, (sockaddr*)&addr, sizeof(addr));
         
-        if (operationRes == 0)
+        if (operationRes != 0)
 		{
-			SocketMtx.unlock();
-			OnConnect();
-		}
-        else
-        {
 			ServerConnectionSocket = INVALID_SOCKET;
 			SocketMtx.unlock();
             LOG(LogLevels::Warning, "Warning: failed connect to server");
             return false;
         }		
+
+		SocketMtx.unlock();
 
 		// If reconnection we have to join last std::thread
 		WaitForServerHandlerEnd();
@@ -91,6 +88,8 @@ namespace EN
 
 	void EN_TCP_Client::ServerHandler()
 	{
+		OnConnect();
+
 		bool isServerConnected = true;
 		std::string message;
 
