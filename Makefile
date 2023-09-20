@@ -13,7 +13,8 @@ TARGETS = bin/EN_Functions.o \
 	bin/EN_BackgroundTimer.o \
 	bin/EN_FileTransmissionStatus.o \
 	bin/EN_FT_Server.o \
-	bin/EN_FT_Client.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
+	bin/EN_FT_Client.o \
+	bin/EN_ThreadBarrier.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
 
 # Check os
 ifeq ($(OS), Windows_NT)
@@ -46,7 +47,6 @@ all: bin/TCP_Chat_Server$(FILEEXT) \
 	bin/HTTP_Server$(FILEEXT) \
 	bin/FT_Chat_Server$(FILEEXT) \
 	bin/FT_Chat_Client$(FILEEXT) \
-
 # bin/RAU_Chat_Server$(FILEEXT) bin/RAU_Chat_Client$(FILEEXT)
 
 # HTTP_Server
@@ -112,35 +112,35 @@ bin/libEasyNetwork.a: $(TARGETS)
 # 	mkdir -p bin
 #	g++ $(CXXFLAGS) -c EN_RAU_Server.cpp -o bin/EN_RAU_Server.o
 
-bin/EN_FT_Client.o: EN_FT_Client.cpp EN_FT_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_FT_Client.o: EN_FT_Client.cpp EN_FT_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_FT_Client.cpp -o bin/EN_FT_Client.o
 
-bin/EN_FT_Server.o: EN_FT_Server.cpp EN_FT_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_FT_Server.o: EN_FT_Server.cpp EN_FT_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_FT_Server.cpp -o bin/EN_FT_Server.o
 
-bin/EN_UDP_Client.o: EN_UDP_Client.cpp EN_UDP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_UDP_Client.o: EN_UDP_Client.cpp EN_UDP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_UDP_Client.cpp -o bin/EN_UDP_Client.o
 
-bin/EN_UDP_Server.o: EN_UDP_Server.cpp EN_UDP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_UDP_Server.o: EN_UDP_Server.cpp EN_UDP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_UDP_Server.cpp -o bin/EN_UDP_Server.o
 
-bin/EN_TCP_Server.o: EN_TCP_Server.cpp EN_TCP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_TCP_Server.o: EN_TCP_Server.cpp EN_TCP_Server.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_TCP_Server.cpp -o bin/EN_TCP_Server.o
 
-bin/EN_TCP_Client.o: EN_TCP_Client.cpp EN_TCP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_TCP_Client.o: EN_TCP_Client.cpp EN_TCP_Client.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_TCP_Client.cpp -o bin/EN_TCP_Client.o
 
-bin/EN_Functions.o: EN_Functions.cpp EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_Functions.o: EN_Functions.cpp EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_Functions.cpp -o bin/EN_Functions.o
 
-bin/EN_Logger.o: EN_Logger.cpp EN_Logger.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h
+bin/EN_Logger.o: EN_Logger.cpp EN_Logger.h EN_Functions.h EN_SocketOptions.h EN_ThreadGate.h EN_ThreadCrossWalk.h EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_Logger.cpp -o bin/EN_Logger.o
 
@@ -168,6 +168,10 @@ bin/EN_Atomic_Int64.o: EN_Atomic_Int64.cpp EN_Atomic_Int64.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_Atomic_Int64.cpp -o bin/EN_Atomic_Int64.o
 
+bin/EN_ThreadBarrier.o: EN_ThreadBarrier.cpp EN_ThreadBarrier.h
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c EN_ThreadBarrier.cpp -o bin/EN_ThreadBarrier.o
+	
 # Clean all
 clean:
 	rm -rf bin

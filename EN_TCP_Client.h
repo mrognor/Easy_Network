@@ -139,8 +139,17 @@ namespace EN
 		*/
         bool WaitMessage(std::string& message);
         
-		/// This function disconnect client from server
-		void Disconnect();
+		/**
+		   \brief This function disconnect client from server.
+
+		   \param[in] isBlocking An optional parameter required to define the function.
+		   This function can be called in the message processing thread or in any other thread. 
+		   If the function is called in a message processing thread, then it will not block it. 
+		   If the function is called in any other thread, 
+		   it will wait for the execution of the incoming message processing thread to complete. 
+		   In this case, the input parameter allows you to determine the behavior of the function if necessary
+		*/
+		void Disconnect(bool isBlocking = true);
 
         /**
            \brief The method sets options for client socket

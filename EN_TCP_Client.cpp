@@ -136,7 +136,7 @@ namespace EN
         return TCP_Recv(ServerConnectionSocket, message);
     }
 
-	void EN_TCP_Client::Disconnect()
+	void EN_TCP_Client::Disconnect(bool isBlocking)
 	{
 		SocketMtx.lock();
 		CloseSocket(ServerConnectionSocket);
@@ -144,7 +144,7 @@ namespace EN
 		
 		ServerHandlerMtx.lock();
 
-		if (ServerHandlerThread.get_id() != std::this_thread::get_id() && ServerHandlerThread.joinable())
+		if (ServerHandlerThread.get_id() != std::this_thread::get_id() && ServerHandlerThread.joinable() && isBlocking)
 			ServerHandlerThread.join();
 
 		ServerConnectionSocket = INVALID_SOCKET;
