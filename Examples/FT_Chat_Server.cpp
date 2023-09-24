@@ -1,4 +1,6 @@
 #include "../EN_TCP_Server.h"
+#include "../EN_ThreadBarrier.h"
+#include "map"
 
 namespace EN
 {
@@ -13,7 +15,7 @@ namespace EN
 
 		virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) override {}
 
-		virtual void OnClientDisconnect(EN_SOCKET clientSocket) override { std::cout << "FT disconn" << std::endl; }
+		void OnClientDisconnect(EN_SOCKET clientSocket);
 	public:
 		EN_FT_Server_Internal_FileTransmitter(EN_FT_Server* fT_Server);
 	};
@@ -27,7 +29,7 @@ namespace EN
 
 		virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) override {}
 
-		virtual void OnClientDisconnect(EN_SOCKET clientSocket) override { std::cout << "MSG disconn" << std::endl; }
+		void OnClientDisconnect(EN_SOCKET clientSocket);
 	public:
 		EN_FT_Server_Internal_MessageTransmitter(EN_FT_Server* fT_Server);
 	};
@@ -46,6 +48,21 @@ namespace EN
 		EN_FT_Server_Internal_MessageTransmitter MessageTransmitter;
 
 		std::thread FileTransmitterRunThread;
+
+		// Thread crosswalk to work with MtToFtSocketsMap
+		EN::EN_ThreadCrossWalk MtToFtSocketsCW;
+		// Map with message transmitter socket as key and file transmitter socket as value
+		std::map<EN_SOCKET, EN_SOCKET> MtToFtSocketsMap;
+
+		// Thread crosswalk to work with FtSocketToBarrierMap
+		EN::EN_ThreadCrossWalk FtSocketToBarrierCW;
+		// Map with file transmitter socket as key and thread barrier as value
+		std::map<EN_SOCKET, EN::EN_ThreadBarrier*> FtSocketToBarrierMap;
+
+		// Thread crosswalk to work with MtSocketToBarrierMap
+		EN::EN_ThreadCrossWalk MtSocketToBarrierCW;
+		// Map with message transmitter socket as key and thread barrier as value
+		std::map<EN_SOCKET, EN::EN_ThreadBarrier*> MtSocketToBarrierMap;
 	public:
 		EN_FT_Server() : FileTransmitter(this), MessageTransmitter(this) {}
 
@@ -70,6 +87,30 @@ namespace EN
 		{
 
 		}
+	
+		void OnClientConnected(EN_SOCKET clientSocket)
+		{
+			EN_SOCKET ftSock;
+			MtToFtSocketsCW.CarStartCrossRoad();
+			auto f = MtToFtSocketsMap.find(clientSocket);
+			if (f != MtToFtSocketsMap.end())
+				ftSock = f->second;
+			MtToFtSocketsCW.CarStopCrossRoad();
+
+			std::cout << "Connected! Sock map: MT=" << std::to_string(clientSocket) + " FT=" + std::to_string(ftSock) << std::endl; 
+		}
+
+		void OnClientDisconnect(EN_SOCKET clientSocket)
+		{
+			EN_SOCKET ftSock;
+			MtToFtSocketsCW.CarStartCrossRoad();
+			auto f = MtToFtSocketsMap.find(clientSocket);
+			if (f != MtToFtSocketsMap.end())
+				ftSock = f->second;
+			MtToFtSocketsCW.CarStopCrossRoad();
+
+			std::cout << "Disconnected! Sock map: MT=" << std::to_string(clientSocket) + " FT=" + std::to_string(ftSock) << std::endl; 
+		}
 	};
 
 	EN_FT_Server_Internal_FileTransmitter::EN_FT_Server_Internal_FileTransmitter(EN_FT_Server* fT_Server)
@@ -81,8 +122,37 @@ namespace EN
 
 	void EN_FT_Server_Internal_FileTransmitter::OnClientConnected(EN_SOCKET clientSocket) 
 	{
-		LOG(LogLevels::Info, "Internal file transmitter connected! Socket descriptor: " + std::to_string(clientSocket));
+		// Add pair with client socket and barrier to map
+		EN_ThreadBarrier* socketsBarrier = new EN_ThreadBarrier;
+		FT_Server->FtSocketToBarrierCW.PedestrianStartCrossRoad();
+		FT_Server->FtSocketToBarrierMap.emplace(clientSocket, socketsBarrier);
+		FT_Server->FtSocketToBarrierCW.PedestrianStopCrossRoad();
+
 		SendToClient(clientSocket, "FtSockDesc " + std::to_string(clientSocket));
+		
+		LOG(LogLevels::Info, "Internal file transmitter connected! Socket descriptor: " + std::to_string(clientSocket));
+		socketsBarrier->Wait(2); // Wait A
+	}
+
+	void EN_FT_Server_Internal_FileTransmitter::OnClientDisconnect(EN_SOCKET clientSocket)
+	{
+		EN_ThreadBarrier* barr;
+		// Remove pair with file transmitter socket and barrier from map
+		FT_Server->FtSocketToBarrierCW.PedestrianStartCrossRoad();
+		auto f = FT_Server->FtSocketToBarrierMap.find(clientSocket);
+		if (f != FT_Server->FtSocketToBarrierMap.end())
+		{
+			barr = f->second;
+			FT_Server->FtSocketToBarrierMap.erase(f);
+			FT_Server->FtSocketToBarrierCW.PedestrianStopCrossRoad();
+			barr->Wait(2); // Wait B
+			delete barr;
+		}
+		else
+		{
+			LOG(LogLevels::Warning, "No thread barrier on FT server. Possibly memmory leak!");
+			FT_Server->FtSocketToBarrierCW.PedestrianStopCrossRoad();
+		}
 	}
 
 	EN_FT_Server_Internal_MessageTransmitter::EN_FT_Server_Internal_MessageTransmitter(EN_FT_Server* fT_Server)
@@ -96,17 +166,71 @@ namespace EN
 	{ 
 		LOG(LogLevels::Info, "Internal message transmitter connected! Socket descriptor: " + std::to_string(clientSocket));
 		std::string ftSockDesc;
-		if (!WaitMessage(clientSocket, ftSockDesc))
-			return;
+
+		WaitMessage(clientSocket, ftSockDesc);
 		
 		auto vec = Split(ftSockDesc);
+
+		// Add pair message socket to file transmitter socket to map
+		FT_Server->MtToFtSocketsCW.PedestrianStartCrossRoad();
+		FT_Server->MtToFtSocketsMap.emplace(clientSocket, (EN_SOCKET)std::stoi(vec[1]));
+		FT_Server->MtToFtSocketsCW.PedestrianStopCrossRoad();
+
+		EN_ThreadBarrier* barr;
+		// Find required thread barrier
+		FT_Server->FtSocketToBarrierCW.CarStartCrossRoad();
+		auto f = FT_Server->FtSocketToBarrierMap.find((EN_SOCKET)std::stoi(vec[1]));
+
+		// Check if it is thread barrier on map
+		if (f != FT_Server->FtSocketToBarrierMap.end())
+		{
+			// Save ptr to thread barrier
+			barr = f->second;
+			FT_Server->FtSocketToBarrierCW.CarStopCrossRoad();
+
+			// Add thread barrier with message transmitter key to map
+			FT_Server->MtSocketToBarrierCW.PedestrianStartCrossRoad();
+			FT_Server->MtSocketToBarrierMap.emplace(clientSocket, barr);
+			FT_Server->MtSocketToBarrierCW.PedestrianStopCrossRoad();
+		}
+		else
+		{
+			LOG(LogLevels::Error, "Not find client barrier!");
+			FT_Server->FtSocketToBarrierCW.CarStopCrossRoad();
+			throw("Not find client barrier!");
+		}
+
 		if (vec[0] != "FtSockDesc")
 		{
+			LOG(LogLevels::Warning, "Not FT client connected! Force disconnected it! Socket descriptor: " + std::to_string(clientSocket));
+			barr->Wait(2);
 			FT_Server->Disconnect(clientSocket);
 			return;
 		}
+
+		barr->Wait(2); // Wait A
+		FT_Server->OnClientConnected(clientSocket);
+	}
+
+	void EN_FT_Server_Internal_MessageTransmitter::OnClientDisconnect(EN_SOCKET clientSocket)
+	{
+		EN_ThreadBarrier* barr;
+		// Remove pair with message transmitter socket and barrier from map
+		FT_Server->MtSocketToBarrierCW.PedestrianStartCrossRoad();
+		auto f = FT_Server->MtSocketToBarrierMap.find(clientSocket);
+		if (f != FT_Server->MtSocketToBarrierMap.end())
+		{
+			barr = f->second;
+			FT_Server->MtSocketToBarrierMap.erase(f);	
+			FT_Server->MtSocketToBarrierCW.PedestrianStopCrossRoad();
+			FT_Server->OnClientDisconnect(clientSocket);
+			barr->Wait(2); // Wait B
+		}
 		
-		std::cout << "Sock map: " << std::to_string(clientSocket) << " " << vec[1] << std::endl;
+		// Remove message transmitter to file transmitter pair from map
+		FT_Server->MtToFtSocketsCW.PedestrianStartCrossRoad();
+		FT_Server->MtToFtSocketsMap.erase(clientSocket);
+		FT_Server->MtToFtSocketsCW.PedestrianStopCrossRoad();
 	}
 }
 
