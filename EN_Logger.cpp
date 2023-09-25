@@ -7,6 +7,10 @@ std::ofstream LogLevelErrorFile;
 
 std::mutex LoggerMtx;
 
+#if defined WIN32 || defined _WIN64
+HANDLE console_color = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
+
 class FileLogger
 {
 public:
@@ -55,7 +59,15 @@ namespace EN
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [hint] " + logMessage;
+                
+                #if defined WIN32 || defined _WIN64
+                SetConsoleTextAttribute(console_color, 11);
+                std::cerr << msg << std::endl;
+                SetConsoleTextAttribute(console_color, 7);
+                #else
                 std::cerr << "\x1B[94m" << msg << "\033[0m" << std::endl;
+                #endif
+                
                 if (!LogLevelHintFileName.empty())
                     LogLevelHintFile << msg << std::endl;
             }
@@ -66,7 +78,15 @@ namespace EN
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [warning] " + logMessage;
+                                
+                #if defined WIN32 || defined _WIN64
+                SetConsoleTextAttribute(console_color, 14);
+                std::cerr << msg << std::endl;
+                SetConsoleTextAttribute(console_color, 7);
+                #else
                 std::cerr << "\x1B[33m" << msg << "\033[0m" << std::endl;
+                #endif
+
                 if (!LogLevelWarningFileName.empty())
                     LogLevelWarningFile << msg << std::endl;
             }
@@ -77,7 +97,15 @@ namespace EN
             {
                 LoggerMtx.lock();
                 std::string msg = GetCurrentDate() + " " + GetCurrentDayTimeWithSecondFraction<std::chrono::milliseconds>() + " [error] " + logMessage;
+                
+                #if defined WIN32 || defined _WIN64
+                SetConsoleTextAttribute(console_color, 12);
+                std::cerr << msg << std::endl;
+                SetConsoleTextAttribute(console_color, 7);
+                #else
                 std::cerr << "\x1B[31m" << msg << "\033[0m" << std::endl;
+                #endif
+
                 if (!LogLevelErrorFileName.empty())
                     LogLevelErrorFile << msg << std::endl;
             }
