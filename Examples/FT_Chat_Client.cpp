@@ -12,7 +12,7 @@ namespace EN
 	protected:
 		void OnConnect();
 
-		virtual void ServerMessageHandler(std::string message) override { std::cout << "FT " << message << std::endl; }
+		void ServerMessageHandler(std::string message);
 
 		void OnDisconnect();
 	public:
@@ -26,7 +26,7 @@ namespace EN
 	protected:
 		void OnConnect();
 
-		virtual void ServerMessageHandler(std::string message) override { std::cout << "MT " << message << std::endl; }
+		void ServerMessageHandler(std::string message);
 
 		void OnDisconnect();
 	public:
@@ -76,9 +76,19 @@ namespace EN
 			LOG(LogLevels::Info, "FT_Client connected!");
 		}
 
+		void ServerMessageHandler(std::string message)
+		{
+			std::cout << "Message from server: " << message << std::endl;
+		}
+
 		void OnDisconnect()
 		{
 			LOG(LogLevels::Info, "FT_Client disconnected!");
+		}
+	
+		bool SendToServer(std::string message)
+		{
+			return MessageTransmitter.SendToServer(message);
 		}
 	};
 
@@ -114,6 +124,11 @@ namespace EN
 		}
 	}
 
+	void EN_FT_Client_Internal_FileTransmitter::ServerMessageHandler(std::string message)
+	{
+
+	}
+
 	void EN_FT_Client_Internal_FileTransmitter::OnDisconnect() 
 	{
 		FT_Client->MessageTransmitter.Disconnect(false);
@@ -136,6 +151,11 @@ namespace EN
 		if (FT_Client->IsConnectedToFTServer)
 			FT_Client->OnConnect();
 		FT_Client->StartEndBarrier.Wait(2); // Wait B
+	}
+
+	void EN_FT_Client_Internal_MessageTransmitter::ServerMessageHandler(std::string message)
+	{
+		FT_Client->ServerMessageHandler(message);
 	}
 
 	void EN_FT_Client_Internal_MessageTransmitter::OnDisconnect()
@@ -183,13 +203,7 @@ int main()
 		if (message == "r")
 			A.Connect();
 
-		// Check if we still connected
-		//if (A.IsConnected())
-		//{
-			// A.SendToServer(message);
-		//}
-		//else 
-		//	break;
+		A.SendToServer(message);
 	}
 
 	// Disconnect client from server if still connected

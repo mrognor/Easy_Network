@@ -27,7 +27,7 @@ namespace EN
 	protected:
 		void OnClientConnected(EN_SOCKET clientSocket);
 
-		virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) override {}
+		void ClientMessageHandler(EN_SOCKET clientSocket, std::string message);
 
 		void OnClientDisconnect(EN_SOCKET clientSocket);
 	public:
@@ -98,6 +98,12 @@ namespace EN
 			MtToFtSocketsCW.CarStopCrossRoad();
 
 			std::cout << "Connected! Sock map: MT=" << std::to_string(clientSocket) + " FT=" + std::to_string(ftSock) << std::endl; 
+			SendToClient(clientSocket, "Hello from FT server");
+		}
+
+		void ClientMessageHandler(EN_SOCKET clientSocket, std::string message)
+		{
+			std::cout << "Message from client: " << std::to_string(clientSocket) << " Message: " << message << std::endl;
 		}
 
 		void OnClientDisconnect(EN_SOCKET clientSocket)
@@ -110,6 +116,16 @@ namespace EN
 			MtToFtSocketsCW.CarStopCrossRoad();
 
 			std::cout << "Disconnected! Sock map: MT=" << std::to_string(clientSocket) + " FT=" + std::to_string(ftSock) << std::endl; 
+		}
+	
+		bool SendToClient(EN_SOCKET clientSocket, std::string message)
+		{
+			return MessageTransmitter.SendToClient(clientSocket, message);
+		}
+
+		void MulticastSend(std::string message)
+		{
+			MessageTransmitter.MulticastSend(message);
 		}
 	};
 
@@ -212,6 +228,11 @@ namespace EN
 		FT_Server->OnClientConnected(clientSocket);
 	}
 
+	void EN_FT_Server_Internal_MessageTransmitter::ClientMessageHandler(EN_SOCKET clientSocket, std::string message)
+	{
+		FT_Server->ClientMessageHandler(clientSocket, message);
+	}
+
 	void EN_FT_Server_Internal_MessageTransmitter::OnClientDisconnect(EN_SOCKET clientSocket)
 	{
 		EN_ThreadBarrier* barr;
@@ -261,6 +282,8 @@ int main()
 			A.Shutdown();
 			break;
 		}
+
+		A.MulticastSend(message);
 	}
 
 	th.join();

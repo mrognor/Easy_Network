@@ -350,6 +350,16 @@ namespace EN
 			return false;
 		}
 
+		// We are waiting for confirmation from the receiving party about the possibility to send accept
+		std::string isRecvAvailable;
+		if (!EN::Default_TCP_Recv(fileSendSocket, isRecvAvailable) || isRecvAvailable == "bad")
+		{
+			fileTransmissionStatus.SetIsTransmissionSucceed(false);
+			fileTransmissionStatus.SetIsTransmissionEnded(true);
+			LOG(LogLevels::Error, "Receiving party cannot open file!");
+			return false;
+		}
+
 		// See file start
 		sendingFile.seekg(0, std::ios::beg);
 
@@ -512,6 +522,7 @@ namespace EN
 
 		if (receivedFile.is_open())
 		{
+			EN::Default_TCP_Send(FileSendSocket, "ok");
 			uint64_t lastReceivedMessageSize = 0;
 
 			// Skip while loop if file size less when send buffer
@@ -588,7 +599,8 @@ namespace EN
 		}
 		else
 		{
-            LOG(Error, "Failed to send file: " + fileName);
+			EN::Default_TCP_Send(FileSendSocket, "bad");
+            LOG(Error, "Failed to received file: " + fileName);
 			delete[] messageBuf;
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
 			fileTransmissionStatus.SetIsTransmissionEnded(true);
