@@ -28,6 +28,7 @@ typedef int EN_SOCKET;
 #include <set>
 #include <list>
 #include <atomic>
+#include <random>
 
 #include "EN_ParallelFor.h"
 #include "EN_BackgroundTimer.h"
@@ -271,6 +272,9 @@ namespace EN
         \param [in] optionValue Socket option value
     */
     void SetSocketOption(EN_SOCKET socket, int level, int optionName, int optionValue);
+
+    /// Function to generate 4 version uuid
+    std::string UUID4();
 
 	/**
         \brief Crossplatform function for program suspension
