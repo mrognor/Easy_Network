@@ -27,8 +27,12 @@ namespace EN
 				RAU_Client->CondVar.notify_all();
 			}
 		}
-		else 
-			RAU_Client->ClientId = std::atoi(message.c_str());
+		else
+		{
+			int clientId;
+			if (StringToInt(message, clientId))
+				RAU_Client->ClientId = clientId);
+		}
 	}
 
 	void EN_RAU_TCP_Client::OnDisconnect()

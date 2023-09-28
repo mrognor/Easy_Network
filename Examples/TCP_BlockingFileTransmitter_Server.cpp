@@ -66,7 +66,9 @@ public:
 			{
 				LOG(EN::LogLevels::Info, "Continue the previous sending");
 				SendToClient(clientSocket, "ok");
-				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, std::atoll(InterpretedMessage[2].c_str()), transmissionStatus);
+				std::uint64_t sendingSize;
+				EN::StringToUnsignedLongLong(InterpretedMessage[2], sendingSize);
+				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, sendingSize, transmissionStatus);
 			}
 			else
 			{
@@ -100,7 +102,7 @@ int main()
 		ip = vec[0];
 
 	if (vec.size() == 2)
-		port = std::atoi(vec[1].c_str());
+		EN::StringToInt(vec[1], port);
 	else port = 1111; // Default value 
 
 	// No incorrect port check

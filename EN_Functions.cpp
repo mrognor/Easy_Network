@@ -151,7 +151,12 @@ namespace EN
 		sockaddr_in ClientAddr;
 		//Prepare the sockaddr_in structure
 		ClientAddr.sin_family = AF_INET;
-		ClientAddr.sin_port = htons(std::atoi(SplittedAddr[1].c_str()));
+
+		int port;
+		if (!StringToInt(SplittedAddr[1], port))
+			return;
+
+		ClientAddr.sin_port = htons(port);
 		// Set ip address
 		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
 
@@ -492,12 +497,7 @@ namespace EN
 		uint64_t fileSize;
 		uint64_t previoslySendedBytes;
 
-		try
-		{
-			previoslySendedBytes = std::stoll(fileInfos[1]);
-			fileSize = std::stoll(fileInfos[2]);
-		}
-		catch (...)
+		if (!StringToUnsignedLongLong(fileInfos[1], previoslySendedBytes) || !StringToUnsignedLongLong(fileInfos[2], fileSize))
 		{
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
@@ -647,11 +647,7 @@ namespace EN
 
 		uint64_t fileSize;
 
-		try
-		{
-			fileSize = std::stoll(Split(fileInfo)[1]);
-		}
-		catch (...)
+		if (!StringToUnsignedLongLong(Split(fileInfo)[1], fileSize))
 		{
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
@@ -1060,5 +1056,72 @@ namespace EN
         }
 
         return res;
+    }
+
+	bool IsCanBeDigit(const std::string& str)
+    {
+        if ((str[0] < '0' && str[0] != '-') || str[0] > '9')
+		    return false;
+
+        for (char it : str)
+            if (it < '0' || it > '9')
+                return false;
+        return true;
+    }
+
+    bool StringToInt(const std::string& str, int& res)
+    {
+        if (IsCanBeDigit(str))
+        {
+            res = std::stoi(str);
+            std::cout << res << std::endl;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool StringToLong(const std::string& str, long int& res)
+    {
+        if (IsCanBeDigit(str))
+        {
+            res = std::stol(str);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool StringToLongLong(const std::string& str, long long int& res)
+    {
+        if (IsCanBeDigit(str))
+        {
+            res = std::stoll(str);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool StringToUnsignedLong(const std::string& str, unsigned long int& res)
+    {
+        if (IsCanBeDigit(str))
+        {
+            res = std::stoul(str);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res)
+    {
+        if (IsCanBeDigit(str))
+        {
+            res = std::stoull(str);
+            return true;
+        }
+        else
+            return false;
     }
 }

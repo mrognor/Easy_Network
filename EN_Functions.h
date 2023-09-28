@@ -276,6 +276,59 @@ namespace EN
     /// Function to generate 4 version uuid
     std::string UUID4();
 
+    /// A function for checking a string for any characters other than numbers
+    bool IsCanBeDigit(const std::string& str);
+
+    /**
+        \brief A function for converting a string to a int.
+        
+        \param [in] str The string to be converted
+        \param [in] res The number where the number from the string will be written, if it was possible to convert
+
+        \return Returns true if the conversion succeeded and false if it failed
+    */ 
+    bool StringToInt(const std::string& str, int& res);
+
+    /**
+        \brief A function for converting a string to a long int.
+        
+        \param [in] str The string to be converted
+        \param [in] res The number where the number from the string will be written, if it was possible to convert
+
+        \return Returns true if the conversion succeeded and false if it failed
+    */ 
+    bool StringToLong(const std::string& str, long int& res);
+
+    /**
+        \brief A function for converting a string to a long long int.
+        
+        \param [in] str The string to be converted
+        \param [in] res The number where the number from the string will be written, if it was possible to convert
+
+        \return Returns true if the conversion succeeded and false if it failed
+    */ 
+    bool StringToLongLong(const std::string& str, long long int& res);
+
+    /**
+        \brief A function for converting a string to a unsigned long int.
+        
+        \param [in] str The string to be converted
+        \param [in] res The number where the number from the string will be written, if it was possible to convert
+
+        \return Returns true if the conversion succeeded and false if it failed
+    */ 
+    bool StringToUnsignedLong(const std::string& str, unsigned long int& res);
+
+    /**
+        \brief A function for converting a string to a unsigned long long int.
+        
+        \param [in] str The string to be converted
+        \param [in] res The number where the number from the string will be written, if it was possible to convert
+
+        \return Returns true if the conversion succeeded and false if it failed
+    */ 
+    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res);
+
 	/**
         \brief Crossplatform function for program suspension
 
@@ -373,7 +426,7 @@ namespace EN
     }
 
 	/*!
-		\brief Function to convert int to string. 
+		\brief Function to convert int to string with base 256. 
 		Works with standart data types. Use this function if your data 
 		types support next operators: >>, <<, &
 
@@ -387,7 +440,7 @@ namespace EN
 		This function does not work with negative numbers.
 	*/
 	template <class T>
-    std::string IntToString(T n)
+    std::string IntToB256String(T n)
     {
         std::string str;
 
@@ -417,7 +470,7 @@ namespace EN
 		This function can be considered as the translation of a number into a number system with a base of 256
 	*/
 	template <class T>
-    std::string WIntToString(T n)
+    std::string CIntToB256String(T n)
     {
         std::string str;
 
@@ -432,16 +485,16 @@ namespace EN
         return str;
     }
 
-	/** \brief Function to convert string to int.
+	/** \brief Function to convert base 256 string to int.
 	
 		Works with standart data types. Use this function if your data 
 		types support next operators: >>, <<, &
-		Works with strings from function EN::IntToString.
-		\warning Dont forget to specify returning value using <type>. Example: int i = StringToInt<int>("string")
-        \warning Don't forget that the IntToString function doesn't work with negative numbers
+		Works with strings from function EN::IntToB256String.
+		\warning Dont forget to specify returning value using <type>. Example: int i = B256StringToInt<int>("string")
+        \warning Don't forget that the IntToB256String function doesn't work with negative numbers
 	*/
     template <class T>
-    T StringToInt(const std::string& str)
+    T B256StringToInt(const std::string& str)
     {
         T n = 0;
         for (auto it = str.rbegin(); it != --str.rend(); ++it)
@@ -453,16 +506,16 @@ namespace EN
         return n;
     }
 
-	/** \brief Function to convert string to int.
+	/** \brief Function to convert base 256 string to int.
 	
 		Works with custom data types. Use this function if your data 
 		types dont support next operators: >>, <<, &
-		Works with strings from function EN::IntToString.
-		\warning Dont forget to specify returning value using <type>. Example: int i = WStringToInt<int>("string")
-        \warning Don't forget that the IntToString function doesn't work with negative numbers
+		Works with strings from function EN::CIntToB256String.
+		\warning Dont forget to specify returning value using <type>. Example: int i = CB256StringToInt<int>("string")
+        \warning Don't forget that the CIntToB256String function doesn't work with negative numbers
 	*/
     template <class T>
-    T WStringToInt(const std::string& str)
+    T CB256StringToInt(const std::string& str)
     {
         T n = 0;
         for (auto it = str.rbegin(); it != --str.rend(); ++it)

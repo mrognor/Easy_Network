@@ -38,7 +38,7 @@ int main()
 		ip = vec[0];
 	
 	if (vec.size() == 2)
-		port = std::atoi(vec[1].c_str());
+		EN::StringToInt(vec[1], port);
 	else port = 1111; // Default value 
 
 	// No incorrect port check
@@ -86,7 +86,9 @@ int main()
 				if (parsedResponce[0] == "ok")
 				{
 					LOG(EN::LogLevels::Info, "Continue the previous sending");
-					EN::SendFile(A.GetSocket(), InterpretedMessage[1], isStop, transferingSpeed, std::stoll(parsedResponce[1]), transmissionStatus);
+					std::uint64_t sendingSize;
+					EN::StringToUnsignedLongLong(parsedResponce[1], sendingSize);
+					EN::SendFile(A.GetSocket(), InterpretedMessage[1], isStop, transferingSpeed, sendingSize, transmissionStatus);
 				}
 				else
 				{

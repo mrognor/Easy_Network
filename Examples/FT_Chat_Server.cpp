@@ -187,15 +187,18 @@ namespace EN
 		
 		auto vec = Split(ftSockDesc);
 
+		int ftSock;
+		if (StringToInt(ftSockDesc, ftSock))
+
 		// Add pair message socket to file transmitter socket to map
 		FT_Server->MtToFtSocketsCW.PedestrianStartCrossRoad();
-		FT_Server->MtToFtSocketsMap.emplace(clientSocket, (EN_SOCKET)std::stoi(vec[1]));
+		FT_Server->MtToFtSocketsMap.emplace(clientSocket, (EN_SOCKET)ftSock);
 		FT_Server->MtToFtSocketsCW.PedestrianStopCrossRoad();
 
 		EN_ThreadBarrier* barr;
 		// Find required thread barrier
 		FT_Server->FtSocketToBarrierCW.CarStartCrossRoad();
-		auto f = FT_Server->FtSocketToBarrierMap.find((EN_SOCKET)std::stoi(vec[1]));
+		auto f = FT_Server->FtSocketToBarrierMap.find((EN_SOCKET)ftSock);
 
 		// Check if it is thread barrier on map
 		if (f != FT_Server->FtSocketToBarrierMap.end())

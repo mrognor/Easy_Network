@@ -90,21 +90,20 @@ namespace EN
 
 	bool EN_RAU_UDP_Server::InstantClientMessageHandler(std::string message, std::string ClientSocketAddr, long long TimeWhenPackageArrived)
 	{
-		int ThreadID = std::atoi(message.substr(0, message.find(" ")).c_str());
-
-		if (ThreadID < 0)
+		int threadId;
+		if (!StringToInt(message.substr(0, message.find(" ")), threadId) || threadId < 0)
 			return false;
 
-		if (RAU_Server->UDPIpAddresses[ThreadID] == "none")
+		if (RAU_Server->UDPIpAddresses[threadId] == "none")
 		{
-			RAU_Server->UDPIpAddresses[ThreadID] = ClientSocketAddr;
-			RAU_Server->TCP_Server->SendToClient(ThreadID, " ");
-			RAU_Server->OnClientConnected(ThreadID);
+			RAU_Server->UDPIpAddresses[threadId] = ClientSocketAddr;
+			RAU_Server->TCP_Server->SendToClient(threadId, " ");
+			RAU_Server->OnClientConnected(threadId);
 		}
 		else
 		{
-			RAU_Server->VectorQueuesMessages[ThreadID]->push(message.substr(message.find(" ") + 1));
-			RAU_Server->VectorCondVars[ThreadID]->notify_all();
+			RAU_Server->VectorQueuesMessages[threadId]->push(message.substr(message.find(" ") + 1));
+			RAU_Server->VectorCondVars[threadId]->notify_all();
 		}
 		return false;
 	}
