@@ -2,6 +2,9 @@
 
 namespace EN
 {
+	std::size_t MaxTcpMessageSize = 1073741824;
+	std::size_t MaxUdpMessageSize = 16384;
+
 	#if defined WIN32 || defined _WIN64
 
     WSA_Init_Cleanup::WSA_Init_Cleanup()
@@ -39,11 +42,37 @@ namespace EN
 			return "";
 	}
 
+	void SetMaxTcpMessageSize(std::size_t maxTcpMessageSize)
+	{
+		MaxTcpMessageSize = maxTcpMessageSize;
+	}
+
+	std::size_t GetMaxTcpMessageSize()
+	{
+		return MaxTcpMessageSize;
+	}
+
+	void SetMaxUdpMessageSize(std::size_t maxUdpMessageSize)
+	{
+		MaxUdpMessageSize = maxUdpMessageSize;
+	}
+
+	std::size_t GetMaxUdpMessageSize()
+	{
+		return MaxUdpMessageSize;
+	}
+
 	bool Default_TCP_Send(EN_SOCKET sock, const std::string& message)
 	{
 		// Sending data prefix with information about message length
 		std::string messageLengthString;
 		std::size_t messageLength = message.length();
+
+		if (messageLength > MaxTcpMessageSize)
+		{
+			LOG(LogLevels::Warning, "Trying to send message longer then maximal message size");
+			return false;
+		}
 
 		if (messageLength == 0) messageLengthString = '\0';
 		
@@ -118,6 +147,12 @@ namespace EN
 
 		if (messageSize != 0)
 		{
+			if (messageSize > MaxTcpMessageSize)
+			{
+				LOG(LogLevels::Warning, "Trying to recv message longer then maximal message size");
+				return false;
+			}
+
 			// Allocate memory to incoming message
 			char* msg = new char[messageSize];
 
@@ -161,6 +196,12 @@ namespace EN
 		inet_pton(AF_INET, SplittedAddr[0].c_str(), &ClientAddr.sin_addr);
 
 		size_t messageLength = message.length();
+		if (messageLength > MaxUdpMessageSize)
+		{
+			LOG(LogLevels::Warning, "Trying to recv message longer then maximal message size");
+			return;
+		}
+
 		unsigned char* msgBuf;
 		unsigned char messageByteLength;
 
@@ -198,7 +239,7 @@ namespace EN
 		int sizeofaddr = sizeof(sourceSockAddr);
 		int receivedBytes;
 
-		char msg[16384];
+		char msg[MaxUdpMessageSize];
 		#if defined WIN32 || defined _WIN64
 		//try to receive some data, this is a blocking call
 		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
@@ -499,6 +540,7 @@ namespace EN
 
 		if (!StringToUnsignedLongLong(fileInfos[1], previoslySendedBytes) || !StringToUnsignedLongLong(fileInfos[2], fileSize))
 		{
+			EN::Default_TCP_Send(FileSendSocket, "bad");
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
 			fileTransmissionStatus.SetIsTransmissionEnded(true);

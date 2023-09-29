@@ -58,6 +58,18 @@ namespace EN
 	/// \return Return host ip or empty string if cannot get host ip.
 	std::string GetIpByURL(std::string url);
 
+    /// Function to set maximal tcp message size
+	void SetMaxTcpMessageSize(std::size_t maxTcpMessageSize);
+
+    /// Function to get maximal tcp message size
+	std::size_t GetMaxTcpMessageSize();
+
+    /// Function to set maximal udp message size
+	void SetMaxUdpMessageSize(std::size_t maxUdpMessageSize);
+	
+    /// Function to get maximal udp message size
+	std::size_t GetMaxUdpMessageSize();
+
 	/*!
 		Wrapper over the send function. Allows you to send std::string. 
 		\param[in] sock socket to send data 
@@ -135,7 +147,10 @@ namespace EN
 		\brief The function gets socket and filename and send file to socket. 
 		\param[in] fileSendSocket the socket for sending files
 		\param[in] filePath the full path to the file to be sent
-		\param[in] isStop the reference to a atomic boolean variable to stop file transfer
+		\param[in] isStop the reference to a atomic boolean variable to stop file transfer.
+        \warning It is important to understand that using this variable, you can stop the file sending, 
+        but the receiving party will not know about it. In order for the receiving side to stop waiting for the file data, 
+        it is necessary to stop receiving the file on the receiving side
         \param[in] microsecondsBetweenSendingChunks the parameter is needed to regulate the file transfer rate. Set time in microseconds between sending 4 kilobytes. 0 means no delay
 		\param[in] previouslySendedSize the parameter is needed to continue downloading. Gets the size of the previously transmitted file in bytes. 0 means no previosly sending
         \param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
@@ -155,7 +170,10 @@ namespace EN
         Each subsequent file will have a postscript 1 more. At the beginning of receiving the file, 
         it will be saved with the postscript tmp. After successful receipt of the file, the tmp postscript will be removed
 		\param[in] FileSendSocket the socket for receiving files
-		\param[in] IsStop the reference to a boolean variable to stop file transfer
+		\param[in] IsStop the reference to a atomic boolean variable to stop file transfer.
+        \warning It is important to understand that using this variable, you can stop the file receiving, 
+        but the sending party will not know about it. In order for the sending side to stop waiting for the file data, 
+        it is necessary to stop sending the file on the sending side and you need to do this before calling the file reception stop
 		\param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
         If desired, you can set a function in it that will be called once a second
         
@@ -167,7 +185,7 @@ namespace EN
 		\brief This function will forward file from one socket to another.
 		\param[in] SourceFileSocket the source socket for receiving files
 		\param[in] DestinationFileSocket the destination socket for sending files
-		\param[in] IsStop the reference to a boolean variable to stop file transfer
+		\param[in] IsStop the reference to a atomic boolean variable to stop file transfer. 
 		\param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
         If desired, you can set a function in it that will be called once a second
 
