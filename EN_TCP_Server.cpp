@@ -19,8 +19,9 @@ namespace EN
 
 	size_t EN_TCP_Server::GetConnectionsCount()
 	{ 
+		size_t res;
 		CrossWalk.CarStartCrossRoad();
-		size_t res = ClientSockets.size();
+		res = ClientSockets.size();
 		CrossWalk.CarStopCrossRoad();
 		return res;
 	}

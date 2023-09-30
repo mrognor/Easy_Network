@@ -39,37 +39,11 @@ namespace EN
 		friend EN_FT_Client_Internal_MessageTransmitter;
 		friend EN_FT_Client_Internal_FileTransmitter;
 
-		EN_FT_Client_Internal_MessageTransmitter MessageTransmitter;
-		EN_FT_Client_Internal_FileTransmitter FileTransmitter;
 		EN_ThreadBarrier StartEndBarrier;
 		bool IsConnectedToFTServer = true;
-	public:
-		EN_FT_Client() : MessageTransmitter(this), FileTransmitter(this) {}
-
-		bool Connect(std::string serverIpAddress = "127.0.0.1", int messageTransmitterPort = 1111, int fileTransmitterPort = 1112)
-		{
-			if (!MessageTransmitter.Connect(serverIpAddress, messageTransmitterPort))
-				return false;
-
-			if (!FileTransmitter.Connect(serverIpAddress, fileTransmitterPort))
-			{
-				MessageTransmitter.Disconnect();
-				return false;
-			}
-
-			return true;
-		}
-
-		void Disconnect()
-		{
-			FileTransmitter.Disconnect(false);
-			MessageTransmitter.Disconnect(false);
-		}
-
-		bool IsConnected()
-		{
-			return (MessageTransmitter.IsConnected() || FileTransmitter.IsConnected());
-		}
+	protected:
+		EN_FT_Client_Internal_MessageTransmitter MessageTransmitter;
+		EN_FT_Client_Internal_FileTransmitter FileTransmitter;
 
 		void OnConnect()
 		{
@@ -85,10 +59,42 @@ namespace EN
 		{
 			LOG(LogLevels::Info, "FT_Client disconnected!");
 		}
+	public:
+		EN_FT_Client() : MessageTransmitter(this), FileTransmitter(this) {}
 	
+		bool IsConnected()
+		{
+			return (MessageTransmitter.IsConnected() || FileTransmitter.IsConnected());
+		}
+
+		bool Connect(std::string serverIpAddress = "127.0.0.1", int messageTransmitterPort = 1111, int fileTransmitterPort = 1112)
+		{
+			if (!MessageTransmitter.Connect(serverIpAddress, messageTransmitterPort))
+				return false;
+
+			if (!FileTransmitter.Connect(serverIpAddress, fileTransmitterPort))
+			{
+				MessageTransmitter.Disconnect();
+				return false;
+			}
+
+			return true;
+		}
+
 		bool SendToServer(std::string message)
 		{
 			return MessageTransmitter.SendToServer(message);
+		}
+
+		bool WaitMessage(std::string& message)
+		{
+			return MessageTransmitter.WaitMessage(message);
+		}
+
+		void Disconnect()
+		{
+			FileTransmitter.Disconnect(false);
+			MessageTransmitter.Disconnect(false);
 		}
 	};
 

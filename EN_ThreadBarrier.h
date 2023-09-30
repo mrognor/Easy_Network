@@ -3,6 +3,7 @@
 #include <iostream>
 #include <condition_variable>
 #include <atomic>
+#include <chrono>
 
 namespace EN
 {
@@ -16,5 +17,7 @@ namespace EN
         EN_ThreadBarrier();
 
         void Wait(int amount);
+
+        void WaitFor(int amount, std::chrono::seconds time);
     };
 }

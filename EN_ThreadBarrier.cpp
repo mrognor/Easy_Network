@@ -21,4 +21,22 @@ namespace EN
             WaitingAmount.fetch_sub(1);
         }
     }
+
+    void EN_ThreadBarrier::WaitFor(int amount, std::chrono::seconds time)
+    {
+        std::mutex sleepMtx;
+        std::unique_lock<std::mutex> lk(sleepMtx);
+
+        WaitingAmount.fetch_add(1);
+
+        if (WaitingAmount.compare_exchange_strong(amount, amount - 1))
+        {
+            while (WaitingAmount.load() != 0) Cv.notify_all();
+        }
+        else
+        {
+            Cv.wait_for(lk, time);
+            WaitingAmount.fetch_sub(1);
+        }
+    }
 }
