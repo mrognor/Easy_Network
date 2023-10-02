@@ -526,7 +526,16 @@ namespace EN
 		return true;
 	}
 
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus)
+	std::string DefaultRecvFileNameFunction(std::string fileName)
+	{
+		#if defined WIN32 || defined _WIN64
+		return fileName.substr(fileName.rfind("\\") + 1);
+		#else
+		return fileName.substr(fileName.rfind("/") + 1);
+		#endif
+	}
+
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus, std::function<std::string(std::string)> fileNameFunction)
 	{
 		// Get file name and file size
 		std::string fileInfo;
@@ -539,7 +548,7 @@ namespace EN
 		}
 
 		std::vector<std::string> fileInfos = Split(fileInfo);
-		std::string fileName = fileInfos[0];
+		std::string fileName = fileNameFunction(fileInfos[0]);
 		uint64_t fileSize;
 		uint64_t previoslySendedBytes;
 
