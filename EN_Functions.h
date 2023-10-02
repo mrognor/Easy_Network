@@ -315,7 +315,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToLong(const std::string& str, long int& res);
+    bool StringToInt(const std::string& str, long int& res);
 
     /**
         \brief A function for converting a string to a long long int.
@@ -325,7 +325,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToLongLong(const std::string& str, long long int& res);
+    bool StringToInt(const std::string& str, long long int& res);
 
     /**
         \brief A function for converting a string to a unsigned long int.
@@ -335,7 +335,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToUnsignedLong(const std::string& str, unsigned long int& res);
+    bool StringToInt(const std::string& str, unsigned long int& res);
 
     /**
         \brief A function for converting a string to a unsigned long long int.
@@ -345,7 +345,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res);
+    bool StringToInt(const std::string& str, unsigned long long int& res);
 
 	/**
         \brief Crossplatform function for program suspension

@@ -239,19 +239,21 @@ namespace EN
 		int sizeofaddr = sizeof(sourceSockAddr);
 		int receivedBytes;
 
-		char msg[MaxUdpMessageSize];
+		char* msg = new char[MaxUdpMessageSize];
+
 		#if defined WIN32 || defined _WIN64
 		//try to receive some data, this is a blocking call
-		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
+		receivedBytes = recvfrom(sock, msg, MaxUdpMessageSize, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
 		#else
 		//try to receive some data, this is a blocking call
-		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
+		receivedBytes = recvfrom(sock, &msg, MaxUdpMessageSize, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
 		#endif
 
 		if (receivedBytes <= 0)
 		{
 			message = "";
 			CloseSocket(sock);
+			delete[] msg;
 			return false;
 		}
 
@@ -268,6 +270,7 @@ namespace EN
 			{
 				message = "";
 				CloseSocket(sock);
+				delete[] msg;
 				return false;
 			}
 
@@ -281,6 +284,7 @@ namespace EN
 		if (msg_size <= 0)
 		{
 			message = "";
+			delete[] msg;
 			return true;
 		}
 
@@ -291,7 +295,8 @@ namespace EN
 	    message.clear();
 	    for (int i = 0; i < msg_size; ++i)
 		    message += msg[i + messageLengthInBytes];
-
+		
+		delete[] msg;
 		return true;
 	}
 
@@ -538,7 +543,7 @@ namespace EN
 		uint64_t fileSize;
 		uint64_t previoslySendedBytes;
 
-		if (!StringToUnsignedLongLong(fileInfos[1], previoslySendedBytes) || !StringToUnsignedLongLong(fileInfos[2], fileSize))
+		if (!StringToInt(fileInfos[1], previoslySendedBytes) || !StringToInt(fileInfos[2], fileSize))
 		{
 			EN::Default_TCP_Send(FileSendSocket, "bad");
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
@@ -689,7 +694,7 @@ namespace EN
 
 		uint64_t fileSize;
 
-		if (!StringToUnsignedLongLong(Split(fileInfo)[1], fileSize))
+		if (!StringToInt(Split(fileInfo)[1], fileSize))
 		{
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
@@ -1123,7 +1128,7 @@ namespace EN
             return false;
     }
 
-    bool StringToLong(const std::string& str, long int& res)
+    bool StringToInt(const std::string& str, long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1134,7 +1139,7 @@ namespace EN
             return false;
     }
 
-    bool StringToLongLong(const std::string& str, long long int& res)
+    bool StringToInt(const std::string& str, long long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1145,7 +1150,7 @@ namespace EN
             return false;
     }
 
-    bool StringToUnsignedLong(const std::string& str, unsigned long int& res)
+    bool StringToInt(const std::string& str, unsigned long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1156,7 +1161,7 @@ namespace EN
             return false;
     }
 
-    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res)
+    bool StringToInt(const std::string& str, unsigned long long int& res)
     {
         if (IsCanBeDigit(str))
         {
