@@ -239,19 +239,21 @@ namespace EN
 		int sizeofaddr = sizeof(sourceSockAddr);
 		int receivedBytes;
 
-		char msg[MaxUdpMessageSize];
+		char* msg = new char[MaxUdpMessageSize];
+
 		#if defined WIN32 || defined _WIN64
 		//try to receive some data, this is a blocking call
-		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
+		receivedBytes = recvfrom(sock, msg, MaxUdpMessageSize, 0, (sockaddr*)&sourceSockAddr, &sizeofaddr);
 		#else
 		//try to receive some data, this is a blocking call
-		receivedBytes = recvfrom(sock, (char*)&msg, 16384, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
+		receivedBytes = recvfrom(sock, &msg, MaxUdpMessageSize, 0, (sockaddr*)&sourceSockAddr, (socklen_t*)&sizeofaddr);
 		#endif
 
 		if (receivedBytes <= 0)
 		{
 			message = "";
 			CloseSocket(sock);
+			delete[] msg;
 			return false;
 		}
 
@@ -268,6 +270,7 @@ namespace EN
 			{
 				message = "";
 				CloseSocket(sock);
+				delete[] msg;
 				return false;
 			}
 
@@ -281,6 +284,7 @@ namespace EN
 		if (msg_size <= 0)
 		{
 			message = "";
+			delete[] msg;
 			return true;
 		}
 
@@ -291,7 +295,8 @@ namespace EN
 	    message.clear();
 	    for (int i = 0; i < msg_size; ++i)
 		    message += msg[i + messageLengthInBytes];
-
+		
+		delete[] msg;
 		return true;
 	}
 
