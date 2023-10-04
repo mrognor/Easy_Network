@@ -14,7 +14,8 @@ TARGETS = bin/EN_Functions.o \
 	bin/EN_FileTransmissionStatus.o \
 	bin/EN_FT_Server.o \
 	bin/EN_FT_Client.o \
-	bin/EN_ThreadBarrier.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
+	bin/EN_ThreadBarrier.o\
+	bin/EN_EXPERIMENTAL_HTTP_Server.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
 
 # Check os
 ifeq ($(OS), Windows_NT)
@@ -47,6 +48,7 @@ all: bin/TCP_Chat_Server$(FILEEXT) \
 	bin/HTTP_Server$(FILEEXT) \
 	bin/FT_Chat_Server$(FILEEXT) \
 	bin/FT_Chat_Client$(FILEEXT) \
+	bin/HTTP_Server$(FILEEXT)
 # bin/RAU_Chat_Server$(FILEEXT) bin/RAU_Chat_Client$(FILEEXT)
 
 # HTTP_Server
@@ -171,7 +173,11 @@ bin/EN_Atomic_Int64.o: EN_Atomic_Int64.cpp EN_Atomic_Int64.h
 bin/EN_ThreadBarrier.o: EN_ThreadBarrier.cpp EN_ThreadBarrier.h
 	mkdir -p bin
 	g++ $(CXXFLAGS) -c EN_ThreadBarrier.cpp -o bin/EN_ThreadBarrier.o
-	
+
+bin/EN_EXPERIMENTAL_HTTP_Server.o: experimental/EN_HTTP_Server.h experimental/EN_HTTP_Server.cpp
+	mkdir -p bin
+	g++ $(CXXFLAGS) -c experimental/EN_HTTP_Server.cpp -o bin/EN_EXPERIMENTAL_HTTP_Server.o
+
 # Clean all
 clean:
 	rm -rf bin
