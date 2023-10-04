@@ -87,7 +87,7 @@ int main()
 				{
 					LOG(EN::LogLevels::Info, "Continue the previous sending");
 					std::uint64_t sendingSize;
-					EN::StringToUnsignedLongLong(parsedResponce[1], sendingSize);
+					EN::StringToInt(parsedResponce[1], sendingSize);
 					EN::SendFile(A.GetSocket(), InterpretedMessage[1], isStop, transferingSpeed, sendingSize, transmissionStatus);
 				}
 				else

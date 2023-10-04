@@ -172,6 +172,13 @@ namespace EN
 	bool SendFile(EN_SOCKET fileSendSocket, std::string filePath, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
 		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus);
 
+    /*!
+        \brief The default function that removes the path from the file name
+        \param[in] fileName file name with path from sending party
+        \return new file name without path
+    */
+    std::string DefaultRecvFileNameFunction(std::string fileName);
+
 	/*!
 		\brief This function will wait incoming file.
 
@@ -185,10 +192,13 @@ namespace EN
         it is necessary to stop sending the file on the sending side and you need to do this before calling the file reception stop
 		\param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
         If desired, you can set a function in it that will be called once a second
-        
+        \param[in] fileNameFunction A function for setting the name of the received file by the user. 
+        The function takes one parameter with the path to the file being transmitted on the transmitting side and should return the new file name. 
+        By default, the function removes the path to the file and returns its name
+
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus);
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus, std::function<std::string(std::string)> fileNameFunction = DefaultRecvFileNameFunction);
 
 	/*!
 		\brief This function will forward file from one socket to another.
@@ -324,7 +334,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToLong(const std::string& str, long int& res);
+    bool StringToInt(const std::string& str, long int& res);
 
     /**
         \brief A function for converting a string to a long long int.
@@ -334,7 +344,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToLongLong(const std::string& str, long long int& res);
+    bool StringToInt(const std::string& str, long long int& res);
 
     /**
         \brief A function for converting a string to a unsigned long int.
@@ -344,7 +354,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToUnsignedLong(const std::string& str, unsigned long int& res);
+    bool StringToInt(const std::string& str, unsigned long int& res);
 
     /**
         \brief A function for converting a string to a unsigned long long int.
@@ -354,7 +364,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res);
+    bool StringToInt(const std::string& str, unsigned long long int& res);
 
 	/**
         \brief Crossplatform function for program suspension
