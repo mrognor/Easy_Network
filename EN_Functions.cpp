@@ -338,18 +338,18 @@ namespace EN
 		return returnVector;
 	}
 
-	std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& splitterString)
+	std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& stringToFind)
 	{
 		std::vector<std::size_t> returnVector;
 		size_t i = 0;
 		while (i < stringToFindIn.size())
 		{
-			if (stringToFindIn[i] == splitterString[0])
+			if (stringToFindIn[i] == stringToFind[0])
 			{
 				bool isSplitter = true;
-				for (size_t j = 1; j < splitterString.size(); ++j)
+				for (size_t j = 1; j < stringToFind.size(); ++j)
 				{
-					if (stringToFindIn[i + j] != splitterString[j])
+					if (stringToFindIn[i + j] != stringToFind[j])
 					{
 						isSplitter = false;
 						break;
@@ -358,13 +358,47 @@ namespace EN
 				if (isSplitter)
 				{
 					returnVector.push_back(i);
-					i += splitterString.size();
+					i += stringToFind.size();
 					continue;
 				}
 			}
 			++i;
 		}
 		return returnVector;
+	}
+
+	std::string Replace(const std::string& stringToReplaceIn, const std::string& stringToDelete, const std::string& stringToReplace)
+	{
+		std::string res;
+		size_t i = 0;
+
+		while (i < stringToReplaceIn.size())
+		{
+			if (stringToReplaceIn[i] == stringToDelete[0])
+			{
+				bool isSplitter = true;
+				for (size_t j = 1; j < stringToDelete.size(); ++j)
+				{
+					if (stringToReplaceIn[i + j] != stringToDelete[j])
+					{
+						isSplitter = false;
+						break;
+					}
+				}
+
+				if (isSplitter)
+				{
+					res += stringToReplace;
+					i += stringToDelete.size();
+					continue;
+				}
+			}
+
+			res += stringToReplaceIn[i];
+			++i;
+		}
+
+		return res;
 	}
 
 	bool SendFile(EN_SOCKET fileSendSocket, std::string fileName, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,

@@ -137,11 +137,20 @@ namespace EN
 
 	/*!
 		Find all substring occurrences and put theirs positions inside result vector
-		\param[in] stringToFindIn string to split
-		\param[in] splitterString the string that divides the string. Default set to space(" ")
-		\return Vector of strings
+		\param[in] stringToFindIn string to find in it
+		\param[in] stringToFind the string to be found
+		\return Vector of positions
 	*/ 
-    std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& splitterString);
+    std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& stringToFind);
+	
+    /*!
+		Replace all substring occurrences and return new string
+		\param[in] stringToReplaceIn string to replace in it
+        \param[in] stringToDelete string to replace in it
+		\param[in] stringToReplace the string to be replaced
+		\return New string 
+	*/ 
+    std::string Replace(const std::string& stringToReplaceIn, const std::string& stringToDelete, const std::string& stringToReplace);
 
 	/*! 
 		\brief The function gets socket and filename and send file to socket. 
