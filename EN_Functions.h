@@ -37,6 +37,13 @@ typedef int EN_SOCKET;
 
 #define SendFileBufLen 4096
 
+const unsigned char B64Symbols[64] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+    'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+};
+
 namespace EN
 {
     #if defined WIN32 || defined _WIN64
@@ -365,6 +372,15 @@ namespace EN
         \return Returns true if the conversion succeeded and false if it failed
     */ 
     bool StringToInt(const std::string& str, unsigned long long int& res);
+
+    /// Function to convert regular string symbol to base 64 symbol
+    unsigned char B64ConvertSymbol(unsigned char c);
+
+    /// Convert regular base256 string to base64 string
+    std::string RegularStringToBase64String(const std::string& str);
+
+    /// Convert base64 string to regular base256 string
+    std::string Base64StringToRegularString(const std::string& str);
 
 	/**
         \brief Crossplatform function for program suspension
