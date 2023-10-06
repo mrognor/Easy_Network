@@ -153,6 +153,14 @@ namespace EN
                     ReadFile(requestFileName, requestFile);
                 }
 
+                if (requestedDataType == "font")
+                {
+                    if (requestFileName.substr(requestFileName.rfind(".") + 1) == "ttf")
+                        responce += "content-type: application/x-font-ttf\r\n";
+
+                    if (requestFileName.substr(requestFileName.rfind(".") + 1) == "otf")
+                        responce += "content-type: application/x-font-opentype\r\n";
+                }
                 responce += "content-length: " + std::to_string(requestFile.length()) + "\r\n";
                 responce += "connection: closed\r\n\r\n";
                 responce += requestFile;
