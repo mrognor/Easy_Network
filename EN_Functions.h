@@ -143,6 +143,17 @@ namespace EN
 	std::vector<std::string> Split(const std::string& stringToSplit, const std::string& splitterString = " ");
 
 	/*!
+        \brief Split a string into a pair of two strings, it will be divided at the first location of the splitterString
+
+        If the divisor string was not found, then the original string will be in the first, and an empty string in the second
+
+		\param[in] stringToSplit string to split
+		\param[in] splitterString the string that divides the string. Default set to space(" ")
+		\return Pair of strings
+	*/ 
+	std::pair<std::string, std::string> SplitUpToTheFirst(const std::string& stringToSplit, const std::string& splitterString = " ");
+
+	/*!
 		Find all substring occurrences and put theirs positions inside result vector
 		\param[in] stringToFindIn string to find in it
 		\param[in] stringToFind the string to be found
@@ -159,6 +170,17 @@ namespace EN
 	*/ 
     std::string Replace(const std::string& stringToReplaceIn, const std::string& stringToDelete, const std::string& stringToReplace);
 
+    /*!
+        This function delete all spaces and tabs from line beggining and ending
+
+        \param[in] str The string to trim
+        \param[in] isFromLeft The function will delete all spaces from left
+        \param[in] isFromRight The function will delete all spaces from right
+
+        \return Returns a trimmed string
+    */
+    std::string TrimString(const std::string& str, bool isFromLeft = true, bool isFromRight = true);
+    
 	/*! 
 		\brief The function gets socket and filename and send file to socket. 
 		\param[in] fileSendSocket the socket for sending files

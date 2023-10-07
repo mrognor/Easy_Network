@@ -343,6 +343,39 @@ namespace EN
 		return returnVector;
 	}
 
+	std::pair<std::string, std::string> SplitUpToTheFirst(const std::string& stringToSplit, const std::string& splitterString)
+	{
+		std::pair<std::string, std::string> returnPair(stringToSplit, "");
+		size_t i = 0;
+		std::string splittedString = "";
+		while (i < stringToSplit.size())
+		{
+			if (stringToSplit[i] == splitterString[0])
+			{
+				bool isSplitter = true;
+				for (size_t j = 1; j < splitterString.size(); ++j)
+				{
+					if (stringToSplit[i + j] != splitterString[j])
+					{
+						isSplitter = false;
+						break;
+					}
+				}
+				if (isSplitter)
+				{
+					returnPair.first = splittedString;
+					splittedString = "";
+					i += splitterString.size();
+					break;
+				}
+			}
+			splittedString += stringToSplit[i];
+			++i;
+		}
+		returnPair.second = stringToSplit.substr(i);
+		return returnPair;
+	}
+
 	std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& stringToFind)
 	{
 		std::vector<std::size_t> returnVector;
@@ -405,6 +438,30 @@ namespace EN
 
 		return res;
 	}
+
+	std::string TrimString(const std::string& str, bool isFromLeft, bool isFromRight)
+    {
+        if (str.length() == 0)
+            return "";
+            
+        std::size_t start = 0;
+
+        if (isFromLeft)
+        {
+            while (start < str.length() && (str[start] == ' ' || str[start] == '\t'))
+                ++start;
+        }
+
+        std::size_t end = str.length();
+
+        if (isFromRight)
+        {
+            while (end > 0 && (str[end - 1] == ' ' || str[end - 1] == '\t'))
+                end--;
+        }
+
+        return str.substr(start, end - start);
+    }
 
 	bool SendFile(EN_SOCKET fileSendSocket, std::string fileName, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
 		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus)
