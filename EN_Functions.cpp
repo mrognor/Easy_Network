@@ -1221,7 +1221,6 @@ namespace EN
         if (IsCanBeDigit(str))
         {
             res = std::stoi(str);
-            std::cout << res << std::endl;
             return true;
         }
         else
