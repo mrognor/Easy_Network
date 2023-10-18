@@ -100,7 +100,7 @@ namespace EN
             std::string requestFileName;
 
             if (splittedFileRequest[0] == "/")
-                requestFileName = "index.html";
+                requestFileName = WebFilesPath + "index.html";
             else
                 requestFileName = splittedFileRequest[0].substr(1);
 
@@ -115,6 +115,15 @@ namespace EN
 
             std::string requestFile;
             std::string responce;
+            
+            if (splittedFileRequest[0] != "/")
+            {
+                if (WebFilesPath == "")
+                    requestFileName = GetRunningDirectory() + requestFileName;
+                else 
+                    requestFileName = WebFilesPath + requestFileName;
+            }
+
             if (EN::IsFileExist(requestFileName))
             {
                 // Value of Sec-Fetch-Dest field
@@ -188,6 +197,11 @@ namespace EN
             HTTPRequestHandler(clientSocket, parsedRequestMap, requestHeader);
             return;
         }
+    }
+
+    void EN_HTTP_Server::SetWebFilesPath(std::string path)
+    {
+        WebFilesPath = path;
     }
 
     void EN_HTTP_Server::OnClientDisconnect(EN_SOCKET clientSocket)

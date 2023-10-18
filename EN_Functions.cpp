@@ -617,7 +617,7 @@ namespace EN
 		return true;
 	}
 
-	std::string DefaultRecvFileNameFunction(std::string fileName)
+	std::string GetFileNameFromFullFilePath(std::string fileName)
 	{
 		#if defined WIN32 || defined _WIN64
 		return fileName.substr(fileName.rfind("\\") + 1);
@@ -988,6 +988,21 @@ namespace EN
     int GetCPUCores()
 	{
 		return std::thread::hardware_concurrency();
+	}
+
+	std::string GetRunningDirectory()
+	{
+		#if defined WIN32 || defined _WIN64
+
+		char path[FILENAME_MAX];
+		GetModuleFileNameA(NULL, path, FILENAME_MAX);
+		std::string res = std::string(path);
+		return res.substr(0, res.rfind("\\") + 1);
+        #else
+
+        return (errno);
+
+        #endif
 	}
 
     int GetSocketErrorCode()

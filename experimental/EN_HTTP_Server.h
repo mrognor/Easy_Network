@@ -17,6 +17,8 @@ namespace EN
 
     class EN_HTTP_Server : public EN_TCP_Server
     {
+    private:
+        std::string WebFilesPath = "";
     public:
         EN_HTTP_Server();
 
@@ -25,6 +27,10 @@ namespace EN
         void ClientMessageHandler(EN_SOCKET clientSocket, std::string message);
 
         void OnClientDisconnect(EN_SOCKET clientSocket);
+
+        // Function to set custom path with web server files. By default set to same path as server executable.
+        // Dont forget to specify last path symbol "\" on windows and "/" on linux
+        void SetWebFilesPath(std::string path);
 
         // Function to handle url params in GET request.
         virtual void GetUrlParamsHandler(const std::string& urlParams) = 0;

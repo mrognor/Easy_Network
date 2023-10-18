@@ -202,11 +202,11 @@ namespace EN
 		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus);
 
     /*!
-        \brief The default function that removes the path from the file name
-        \param[in] fileName file name with path from sending party
-        \return new file name without path
+        \brief The function that removes the path from the full path to file
+        \param[in] fileName file name with path
+        \return file name without path
     */
-    std::string DefaultRecvFileNameFunction(std::string fileName);
+    std::string GetFileNameFromFullFilePath(std::string fileName);
 
 	/*!
 		\brief This function will wait incoming file.
@@ -227,7 +227,7 @@ namespace EN
 
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus, std::function<std::string(std::string)> fileNameFunction = DefaultRecvFileNameFunction);
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus, std::function<std::string(std::string)> fileNameFunction = GetFileNameFromFullFilePath);
 
 	/*!
 		\brief This function will forward file from one socket to another.
@@ -260,7 +260,9 @@ namespace EN
 	/// Returns the number of processor cores
 	int GetCPUCores();
 
-    
+    /// Get the directory of the running binary file. Last symbol of string on windows is "\" and "/" on linux
+    std::string GetRunningDirectory();
+
     /// Return last socket error code 
     int GetSocketErrorCode();
 
