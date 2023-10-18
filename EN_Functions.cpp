@@ -1000,7 +1000,11 @@ namespace EN
 		return res.substr(0, res.rfind("\\") + 1);
         #else
 
-        return (errno);
+		char path[FILENAME_MAX];
+		std::string procFile = "/proc/" + std::to_string(getpid()) + "/exe";
+		readlink(procFile.c_str(), path, FILENAME_MAX);
+        std::string res = std::string(path);
+		return res.substr(0, res.rfind("/") + 1);
 
         #endif
 	}
