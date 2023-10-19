@@ -343,18 +343,51 @@ namespace EN
 		return returnVector;
 	}
 
-	std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& splitterString)
+	std::pair<std::string, std::string> SplitUpToTheFirst(const std::string& stringToSplit, const std::string& splitterString)
+	{
+		std::pair<std::string, std::string> returnPair(stringToSplit, "");
+		size_t i = 0;
+		std::string splittedString = "";
+		while (i < stringToSplit.size())
+		{
+			if (stringToSplit[i] == splitterString[0])
+			{
+				bool isSplitter = true;
+				for (size_t j = 1; j < splitterString.size(); ++j)
+				{
+					if (stringToSplit[i + j] != splitterString[j])
+					{
+						isSplitter = false;
+						break;
+					}
+				}
+				if (isSplitter)
+				{
+					returnPair.first = splittedString;
+					splittedString = "";
+					i += splitterString.size();
+					break;
+				}
+			}
+			splittedString += stringToSplit[i];
+			++i;
+		}
+		returnPair.second = stringToSplit.substr(i);
+		return returnPair;
+	}
+
+	std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& stringToFind)
 	{
 		std::vector<std::size_t> returnVector;
 		size_t i = 0;
 		while (i < stringToFindIn.size())
 		{
-			if (stringToFindIn[i] == splitterString[0])
+			if (stringToFindIn[i] == stringToFind[0])
 			{
 				bool isSplitter = true;
-				for (size_t j = 1; j < splitterString.size(); ++j)
+				for (size_t j = 1; j < stringToFind.size(); ++j)
 				{
-					if (stringToFindIn[i + j] != splitterString[j])
+					if (stringToFindIn[i + j] != stringToFind[j])
 					{
 						isSplitter = false;
 						break;
@@ -363,7 +396,7 @@ namespace EN
 				if (isSplitter)
 				{
 					returnVector.push_back(i);
-					i += splitterString.size();
+					i += stringToFind.size();
 					continue;
 				}
 			}
@@ -371,6 +404,64 @@ namespace EN
 		}
 		return returnVector;
 	}
+
+	std::string Replace(const std::string& stringToReplaceIn, const std::string& stringToDelete, const std::string& stringToReplace)
+	{
+		std::string res;
+		size_t i = 0;
+
+		while (i < stringToReplaceIn.size())
+		{
+			if (stringToReplaceIn[i] == stringToDelete[0])
+			{
+				bool isSplitter = true;
+				for (size_t j = 1; j < stringToDelete.size(); ++j)
+				{
+					if (stringToReplaceIn[i + j] != stringToDelete[j])
+					{
+						isSplitter = false;
+						break;
+					}
+				}
+
+				if (isSplitter)
+				{
+					res += stringToReplace;
+					i += stringToDelete.size();
+					continue;
+				}
+			}
+
+			res += stringToReplaceIn[i];
+			++i;
+		}
+
+		return res;
+	}
+
+	std::string TrimString(const std::string& str, bool isFromLeft, bool isFromRight)
+    {
+        if (str.length() == 0)
+            return "";
+            
+        std::size_t start = 0;
+
+        if (isFromLeft)
+        {
+            while (start < str.length() && (str[start] == ' ' || str[start] == '\t'))
+                ++start;
+        }
+
+        std::size_t end = str.length();
+
+        if (isFromRight)
+        {
+            while (end > 0 && (str[end - 1] == ' ' || str[end - 1] == '\t'))
+                end--;
+        }
+
+        return str.substr(start, end - start);
+    }
 
 	bool SendFile(EN_SOCKET fileSendSocket, std::string fileName, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
 		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus)
@@ -526,7 +617,16 @@ namespace EN
 		return true;
 	}
 
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus)
+	std::string GetFileNameFromFullFilePath(std::string fileName)
+	{
+		#if defined WIN32 || defined _WIN64
+		return fileName.substr(fileName.rfind("\\") + 1);
+		#else
+		return fileName.substr(fileName.rfind("/") + 1);
+		#endif
+	}
+
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus, std::function<std::string(std::string)> fileNameFunction)
 	{
 		// Get file name and file size
 		std::string fileInfo;
@@ -539,11 +639,11 @@ namespace EN
 		}
 
 		std::vector<std::string> fileInfos = Split(fileInfo);
-		std::string fileName = fileInfos[0];
+		std::string fileName = fileNameFunction(fileInfos[0]);
 		uint64_t fileSize;
 		uint64_t previoslySendedBytes;
 
-		if (!StringToUnsignedLongLong(fileInfos[1], previoslySendedBytes) || !StringToUnsignedLongLong(fileInfos[2], fileSize))
+		if (!StringToInt(fileInfos[1], previoslySendedBytes) || !StringToInt(fileInfos[2], fileSize))
 		{
 			EN::Default_TCP_Send(FileSendSocket, "bad");
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
@@ -694,7 +794,7 @@ namespace EN
 
 		uint64_t fileSize;
 
-		if (!StringToUnsignedLongLong(Split(fileInfo)[1], fileSize))
+		if (!StringToInt(Split(fileInfo)[1], fileSize))
 		{
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
@@ -888,6 +988,25 @@ namespace EN
     int GetCPUCores()
 	{
 		return std::thread::hardware_concurrency();
+	}
+
+	std::string GetRunningDirectory()
+	{
+		#if defined WIN32 || defined _WIN64
+
+		char path[FILENAME_MAX];
+		GetModuleFileNameA(NULL, path, FILENAME_MAX);
+		std::string res = std::string(path);
+		return res.substr(0, res.rfind("\\") + 1);
+        #else
+
+		char path[FILENAME_MAX];
+		std::string procFile = "/proc/" + std::to_string(getpid()) + "/exe";
+		readlink(procFile.c_str(), path, FILENAME_MAX);
+        std::string res = std::string(path);
+		return res.substr(0, res.rfind("/") + 1);
+
+        #endif
 	}
 
     int GetSocketErrorCode()
@@ -1121,14 +1240,13 @@ namespace EN
         if (IsCanBeDigit(str))
         {
             res = std::stoi(str);
-            std::cout << res << std::endl;
             return true;
         }
         else
             return false;
     }
 
-    bool StringToLong(const std::string& str, long int& res)
+    bool StringToInt(const std::string& str, long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1139,7 +1257,7 @@ namespace EN
             return false;
     }
 
-    bool StringToLongLong(const std::string& str, long long int& res)
+    bool StringToInt(const std::string& str, long long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1150,7 +1268,7 @@ namespace EN
             return false;
     }
 
-    bool StringToUnsignedLong(const std::string& str, unsigned long int& res)
+    bool StringToInt(const std::string& str, unsigned long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1161,7 +1279,7 @@ namespace EN
             return false;
     }
 
-    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res)
+    bool StringToInt(const std::string& str, unsigned long long int& res)
     {
         if (IsCanBeDigit(str))
         {
@@ -1171,4 +1289,78 @@ namespace EN
         else
             return false;
     }
+
+	unsigned char B64ConvertSymbol(unsigned char c)
+	{
+		if (c >= 48 && c <= 57)
+			return c += 4; // -48 + 26*2
+
+		if (c >= 65 && c <= 90)
+			return c -= 65;
+
+		if (c >= 97 && c <= 122)
+			return (c -= 71); // 97 - 26
+
+		if (c == '+')
+			return 62;
+		
+		if (c == '/')
+			return 63;
+
+		return 0;
+	}
+
+	std::string RegularStringToBase64String(const std::string& str)
+	{
+		std::string res;
+
+		if (str.length() >= 3)
+		{
+			for (uint64_t i = 0; i <= str.length() - 3; i += 3)
+			{
+				res += B64Symbols[(unsigned char)str[i] >> 2];
+				res += B64Symbols[(((unsigned char)str[i] & 0b00000011) << 4) + ((unsigned char)str[i + 1] >> 4)];
+				res += B64Symbols[(((unsigned char)str[i + 1] & 0b00001111) << 2) + ((unsigned char)str[i + 2] >> 6)];
+				res += B64Symbols[(unsigned char)str[i + 2] & 0b00111111];
+			}
+		}
+
+		if (str.length() % 3 == 1)
+		{
+			res += B64Symbols[(unsigned char)str[str.length() - 1] >> 2];
+			res += B64Symbols[(((unsigned char)str[str.length() - 1] & 0b00000011) << 4)];
+			res += "==";
+		}
+		else if (str.length() % 3 == 2)
+		{
+			res += B64Symbols[(unsigned char)str[str.length() - 2] >> 2];
+			res += B64Symbols[(((unsigned char)str[str.length() - 2] & 0b00000011) << 4) + ((unsigned char)str[str.length() - 1] >> 4)];
+			res += B64Symbols[(((unsigned char)str[str.length() - 1] & 0b00001111) << 2)];
+			res += "=";
+		}
+
+		return res;
+	}
+
+	std::string Base64StringToRegularString(const std::string& str)
+	{
+		std::string res;
+		
+		for (uint64_t i = 0; i <= str.length() - 4; i += 4)
+		{
+			res += ((B64ConvertSymbol(str[i]) << 2) + (B64ConvertSymbol(str[i + 1]) >> 4));
+
+			if (str[i + 2] == '=')
+				break;
+			else
+				res += (((B64ConvertSymbol(str[i + 1]) & 0b00001111) << 4) + (B64ConvertSymbol(str[i + 2]) >> 2));
+
+			if (str[i + 3] == '=')
+				break;
+			else
+				res += (((B64ConvertSymbol(str[i + 2]) & 0b00000011) << 6) + B64ConvertSymbol(str[i + 3]));
+		}
+
+		return res;
+	}
 }

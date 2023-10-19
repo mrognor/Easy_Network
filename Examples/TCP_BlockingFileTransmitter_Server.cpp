@@ -67,7 +67,7 @@ public:
 				LOG(EN::LogLevels::Info, "Continue the previous sending");
 				SendToClient(clientSocket, "ok");
 				std::uint64_t sendingSize;
-				EN::StringToUnsignedLongLong(InterpretedMessage[2], sendingSize);
+				EN::StringToInt(InterpretedMessage[2], sendingSize);
 				EN::SendFile(clientSocket, InterpretedMessage[1], ShouldShutdown, transferingSpeed, sendingSize, transmissionStatus);
 			}
 			else

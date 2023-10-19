@@ -37,6 +37,13 @@ typedef int EN_SOCKET;
 
 #define SendFileBufLen 4096
 
+const unsigned char B64Symbols[64] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+    'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+};
+
 namespace EN
 {
     #if defined WIN32 || defined _WIN64
@@ -136,13 +143,44 @@ namespace EN
 	std::vector<std::string> Split(const std::string& stringToSplit, const std::string& splitterString = " ");
 
 	/*!
-		Find all substring occurrences and put theirs positions inside result vector
-		\param[in] stringToFindIn string to split
-		\param[in] splitterString the string that divides the string. Default set to space(" ")
-		\return Vector of strings
-	*/ 
-    std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& splitterString);
+        \brief Split a string into a pair of two strings, it will be divided at the first location of the splitterString
 
+        If the divisor string was not found, then the original string will be in the first, and an empty string in the second
+
+		\param[in] stringToSplit string to split
+		\param[in] splitterString the string that divides the string. Default set to space(" ")
+		\return Pair of strings
+	*/ 
+	std::pair<std::string, std::string> SplitUpToTheFirst(const std::string& stringToSplit, const std::string& splitterString = " ");
+
+	/*!
+		Find all substring occurrences and put theirs positions inside result vector
+		\param[in] stringToFindIn string to find in it
+		\param[in] stringToFind the string to be found
+		\return Vector of positions
+	*/ 
+    std::vector<std::size_t> FindAllOccurrences(const std::string& stringToFindIn, const std::string& stringToFind);
+	
+    /*!
+		Replace all substring occurrences and return new string
+		\param[in] stringToReplaceIn string to replace in it
+        \param[in] stringToDelete string to replace in it
+		\param[in] stringToReplace the string to be replaced
+		\return New string 
+	*/ 
+    std::string Replace(const std::string& stringToReplaceIn, const std::string& stringToDelete, const std::string& stringToReplace);
+
+    /*!
+        This function delete all spaces and tabs from line beggining and ending
+
+        \param[in] str The string to trim
+        \param[in] isFromLeft The function will delete all spaces from left
+        \param[in] isFromRight The function will delete all spaces from right
+
+        \return Returns a trimmed string
+    */
+    std::string TrimString(const std::string& str, bool isFromLeft = true, bool isFromRight = true);
+    
 	/*! 
 		\brief The function gets socket and filename and send file to socket. 
 		\param[in] fileSendSocket the socket for sending files
@@ -163,6 +201,13 @@ namespace EN
 	bool SendFile(EN_SOCKET fileSendSocket, std::string filePath, std::atomic_bool& isStop, std::atomic_int& microsecondsBetweenSendingChunks,
 		uint64_t previouslySendedSize, EN_FileTransmissionStatus& fileTransmissionStatus);
 
+    /*!
+        \brief The function that removes the path from the full path to file
+        \param[in] fileName file name with path
+        \return file name without path
+    */
+    std::string GetFileNameFromFullFilePath(std::string fileName);
+
 	/*!
 		\brief This function will wait incoming file.
 
@@ -176,10 +221,13 @@ namespace EN
         it is necessary to stop sending the file on the sending side and you need to do this before calling the file reception stop
 		\param[in] fileTransmissionStatus A link to an object to track the file transfer status. After each iteration of the dispatch loop, all internal variables of the class are updated. I
         If desired, you can set a function in it that will be called once a second
-        
+        \param[in] fileNameFunction A function for setting the name of the received file by the user. 
+        The function takes one parameter with the path to the file being transmitted on the transmitting side and should return the new file name. 
+        By default, the function removes the path to the file and returns its name
+
 		\return Returns true in case of file transmition success, false otherwise
 	*/
-	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus);
+	bool RecvFile(EN_SOCKET FileSendSocket, std::atomic_bool& IsStop, EN_FileTransmissionStatus& fileTransmissionStatus, std::function<std::string(std::string)> fileNameFunction = GetFileNameFromFullFilePath);
 
 	/*!
 		\brief This function will forward file from one socket to another.
@@ -212,7 +260,9 @@ namespace EN
 	/// Returns the number of processor cores
 	int GetCPUCores();
 
-    
+    /// Get the directory of the running binary file. Last symbol of string on windows is "\" and "/" on linux
+    std::string GetRunningDirectory();
+
     /// Return last socket error code 
     int GetSocketErrorCode();
 
@@ -315,7 +365,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToLong(const std::string& str, long int& res);
+    bool StringToInt(const std::string& str, long int& res);
 
     /**
         \brief A function for converting a string to a long long int.
@@ -325,7 +375,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToLongLong(const std::string& str, long long int& res);
+    bool StringToInt(const std::string& str, long long int& res);
 
     /**
         \brief A function for converting a string to a unsigned long int.
@@ -335,7 +385,7 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToUnsignedLong(const std::string& str, unsigned long int& res);
+    bool StringToInt(const std::string& str, unsigned long int& res);
 
     /**
         \brief A function for converting a string to a unsigned long long int.
@@ -345,7 +395,16 @@ namespace EN
 
         \return Returns true if the conversion succeeded and false if it failed
     */ 
-    bool StringToUnsignedLongLong(const std::string& str, unsigned long long int& res);
+    bool StringToInt(const std::string& str, unsigned long long int& res);
+
+    /// Function to convert regular string symbol to base 64 symbol
+    unsigned char B64ConvertSymbol(unsigned char c);
+
+    /// Convert regular base256 string to base64 string
+    std::string RegularStringToBase64String(const std::string& str);
+
+    /// Convert base64 string to regular base256 string
+    std::string Base64StringToRegularString(const std::string& str);
 
 	/**
         \brief Crossplatform function for program suspension
