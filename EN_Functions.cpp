@@ -485,7 +485,7 @@ namespace EN
 		uint64_t fileSize = sendingFile.tellg();
 
 		// Send file name, previosly sended size and full file size
-		if (!EN::Default_TCP_Send(fileSendSocket, fileName + " " + std::to_string(previouslySendedSize) + " "+ std::to_string(fileSize - previouslySendedSize)))
+		if (!EN::Default_TCP_Send(fileSendSocket, fileName + " " + std::to_string(previouslySendedSize) + " " + std::to_string(fileSize - previouslySendedSize)))
 		{
 			fileTransmissionStatus.SetIsTransmissionSucceed(false);
 			fileTransmissionStatus.SetIsTransmissionEnded(true);
@@ -643,7 +643,7 @@ namespace EN
 		uint64_t fileSize;
 		uint64_t previoslySendedBytes;
 
-		if (!StringToInt(fileInfos[1], previoslySendedBytes) || !StringToInt(fileInfos[2], fileSize))
+		if (fileInfos.size() != 3 || !StringToInt(fileInfos[1], previoslySendedBytes) || !StringToInt(fileInfos[2], fileSize))
 		{
 			EN::Default_TCP_Send(FileSendSocket, "bad");
 			LOG(Error, "Failed to received file size. Message \"" + fileInfo + "\" not corrected");
@@ -758,13 +758,26 @@ namespace EN
 		std::string newFileName = fileName;
 		if (IsFileExist(fileName))
 		{
-			std::string name = fileName.substr(0, fileName.rfind("."));
-			std::string type = fileName.substr(fileName.rfind("."));
+			std::size_t dotPos = fileName.rfind(".");
+			std::string name;
+			std::string type;
+
+			if (dotPos != (std::size_t)-1)
+			{
+				name = fileName.substr(0, dotPos);
+				type = fileName.substr(dotPos);
+			}
+			else
+			{
+				name = fileName;
+			}
+
 			int i = 1;
 			while (IsFileExist(name + " (" + std::to_string(i) + ")" + type))
 				i += 1;
 			newFileName = name + " (" + std::to_string(i) + ")" + type;
 		}
+
 		rename((fileName + ".tmp").c_str(), newFileName.c_str());
 
 		delete[] messageBuf;
@@ -1226,7 +1239,7 @@ namespace EN
 
 	bool IsCanBeDigit(const std::string& str)
     {
-        if ((str[0] < '0' && str[0] != '-') || str[0] > '9')
+        if (str.empty() || ((str[0] < '0' && str[0] != '-') || str[0] > '9'))
 		    return false;
 
         for (char it : str)
