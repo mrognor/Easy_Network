@@ -46,6 +46,7 @@ release: CXXFLAGS += -D NDEBUG -O3
 release: all
 
 all: bin/TCP_Chat_Server$(FILEEXT) \
+	bin/TCP_Chat_Server_SC$(FILEEXT) \
 	bin/TCP_Chat_Client$(FILEEXT) \
 	bin/UDP_Chat_Server$(FILEEXT) \
 	bin/UDP_Chat_Client$(FILEEXT) \
@@ -74,6 +75,10 @@ bin/TCP_Chat_Server$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Server.cpp
 	
 bin/TCP_Chat_Client$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Client.cpp
 	g++ $(CXXFLAGS) Examples/TCP_Chat_Client.cpp -I. -Lbin -lEasyNetwork -o bin/TCP_Chat_Client$(FILEEXT) $(LDFLAGS)
+
+# TCP_Chat_SC server
+bin/TCP_Chat_Server_SC$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Server_SC.cpp
+	g++ $(CXXFLAGS) Examples/TCP_Chat_Server_SC.cpp -I. -Lbin -lEasyNetwork -o bin/TCP_Chat_Server_SC$(FILEEXT) $(LDFLAGS)
 
 # UDP_Chat
 bin/UDP_Chat_Server$(FILEEXT): bin/libEasyNetwork.a Examples/UDP_Chat_Server.cpp

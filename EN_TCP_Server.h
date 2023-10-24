@@ -43,17 +43,8 @@ namespace EN
 		// Mutex to prevent errors while shutdown before run
 		std::mutex ShutdownMutex;
 
-		// Thread cross walk to synchronize access to ClientSockets between different threads
-		EN_ThreadCrossWalk CrossWalk;
-
 		// A method that processes messages from clients. Sends a message to the function ClientMessageHandler().
-		void ClientHandler(EN_SOCKET clientSocket);
-
-		// A pointer to a function for sending messages. Allows you to use custom network protocols. Send message to socket
-		bool (*TCP_Send)(EN_SOCKET sock, const std::string& message) = EN::Default_TCP_Send;
-		
-		// A pointer to a function for recv messages. Allows you to use custom network protocols. Recv message from socket
-		bool (*TCP_Recv)(EN_SOCKET sock, std::string& message) = EN::Default_TCP_Recv;
+		virtual void ClientHandler(EN_SOCKET clientSocket);
 	protected:
 
 		/// Server port. Default set to 1111
@@ -77,6 +68,15 @@ namespace EN
 		*/
 		std::set<EN_SOCKET> ClientSockets;
 		
+		// A pointer to a function for sending messages. Allows you to use custom network protocols. Send message to socket
+		bool (*TCP_Send)(EN_SOCKET sock, const std::string& message) = EN::Default_TCP_Send;
+		
+		// A pointer to a function for recv messages. Allows you to use custom network protocols. Recv message from socket
+		bool (*TCP_Recv)(EN_SOCKET sock, std::string& message) = EN::Default_TCP_Recv;
+
+		// Thread cross walk to synchronize access to ClientSockets between different threads
+		EN_ThreadCrossWalk CrossWalk;
+
 		/**
 			\brief The method that is executed when the client connects to the server
 
@@ -101,10 +101,10 @@ namespace EN
 		EN_TCP_Server();
 		
 		/// Port getter
-		int GetPort();
+		virtual int GetPort();
 
 		/// Ip getter
-		std::string GetIpAddr();
+		virtual std::string GetIpAddr();
 
 		/**
 			\brief The function returns the number of connected devices
@@ -113,7 +113,7 @@ namespace EN
 			This is necessary because you can write logic depending on the number of connected clients, 
 			and after receiving the number, one of the clients will disconnect.
 		*/
-		size_t GetConnectionsCount();
+		virtual size_t GetConnectionsCount();
 
 		/**
 			\brief Method to start server. Blocking call. Returns control to the thread after the last client is disconnected
@@ -123,14 +123,14 @@ namespace EN
 			For Windows, errors go through WSAGetLastError, for Linux, errors go through errno.  
 			All errors with the description are duplicated in the log system.
 		*/
-		void Run();
+		virtual void Run();
 
 		/**
 			\brief Method that disconnects the client from the server
 
 			\param[in] clientSocket The number of the client to be disconnect
 		*/
-		void DisconnectClient(EN_SOCKET clientSocket);
+		virtual void DisconnectClient(EN_SOCKET clientSocket);
 
 		/**
 			\brief Method that stops the server
@@ -138,10 +138,10 @@ namespace EN
 			If it is called before the Run method, then the next Run method will not start the server.
 			This method will not wait for all clients to be disconnected. If you need to wait for all clients to finish, use the WaitWhileAllClientsDisconnect method
 		*/
-		void Shutdown();
+		virtual void Shutdown();
 		
 		/// Method that disconnect all connected clients
-		void DisconnectAllConnectedClients();
+		virtual void DisconnectAllConnectedClients();
 
 		/**
 			\brief Method that send message to client
@@ -151,17 +151,17 @@ namespace EN
 
 			\return Returns true in case of success, false if it was disconnection  
 		*/
-		bool SendToClient(EN_SOCKET clientSocket, std::string message);
+		virtual bool SendToClient(EN_SOCKET clientSocket, std::string message);
 
 		/**
 			\brief Method that send message to all connected clients
 
 			\param[in] message The message to be sent to the client 
 		*/
-		void MulticastSend(std::string message);
+		virtual void MulticastSend(std::string message);
 
 		/// Method to wait while all clients disconnect
-		void WaitWhileAllClientsDisconnect();
+		virtual void WaitWhileAllClientsDisconnect();
 
         /**
 			\brief Method that wait new incoming message from client
@@ -174,7 +174,7 @@ namespace EN
 			\param[in] message The string to store incoming message
             \return Returns true in case of success, false if it was disconnection 
 		*/
-        bool WaitMessage(EN_SOCKET clientSocket, std::string& message);
+        virtual bool WaitMessage(EN_SOCKET clientSocket, std::string& message);
 
 		/**
 			\brief Function to lock client sockets list
@@ -183,7 +183,7 @@ namespace EN
 			It will not allow other threads to change the list, while the ability to send messages and read them from 
 			the list items remains. Equals ThreadCrossWalk.CarStartCrossRoad();
 		 */
-		void LockClientSockets();
+		virtual void LockClientSockets();
 
 		/**
 			\brief Function to unlock client sockets list
@@ -192,7 +192,7 @@ namespace EN
 			It will not allow other threads to change the list, while the ability to send messages and read them from 
 			the list items remains. Equals ThreadCrossWalk.CarStartCrossRoad();
 		 */
-		void UnlockClientSockets();
+		virtual void UnlockClientSockets();
 		
         /**
            \brief The method sets options for accept socket.
@@ -203,7 +203,7 @@ namespace EN
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void AddAcceptSocketOption(int level, int optionName, int optionValue);
+        virtual void AddAcceptSocketOption(int level, int optionName, int optionValue);
 
         /**
             \brief The method sets options for accept socket.
@@ -213,7 +213,7 @@ namespace EN
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects
         */
-        void AddAcceptSocketOption(PredefinedSocketOptions socketOptions);
+        virtual void AddAcceptSocketOption(PredefinedSocketOptions socketOptions);
 
         /**
            \brief The method sets options for all sockets that will connect after its call
@@ -226,7 +226,7 @@ namespace EN
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void AddOnSocketCreateOption(int level, int optionName, int optionValue);
+        virtual void AddOnSocketCreateOption(int level, int optionName, int optionValue);
 
         /**
            \brief The method sets options for all sockets that will connect after its call
@@ -238,7 +238,7 @@ namespace EN
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects 
         */
-        void AddOnSocketCreateOption(PredefinedSocketOptions socketOptions);
+        virtual void AddOnSocketCreateOption(PredefinedSocketOptions socketOptions);
 
         /**
            \brief The method sets options for client socket
@@ -249,7 +249,7 @@ namespace EN
             The optionName parameter must be a socket option defined within the specified level, or behavior is undefined.
 			\param[in] optionValue The value for the requested option is specified.
         */
-        void SetSocketOption(EN_SOCKET clientSocket, int level, int optionName, int optionValue);
+        virtual void SetSocketOption(EN_SOCKET clientSocket, int level, int optionName, int optionValue);
 
         /**
             \brief The method sets options for client socket
@@ -259,7 +259,7 @@ namespace EN
             The list of all predefined structures is in EN_SocketOptions.h. 
             You can create your own sets of options using define or by creating structure objects
         */
-        void SetSocketOption(EN_SOCKET clientSocket, PredefinedSocketOptions socketOptions);
+        virtual void SetSocketOption(EN_SOCKET clientSocket, PredefinedSocketOptions socketOptions);
 
         /**
            \brief The method sets custom send function. Allow you use your own protocol
@@ -273,7 +273,7 @@ namespace EN
 			but if you send one message to 2 send calls, then if 2 threads write to the same socket, 
 			then the data of two different messages may be mixed and you will receive errors
         */
-		void SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&));
+		virtual void SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&));
 
         /**
            \brief The method sets custom recv function. Allow you use your own protocol
@@ -282,7 +282,7 @@ namespace EN
 			The function accepts the socket of the connected client, where you want to recv from 
 			the message and the message itself
         */
-		void SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&));
+		virtual void SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&));
 
 		virtual ~EN_TCP_Server();
 	};
