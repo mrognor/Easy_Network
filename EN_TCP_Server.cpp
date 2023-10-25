@@ -249,7 +249,7 @@ namespace EN
 		if (resCode == -2)
 		{
 			LOG(LogLevels::Warning, "You are trying to send to non client socket. Socket descriptor: " + std::to_string(clientSocket));
-            LOG(LogLevels::Hint, "Check that you are dont forget to lock sockets" + std::to_string(clientSocket));
+            LOG(LogLevels::Hint, "Check that you are dont forget to lock sockets. This means that no one is already connected to the called socket" + std::to_string(clientSocket));
             return false;
 		}
         

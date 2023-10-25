@@ -80,12 +80,17 @@ namespace EN
 		/**
 			\brief The method that is executed when the client connects to the server
 
+			\param[in] clientSocket Socket of the connected client
+
 			\warning Must be defined by the user
 		*/
 		virtual void OnClientConnected(EN_SOCKET clientSocket) = 0;
 
 		/**
 			\brief Method that processes incoming messages
+
+			\param[in] clientSocket The socket of the client from which the message came
+			\param[in] message Message from the client
 
 			\warning Must be defined by the user
 		*/
@@ -94,6 +99,8 @@ namespace EN
 		/**
 			\brief Method that runs after the client is disconnected
 			
+			\param[in] clientSocket Socket of the disconnected client
+
 			\warning Must be defined by the user
 		*/
 		virtual void OnClientDisconnect(EN_SOCKET clientSocket) = 0;
@@ -128,7 +135,7 @@ namespace EN
 		/**
 			\brief Method that disconnects the client from the server
 
-			\param[in] clientSocket The number of the client to be disconnect
+			\param[in] clientSocket Client socket to be disconnected
 		*/
 		virtual void DisconnectClient(EN_SOCKET clientSocket);
 

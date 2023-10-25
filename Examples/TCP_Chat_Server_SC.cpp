@@ -1,77 +1,6 @@
-#pragma once
+#include "../EN_TCP_Server_SC.h"
 
-#include "../EN_TCP_Server.h"
-
-namespace EN
-{
-    template <class T>
-    struct TCP_SessionContext
-    {
-        T data;
-
-        // A pointer to a function for sending messages. Allows you to use custom network protocols. Send message to socket
-		bool (*TCP_Send)(EN_SOCKET sock, const std::string& message) = EN::Default_TCP_Send;
-		
-		// A pointer to a function for recv messages. Allows you to use custom network protocols. Recv message from socket
-		bool (*TCP_Recv)(EN_SOCKET sock, std::string& message) = EN::Default_TCP_Recv;
-
-        T* operator-> ()
-        {
-            return &data;
-        }
-    };
-
-    template <class T>
-    class EN_TCP_Server_SC : public EN::EN_TCP_Server
-    {
-    private:
-		virtual void OnClientConnected(EN_SOCKET clientSocket) {};
-
-		virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message) {};
-
-		virtual void OnClientDisconnect(EN_SOCKET clientSocket) {};
-    
-    protected:
-        TCP_SessionContext<T> SessionContext;
-
-    	virtual void OnClientConnected(EN_SOCKET clientSocket, TCP_SessionContext<T>& sessionContext) = 0;
-
-		virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message, TCP_SessionContext<T>& sessionContext) = 0;
-
-		virtual void OnClientDisconnect(EN_SOCKET clientSocket, TCP_SessionContext<T>& sessionContext) = 0;
-
-    public:
-        void ClientHandler(EN_SOCKET clientSocket)
-        {
-            OnClientConnected(clientSocket, SessionContext);
-
-            std::string message;
-            bool ConnectionStatus;
-
-            while (true)
-            {
-                ConnectionStatus = TCP_Recv(clientSocket, message);
-
-                if (ConnectionStatus == false)
-                {
-                    OnClientDisconnect(clientSocket, SessionContext);
-                    break;
-                }
-
-                ClientMessageHandler(clientSocket, message, SessionContext);
-            }
-
-            CloseSocket(clientSocket);
-
-            CrossWalk.PedestrianStartCrossRoad();
-
-            ClientSockets.erase(clientSocket);
-
-            CrossWalk.PedestrianStopCrossRoad();
-        }
-    };
-}
-
+// Class to save session context.
 struct Session
 {
     int counter = 0;
@@ -80,26 +9,59 @@ struct Session
 class TCP_Server_SC : public EN::EN_TCP_Server_SC<Session>
 {
 protected:
-    virtual void OnClientConnected(EN_SOCKET clientSocket, EN::TCP_SessionContext<Session>& sessionContext)
+    virtual void OnClientConnected(EN_SOCKET clientSocket, EN::TCP_SessionContext_SC<Session>& sessionContext)
     {
-        ++sessionContext->counter;
+		LOG(EN::LogLevels::Info, "Client connected! Socket descriptor: " + std::to_string(clientSocket));
+		SendToClient(clientSocket, "Welcome. You are connected to server.");
     }
 
-    virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message, EN::TCP_SessionContext<Session>& sessionContext)
+    virtual void ClientMessageHandler(EN_SOCKET clientSocket, std::string message, EN::TCP_SessionContext_SC<Session>& sessionContext)
     {
-        std::cout << ++sessionContext->counter << std::endl;
+		++sessionContext->counter;
+
+		// Important. This function is run in a separate thread. 
+		// If you want to write data to class variables, you should use mutexes or other algorithms for thread-safe code.
+		LOG(EN::LogLevels::Info, "From: " + std::to_string(clientSocket) + " Message: " + message);
+
+		// Disconnect client
+		if (message == "d")
+			DisconnectClient(clientSocket); 
+
+		// Shutdown server
+		if (message == "F")
+		{
+			LOG(EN::LogLevels::Info, "Server was shutdown by client. Enter f to end programm or r to restart server");
+			Shutdown(); 
+		}
+
+		// Send incoming message to all different clients
+		// Blocking the client sockets list is necessary because while the cycle is going through, 
+		// one of the clients may disconnect and UB will occur. If the client disconnects during the lock, 
+		// its socket will not be released until the unlock occurs, and the Send method for this client returns false
+		LockClientSockets();
+		for (EN_SOCKET sock : ClientSockets)
+		{
+			if (sock != clientSocket)
+				SendToClient(sock, message);
+		}
+		UnlockClientSockets();
     }
 
-    virtual void OnClientDisconnect(EN_SOCKET clientSocket, EN::TCP_SessionContext<Session>& sessionContext)
+    virtual void OnClientDisconnect(EN_SOCKET clientSocket, EN::TCP_SessionContext_SC<Session>& sessionContext)
     {
-
+		LOG(EN::LogLevels::Info, "Client disconnected! Socket descriptor: " + std::to_string(clientSocket) + ". Number of messages received: " + std::to_string(sessionContext->counter));
     }
+
+public:
+	TCP_Server_SC()
+	{
+		// IpAddress = "192.168.1.64"; // Default set to localhost. Read description for this variable before use it.
+		// Port = <put int here> to set port. Default port is 1111
+	}
 };
 
 int main()
 {
-    EN::IsCanBeDigit("");
-    
 	TCP_Server_SC A;
 start:
 
@@ -133,8 +95,6 @@ start:
 			th.join();
 			goto start;
 		}
-
-		A.MulticastSend(message);
 	}
 
 	th.join();
