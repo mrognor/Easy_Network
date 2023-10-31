@@ -279,6 +279,7 @@ namespace EN
 			This is necessary because the send function is thread-safe, 
 			but if you send one message to 2 send calls, then if 2 threads write to the same socket, 
 			then the data of two different messages may be mixed and you will receive errors
+			\warning Use this method only while the server is down
         */
 		virtual void SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&));
 
@@ -288,6 +289,7 @@ namespace EN
             \param[in] TCPRecvFunction This parameter is a pointer to a function for receiving messages from the socket. 
 			The function accepts the socket of the connected client, where you want to recv from 
 			the message and the message itself
+			\warning Use this method only while the server is down
         */
 		virtual void SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&));
 

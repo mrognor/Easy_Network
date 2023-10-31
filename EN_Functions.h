@@ -444,7 +444,7 @@ namespace EN
     template <class T>
     int64_t GetCurrentSecondFraction()
     {
-        std::chrono::time_point<std::chrono::system_clock> now = std::chrono::high_resolution_clock::now();
+        auto now = std::chrono::high_resolution_clock::now();
         auto sec = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
         auto t = std::chrono::duration_cast<T>(now.time_since_epoch()).count();
         return t % sec;

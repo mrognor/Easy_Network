@@ -350,12 +350,22 @@ namespace EN
 
 	void EN_TCP_Server::SetTCPSendFunction(bool (*TCPSendFunction)(EN_SOCKET, const std::string&))
 	{
-		TCP_Send = TCPSendFunction;
+		ShutdownMutex.lock();
+		if (ServerListenSocket == INVALID_SOCKET)
+			TCP_Send = TCPSendFunction;
+		else
+			LOG(LogLevels::Error, "Try to set TCP send function while server alredy running");
+		ShutdownMutex.unlock();
 	}
 
 	void EN_TCP_Server::SetTCPRecvFunction(bool (*TCPRecvFunction)(EN_SOCKET, std::string&))
 	{
-		TCP_Recv = TCPRecvFunction;
+		ShutdownMutex.lock();
+		if (ServerListenSocket == INVALID_SOCKET)
+			TCP_Recv = TCPRecvFunction;
+		else
+			LOG(LogLevels::Error, "Try to set TCP send function while server alredy running");
+		ShutdownMutex.unlock();
 	}
 
 	EN_TCP_Server::~EN_TCP_Server() {}

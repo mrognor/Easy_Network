@@ -26,9 +26,11 @@ TARGETS = bin/EN_Functions.o \
 	bin/EN_FT_Client.o \
 	bin/EN_ThreadBarrier.o \
 	bin/$(EN_SUBPROCESS).o \
-	bin/EN_EXPERIMENTAL_HTTP_Server.o # bin/EN_RAU_Server.o bin/EN_RAU_Client.o
+	bin/EN_EXPERIMENTAL_HTTP_Server.o \
+	EN_TCP_Server_SC.h \
+	EN_TCP_Server_SCUP.h
 
-
+# bin/EN_RAU_Server.o bin/EN_RAU_Client.o 
 
 # Check native atomic_int64 support
 ifneq ($(shell test -e ./scripts/CheckAtomicInt64Support.test && echo -n yes), yes)
@@ -47,6 +49,7 @@ release: all
 
 all: bin/TCP_Chat_Server$(FILEEXT) \
 	bin/TCP_Chat_Server_SC$(FILEEXT) \
+	bin/TCP_Chat_Server_SCUP$(FILEEXT) \
 	bin/TCP_Chat_Client$(FILEEXT) \
 	bin/UDP_Chat_Server$(FILEEXT) \
 	bin/UDP_Chat_Client$(FILEEXT) \
@@ -56,7 +59,7 @@ all: bin/TCP_Chat_Server$(FILEEXT) \
 	bin/HTTP_Server$(FILEEXT) \
 	bin/FT_Chat_Server$(FILEEXT) \
 	bin/FT_Chat_Client$(FILEEXT) \
-	bin/HTTP_Server$(FILEEXT)
+	bin/HTTP_Server$(FILEEXT) \
 # bin/RAU_Chat_Server$(FILEEXT) bin/RAU_Chat_Client$(FILEEXT)
 
 # HTTP_Server
@@ -79,6 +82,10 @@ bin/TCP_Chat_Client$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Client.cpp
 # TCP_Chat_SC server
 bin/TCP_Chat_Server_SC$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Server_SC.cpp
 	g++ $(CXXFLAGS) Examples/TCP_Chat_Server_SC.cpp -I. -Lbin -lEasyNetwork -o bin/TCP_Chat_Server_SC$(FILEEXT) $(LDFLAGS)
+
+# TCP_Chat_Server_SCUP server
+bin/TCP_Chat_Server_SCUP$(FILEEXT): bin/libEasyNetwork.a Examples/TCP_Chat_Server_SCUP.cpp
+	g++ $(CXXFLAGS) Examples/TCP_Chat_Server_SCUP.cpp -I. -Lbin -lEasyNetwork -o bin/TCP_Chat_Server_SC_CUP$(FILEEXT) $(LDFLAGS)
 
 # UDP_Chat
 bin/UDP_Chat_Server$(FILEEXT): bin/libEasyNetwork.a Examples/UDP_Chat_Server.cpp
