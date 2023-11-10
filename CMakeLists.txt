@@ -35,6 +35,15 @@ target_include_directories(TCP_Chat_Client PRIVATE ${CMAKE_SOURCE_DIR}/)
 
 target_link_libraries(TCP_Chat_Client EasyNetwork ${StandartIncludeLibraries})
 
+# TCP_SC chat server binary
+project (TCP_Chat_Server_SC)
+
+add_executable(TCP_Chat_Server_SC Examples/TCP_Chat_Server_SC.cpp)
+
+target_include_directories(TCP_Chat_Server_SC PRIVATE ${CMAKE_SOURCE_DIR}/)
+
+target_link_libraries(TCP_Chat_Server_SC EasyNetwork ${StandartIncludeLibraries})
+
 # UDP chat server binary
 project (UDP_Chat_Server)
 
@@ -122,7 +131,7 @@ project(EasyNetwork)
 set(LibHeaders EN_Functions.h
 EN_TCP_Client.h EN_BackgroundTimer.h EN_FileTransmissionStatus.h
 EN_TCP_Server.h EN_UDP_Client.h EN_UDP_Server.h EN_ParallelFor.h EN_SocketOptions.h EN_ThreadGate.h EN_Logger.h 
-EN_ThreadCrossWalk.h EN_FT_Server.h EN_FT_Client.h EN_ThreadBarrier.h)
+EN_ThreadCrossWalk.h EN_FT_Server.h EN_FT_Client.h EN_ThreadBarrier.h EN_TCP_Server_SC.h)
 
 set(LibSources EN_Functions.cpp
 EN_TCP_Client.cpp EN_BackgroundTimer.cpp EN_FileTransmissionStatus.cpp
