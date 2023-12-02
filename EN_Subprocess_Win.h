@@ -9,6 +9,8 @@
 #include <winioctl.h>
 #include <string>
 
+#include "EN_Atomic_Int64.h"
+
 namespace EN
 {
     class Subprocess
@@ -19,7 +21,7 @@ namespace EN
         PROCESS_INFORMATION ProcInfo;
         std::queue<std::string> MessagesQueue;
         std::thread Th;
-        std::atomic_uint64_t DataCounter;
+        EN::EN_Atomic_Uint64_T DataCounter;
         std::condition_variable Cv;
         std::mutex Mtx;
         std::atomic_bool IsProcessEnded;

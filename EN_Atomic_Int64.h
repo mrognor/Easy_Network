@@ -13,6 +13,9 @@ namespace EN
     public:
         void store(int64_t value);
         const int64_t load();
+
+        void fetch_add(int64_t value);
+        void fetch_sub(int64_t value); 
     };
 
     class EN_Atomic_Uint64_T
@@ -23,5 +26,8 @@ namespace EN
     public:
         void store(uint64_t value);
         uint64_t load();
+
+        void fetch_add(uint64_t value);
+        void fetch_sub(uint64_t value); 
     };
 }
