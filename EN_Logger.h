@@ -37,7 +37,7 @@ namespace EN
     };
 
     /**
-        \brief Maximum logging level
+        \brief Enabled logging levels
 
         Using this variable, you can disable the output of unnecessary messages.
         Use EnableLogLevels functions to turn on only required log levels.
@@ -60,7 +60,7 @@ namespace EN
         The message level will be passed to the LogLevels type parameter. 
         The message itself is passed to the std::string type parameter
         \param [in] logLevelsToEnable Optional parametr for fine-tuning the required logging levels.
-        Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
+        Possible values: EN_LOG_LEVEL_INFO, EN_LOG_LEVEL_HINT, EN_LOG_LEVEL_WARNING, EN_LOG_LEVEL_ERROR.
         Using the logical operator |, you can combine the necessary logging levels.
     */
     void SetLogFunc(void (*logFunc)(LogLevels, std::string), int logLevelsToEnable = (EN_LOG_LEVEL_INFO | EN_LOG_LEVEL_HINT | EN_LOG_LEVEL_WARNING | EN_LOG_LEVEL_ERROR));
@@ -69,7 +69,7 @@ namespace EN
         \brief Enable log levels.
 
         \param [in] logLevelsToEnable Parametr for fine-tuning the required logging levels.
-        Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
+        Possible values: EN_LOG_LEVEL_INFO, EN_LOG_LEVEL_HINT, EN_LOG_LEVEL_WARNING, EN_LOG_LEVEL_ERROR.
         Using the logical operator |, you can combine the necessary logging levels.
     */
     void EnableLogLevels(int logLevelsToEnable);
@@ -78,7 +78,7 @@ namespace EN
         \brief Enable file log levels.
 
         \param [in] logLevelsToEnable Parametr for fine-tuning the required logging levels.
-        Possible values: ENABLE_LOG_LEVEL_INFO, ENABLE_LOG_LEVEL_HINT, ENABLE_LOG_LEVEL_WARNING, ENABLE_LOG_LEVEL_ERROR.
+        Possible values: EN_LOG_LEVEL_INFO, EN_LOG_LEVEL_HINT, EN_LOG_LEVEL_WARNING, EN_LOG_LEVEL_ERROR.
         Using the logical operator |, you can combine the necessary logging levels.
         \param [in] fileName The name of the file to record this logging level
         \param [in] openMode Optional parametr to open log files. Works like standart fstream open. By default set to std::ios_base::in
