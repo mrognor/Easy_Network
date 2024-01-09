@@ -87,6 +87,7 @@ namespace EN
 
     protected:
         /// Variable to store session context data
+        /// \todo Переменная одна для всех потоков, а это не правильно
         TCP_SessionContext_SC<T> SessionContext;
 
 		/**
