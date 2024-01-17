@@ -104,9 +104,10 @@ namespace EN
             else
                 requestFileName = splittedFileRequest[0].substr(1);
 
+            // Checking whether it is possible to send a file to a GET request
             if (EN::FindAllOccurrences(requestFileName, ".").size() != 1 && splittedFileRequest[0] != "/")
             {
-                HTTPRequestHandler(clientSocket, parsedRequestMap, requestHeader);
+                HTTPRequestHandler(clientSocket, parsedRequestMap, requestHeader, "");
                 return;
             }
 
@@ -116,6 +117,7 @@ namespace EN
             std::string requestFile;
             std::string responce;
             
+            // Checking that the requested files are allowed to be given away
             if (splittedFileRequest[0] != "/")
             {
                 if (WebFilesPath == "")
@@ -191,12 +193,29 @@ namespace EN
             }
 
             SendToClient(clientSocket, responce);
-        }
-        else
-        {
-            HTTPRequestHandler(clientSocket, parsedRequestMap, requestHeader);
             return;
         }
+
+        if (parsedRequestHeaderVec[0] == "POST")
+        {
+            auto requestPole = parsedRequestMap.find("Content-Length");
+            if (requestPole != parsedRequestMap.end())
+            {
+                unsigned long long contentLength;
+                if (StringToInt(requestPole->second, contentLength) && contentLength < GetMaxTcpMessageSize())
+                {
+                    char* content = new char[contentLength];
+                    recv(clientSocket, content, contentLength, MSG_WAITALL);
+
+                    HTTPRequestHandler(clientSocket, parsedRequestMap, requestHeader, std::string(content, contentLength));
+                    delete[] content;
+                    return;
+                }
+            }
+        }
+
+        // If the server does not know what to do with the message, it will be passed on HTTPRequestHandler
+        HTTPRequestHandler(clientSocket, parsedRequestMap, requestHeader, "");
     }
 
     void EN_HTTP_Server::SetWebFilesPath(std::string path)

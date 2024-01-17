@@ -36,6 +36,6 @@ namespace EN
         virtual void GetUrlParamsHandler(const std::string& urlParams) = 0;
 
         // Function to handle requests from client
-        virtual void HTTPRequestHandler(EN_SOCKET clientSocket, std::map<std::string, std::string> parsedRequestMap, std::string requestHeader) = 0;
+        virtual void HTTPRequestHandler(EN_SOCKET clientSocket, std::map<std::string, std::string> parsedRequestMap, std::string requestHeader, std::string requestBody) = 0;
     };
 }

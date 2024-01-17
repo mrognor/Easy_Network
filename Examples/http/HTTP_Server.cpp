@@ -6,7 +6,11 @@ class MyHttpServer : public EN::EN_HTTP_Server
 	void GetUrlParamsHandler(const std::string& urlParams) override {}
 
 	// Gets post or get requests
-    void HTTPRequestHandler(EN_SOCKET clientSocket, std::map<std::string, std::string> parsedRequestMap, std::string requestHeader) {}
+    void HTTPRequestHandler(EN_SOCKET clientSocket, std::map<std::string, std::string> parsedRequestMap, std::string requestHeader, std::string requestBody) 
+	{
+		std::cout << requestBody << std::endl;
+		SendToClient(clientSocket, "HTTP/1.1 200 OK\r\ncontent-length: 0\r\nconnection: closed\r\n\r\n");
+	}
 };
 
 int main()
