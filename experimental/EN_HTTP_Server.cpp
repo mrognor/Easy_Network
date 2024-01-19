@@ -178,7 +178,7 @@ namespace EN
             }
             else
             {
-                if (ReadFile("404.html", requestFile))
+                if (ReadFile(WebFilesPath + "404.html", requestFile))
                 {
                     responce = "HTTP/1.1 404 Not Found\r\n";
                     responce += "content-type: text/html\r\n";

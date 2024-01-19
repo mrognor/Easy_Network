@@ -29,7 +29,7 @@ namespace EN
         void OnClientDisconnect(EN_SOCKET clientSocket);
 
         // Function to set custom path with web server files. By default set to same path as server executable.
-        // Dont forget to specify last path symbol "\" on windows and "/" on linux
+        // Dont forget to specify last path symbol "\\" (only one) on windows and "/" on linux
         void SetWebFilesPath(std::string path);
 
         // Function to handle url params in GET request.
