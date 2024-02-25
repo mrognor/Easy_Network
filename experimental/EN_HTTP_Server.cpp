@@ -130,9 +130,15 @@ namespace EN
             {
                 // Value of Sec-Fetch-Dest field
                 auto findRes = parsedRequestMap.find("Sec-Fetch-Dest");
+
                 std::string requestedDataType;
-                if (findRes != parsedRequestMap.end())
-                    requestedDataType = findRes->second;
+                if (findRes == parsedRequestMap.end())
+                {
+                    findRes = parsedRequestMap.find("sec-fetch-dest");
+                    if (findRes != parsedRequestMap.end())
+                        requestedDataType = findRes->second;
+                }
+                else requestedDataType = findRes->second;
 
                 responce = "HTTP/1.1 200 OK\r\n";
                 if (requestedDataType == "document" || requestedDataType == "")
