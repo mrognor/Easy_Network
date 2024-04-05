@@ -141,6 +141,9 @@ namespace EN
                 else requestedDataType = findRes->second;
 
                 responce = "HTTP/1.1 200 OK\r\n";
+                if (requestedDataType == "empty" || requestedDataType == "")
+                    ReadFile(requestFileName, requestFile);
+                   
                 if (requestedDataType == "document" || requestedDataType == "")
                 {
                     responce += "content-type: text/html\r\n";
