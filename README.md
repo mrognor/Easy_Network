@@ -1,4 +1,7 @@
 \mainpage
+
+# Refactoring and restructuring of the project will begin in H2 2024
+
 # Easy_Network
 Simple C++ network library
 # Library documentation:  
