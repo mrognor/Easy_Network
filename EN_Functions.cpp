@@ -988,7 +988,7 @@ namespace EN
 
 		if (!file.is_open())
 		{
-            LOG(Error, "Couldn't open the file");
+            LOG(Error, "Couldn't open the file! File name: " + fileName);
             return 0;
 		}
 		else
@@ -1015,8 +1015,8 @@ namespace EN
 
 		char path[FILENAME_MAX];
 		std::string procFile = "/proc/" + std::to_string(getpid()) + "/exe";
-		readlink(procFile.c_str(), path, FILENAME_MAX);
-        std::string res = std::string(path);
+		std::size_t len = readlink(procFile.c_str(), path, FILENAME_MAX);
+        std::string res = std::string(path, len);
 		return res.substr(0, res.rfind("/") + 1);
 
         #endif

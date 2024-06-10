@@ -2,24 +2,6 @@
 
 namespace EN
 {
-    bool ReadFile(std::string fileName, std::string& fileString, std::ios_base::openmode openMode)
-    {
-        std::ifstream file(fileName, openMode);
-        
-        if (!file.is_open())
-        {
-            LOG(EN::LogLevels::Warning, "In function ReadFile: failed to open file. File name: " + fileName);
-            return false;
-        }
-
-        std::string tmpFileString;
-        
-        while (std::getline(file, tmpFileString))
-            fileString += tmpFileString + "\n";
-        
-        return true;
-    }
-
     bool HTTP_Recv(EN_SOCKET sock, std::string& message)
     {
         char firstLastChar = 0; 
@@ -72,6 +54,44 @@ namespace EN
         }
     }
 
+    void EN_HTTP_Server::SendResponce(const EN_SOCKET& socket, const std::string& responce, const std::string& fileName)
+    {
+        SendToClient(socket, responce);
+        
+        // Open file
+        std::ifstream file(fileName, std::ios::binary | std::ios_base::ate);
+
+        // Save file size
+        uint64_t fileSize = file.tellg();
+        file.seekg(0);
+
+        // Arrays to read 4kb from file and to save 4 kb to file
+        char fileDataChunk[CHUNK_SIZE];
+
+        // Counter for file reading
+        std::size_t counter = 0;
+
+        // Checking whether the file is larger than the size of the file processing chunks
+        if (fileSize > CHUNK_SIZE)
+        {
+            // Processing the part of the file that is a multiple of the chunk size
+            for(; counter < fileSize - CHUNK_SIZE; counter += CHUNK_SIZE)
+            {
+                // Read chunk from input file
+                file.read(fileDataChunk, CHUNK_SIZE);
+
+                send(socket, fileDataChunk, CHUNK_SIZE, 0);
+            }
+        }
+
+        // Calculating the remaining bytes in the file
+        counter = fileSize - counter;
+
+        // Read last bytes from input file
+        file.read(fileDataChunk, counter);
+        send(socket, fileDataChunk, counter, 0);
+    }
+
     EN_HTTP_Server::EN_HTTP_Server()
     {
         SetTCPSendFunction(HTTP_Send);
@@ -114,7 +134,6 @@ namespace EN
             if (splittedFileRequest.size() > 1)
                 GetUrlParamsHandler(splittedFileRequest[1]);
 
-            std::string requestFile;
             std::string responce;
             
             // Checking that the requested files are allowed to be given away
@@ -126,7 +145,9 @@ namespace EN
                     requestFileName = WebFilesPath + requestFileName;
             }
 
-            if (EN::IsFileExist(requestFileName))
+            uint64_t fileSize = EN::GetFileSize(requestFileName);
+
+            if (fileSize != 0)
             {
                 // Value of Sec-Fetch-Dest field
                 auto findRes = parsedRequestMap.find("Sec-Fetch-Dest");
@@ -141,14 +162,10 @@ namespace EN
                 else requestedDataType = findRes->second;
 
                 responce = "HTTP/1.1 200 OK\r\n";
-                if (requestedDataType == "empty" || requestedDataType == "")
-                    ReadFile(requestFileName, requestFile);
                    
                 if (requestedDataType == "document" || requestedDataType == "")
-                {
                     responce += "content-type: text/html\r\n";
-                    ReadFile(requestFileName, requestFile);
-                }
+
                 if (requestedDataType == "image")
                 {
                     if (requestFileName.substr(requestFileName.rfind(".") + 1) == "svg")
@@ -157,21 +174,15 @@ namespace EN
                         responce += "content-type: image/png\r\n";
                     if (requestFileName.substr(requestFileName.rfind(".") + 1) == "jpg")
                         responce += "content-type: image/jpg\r\n";
-                        
-                    ReadFile(requestFileName, requestFile, std::ios::binary);
                 }
+
                 if (requestedDataType == "style")
-                {
                     if (requestFileName.substr(requestFileName.rfind(".") + 1) == "css")
                         responce += "content-type: text/css\r\n";
-                    ReadFile(requestFileName, requestFile);
-                }
+
                 if (requestedDataType == "script")
-                {
                     if (requestFileName.substr(requestFileName.rfind(".") + 1) == "js")
                         responce += "content-type: text/javascript\r\n";
-                    ReadFile(requestFileName, requestFile);
-                }
 
                 if (requestedDataType == "font")
                 {
@@ -181,19 +192,21 @@ namespace EN
                     if (requestFileName.substr(requestFileName.rfind(".") + 1) == "otf")
                         responce += "content-type: application/x-font-opentype\r\n";
                 }
-                responce += "content-length: " + std::to_string(requestFile.length()) + "\r\n";
+
+                responce += "content-length: " + std::to_string(fileSize) + "\r\n";
                 responce += "connection: closed\r\n\r\n";
-                responce += requestFile;
             }
             else
             {
-                if (ReadFile(WebFilesPath + "404.html", requestFile))
+                fileSize = EN::GetFileSize(WebFilesPath + "404.html");
+                if (fileSize != 0)
                 {
+
                     responce = "HTTP/1.1 404 Not Found\r\n";
                     responce += "content-type: text/html\r\n";
-                    responce += "content-length: " + std::to_string(requestFile.length()) + "\r\n";
+                    responce += "content-length: " + std::to_string(fileSize) + "\r\n";
                     responce += "connection: closed\r\n\r\n";
-                    responce += requestFile;
+                    requestFileName = WebFilesPath + "404.html";
                 }
                 else
                 {
@@ -201,7 +214,7 @@ namespace EN
                 }
             }
 
-            SendToClient(clientSocket, responce);
+            SendResponce(clientSocket, responce, requestFileName);
             return;
         }
 

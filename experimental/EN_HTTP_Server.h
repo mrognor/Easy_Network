@@ -5,10 +5,10 @@
 
 #include <map>
 
+#define CHUNK_SIZE 4096
+
 namespace EN
 {
-    bool ReadFile(std::string fileName, std::string& fileString, std::ios_base::openmode openMode = std::ios_base::in);
-
     bool HTTP_Recv(EN_SOCKET sock, std::string& message);
 
     bool HTTP_Send(EN_SOCKET sock, const std::string& message);
@@ -19,6 +19,10 @@ namespace EN
     {
     private:
         std::string WebFilesPath = "";
+
+        // Function to send responce with file to client
+        void SendResponce(const EN_SOCKET& socket, const std::string& responce, const std::string& fileName);
+
     public:
         EN_HTTP_Server();
 
