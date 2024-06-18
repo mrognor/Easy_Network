@@ -80,7 +80,7 @@ namespace EN
                 // Read chunk from input file
                 file.read(fileDataChunk, CHUNK_SIZE);
 
-                send(socket, fileDataChunk, CHUNK_SIZE, 0);
+                if (send(socket, fileDataChunk, CHUNK_SIZE, 0) != CHUNK_SIZE) return;
             }
         }
 

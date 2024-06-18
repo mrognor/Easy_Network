@@ -26,6 +26,17 @@ namespace EN
 
 	WSA_Init_Cleanup WSA_IC = WSA_Init_Cleanup();
 
+	#else
+
+	LinuxLibraryInitClass::LinuxLibraryInitClass()
+	{
+		// Required to ignor sigpipe then writing to closed pipe
+		struct sigaction sigAct{SIG_IGN};
+		sigaction(SIGPIPE, &sigAct, NULL);
+	}
+
+	LinuxLibraryInitClass Llic = LinuxLibraryInitClass();
+
 	#endif
 
 	std::string GetIpByURL(std::string url)
@@ -103,6 +114,7 @@ namespace EN
 			++counter;
 		}
 
+		CloseSocket(sock);
 		// Send all data in one send call
 		int sendedBytes = send(sock, (char*)msgBuf, messageLengthString.length() + messageLength, 0);
 		delete[] msgBuf;

@@ -1,4 +1,4 @@
-﻿#include "EN_TCP_Client.h"
+﻿#include "../EN_TCP_Client.h"
 
 
 class MyClient : public EN::EN_TCP_Client

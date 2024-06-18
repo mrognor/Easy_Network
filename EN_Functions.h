@@ -14,6 +14,7 @@ typedef SOCKET EN_SOCKET;
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
 typedef int EN_SOCKET;
 
 #endif
@@ -58,6 +59,15 @@ namespace EN
     };
 
     extern WSA_Init_Cleanup WSA_IC;
+
+    #else
+
+    class LinuxLibraryInitClass
+    {
+    public:
+        LinuxLibraryInitClass();
+    };
+    
     #endif
 
 	/// Function for getting an ip address from a url.
