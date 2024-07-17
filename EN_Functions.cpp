@@ -1068,7 +1068,7 @@ namespace EN
 
         if (socketErrorCode  == -1)
             socketErrorCode = errno;
-        return strerror(errno);
+        return strerror(socketErrorCode);
 
         #endif
     }
