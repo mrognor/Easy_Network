@@ -114,7 +114,6 @@ namespace EN
 			++counter;
 		}
 
-		CloseSocket(sock);
 		// Send all data in one send call
 		int sendedBytes = send(sock, (char*)msgBuf, messageLengthString.length() + messageLength, 0);
 		delete[] msgBuf;
