@@ -34,6 +34,7 @@ typedef int EN_SOCKET;
 
 #define EN_TCP_KEEPALIVE EN::PredefinedSocketOptions({SOL_SOCKET, IPPROTO_TCP, IPPROTO_TCP, IPPROTO_TCP}, {SO_KEEPALIVE, TCP_KEEPIDLE, TCP_KEEPCNT, TCP_KEEPINTVL}, {1, 1, 1, 1})
 #define EN_TCP_NODELAY EN::PredefinedSocketOptions({IPPROTO_TCP}, {TCP_NODELAY}, {1})
+#define EN_TCP_REUSEADDR EN::PredefinedSocketOptions({SOL_SOCKET}, {SO_REUSEADDR}, {1})
 
 #include <vector>
 

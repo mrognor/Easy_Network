@@ -94,6 +94,7 @@ namespace EN
 
     EN_HTTP_Server::EN_HTTP_Server()
     {
+        AddAcceptSocketOption(EN_TCP_REUSEADDR);
         SetTCPSendFunction(HTTP_Send);
         SetTCPRecvFunction(HTTP_Recv);
         Port = 80;

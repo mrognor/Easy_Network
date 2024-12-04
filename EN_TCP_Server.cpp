@@ -58,6 +58,9 @@ namespace EN
 			throw (std::runtime_error(std::to_string(GetSocketErrorCode())));
 		}
 
+		for (const auto& it : AcceptSocketOptions)
+            EN::SetSocketOption(ServerListenSocket, it.Level, it.OptionName, it.OptionValue);
+
 		int OperationRes;
 		OperationRes = bind(ServerListenSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress));
 
@@ -78,9 +81,6 @@ namespace EN
 		}
 
 		EN_SOCKET IncomingConnection;
-
-		for (const auto& it : AcceptSocketOptions)
-                    EN::SetSocketOption(ServerListenSocket, it.Level, it.OptionName, it.OptionValue);
 		
 		ShutdownMutex.unlock();
 
